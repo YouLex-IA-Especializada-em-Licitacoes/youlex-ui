@@ -759,9 +759,7 @@ export default function IceCreamHarness() {
             type="button"
             aria-label="Close tab"
             onClick={() => closeChat(c.id)}
-            className={`-my-1 flex size-6 shrink-0 items-center justify-center rounded-[5px] text-ink-3 transition-[opacity,background-color,color] duration-100 hover:bg-hover-2 hover:text-ink ${
-              c.id === activeId ? "opacity-100" : "opacity-0 group-hover/tab:opacity-100"
-            }`}
+            className="-my-1 flex size-6 shrink-0 items-center justify-center rounded-[5px] text-ink-3 transition-[background-color,color] duration-100 hover:bg-hover-2 hover:text-ink"
           >
             <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" aria-hidden><path d="M18 6L6 18M6 6l12 12" /></svg>
           </button>
