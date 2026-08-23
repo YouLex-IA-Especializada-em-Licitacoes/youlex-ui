@@ -22,11 +22,14 @@ type Option = {
 };
 
 /* a supplier as a little logo chip — circular mark + name, no external arrow */
-function VendorChip({ name, logoSrc }: { name: string; logoSrc: string }) {
+function VendorChip({ name, color = "#e08a3c" }: { name: string; color?: string }) {
   return (
     <span className="mx-0.5 inline-flex items-center gap-1 rounded-full bg-field py-px pl-[3px] pr-1.5 align-middle shadow-hairline">
-      <span className="flex size-4 shrink-0 items-center justify-center overflow-hidden rounded-full bg-white outline outline-1 -outline-offset-1 outline-black/10">
-        <img src={logoSrc} alt="" className="size-full object-contain" />
+      <span
+        className="flex size-4 shrink-0 items-center justify-center rounded-full text-[9px] font-semibold leading-none text-white"
+        style={{ background: color }}
+      >
+        {name.charAt(0)}
       </span>
       <span className="text-[12px] font-medium text-ink">{name}</span>
     </span>
@@ -57,7 +60,7 @@ const OPTIONS: Option[] = [
     body: (
       <>
         Reorder waffle cones from{" "}
-        <VendorChip name="Cone King" logoSrc="/brands/baskin-robbins.png" />{" "}
+        <VendorChip name="Cone King" />{" "}
         with lead time <Pill tone="green">7 days</Pill>
       </>
     ),
