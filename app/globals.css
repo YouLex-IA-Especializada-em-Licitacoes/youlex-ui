@@ -364,7 +364,7 @@ a:focus-visible .animated-underline::after {
 }
 
 .primitive-card-footer {
-  padding: 10px 12px;
+  padding: 10px;
 }
 
 .primitive-table-cell {
