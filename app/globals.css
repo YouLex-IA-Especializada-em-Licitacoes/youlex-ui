@@ -30,6 +30,7 @@
   /* borders — solid and crisp, not alpha */
   --line: oklch(0.946 0.003 264.542);
   --line-strong: oklch(0.912 0.005 258.326);
+  --line-soft: oklch(0.966 0.002 264.542);
   --field: oklch(0.961 0.001 286.375);
   --stripe: oklch(0.405 0 0 / 0.075);
   --stripe-bg: oklch(0.97 0 0);
@@ -78,6 +79,7 @@
 
   --line: oklch(0.308 0.006 258.354);
   --line-strong: oklch(0.356 0.007 264.474);
+  --line-soft: oklch(0.278 0.006 258.354);
   --field: oklch(0.293 0.006 271.223);
   --stripe: oklch(1 0 0 / 0.055);
   --stripe-bg: oklch(0.226 0.004 264.485);
@@ -128,6 +130,7 @@
   --color-field: var(--field);
   --color-line: var(--line);
   --color-line-strong: var(--line-strong);
+  --color-line-soft: var(--line-soft);
   --color-accent: var(--accent);
   --color-accent-ink: var(--accent-ink);
   --color-accent-tint: var(--accent-tint);

@@ -748,7 +748,7 @@ export default function IceCreamHarness() {
           key={c.id}
           /* fixed width so every close button sits in the same spot — you can
            * close a run of tabs without chasing the next × across the bar */
-          className={`group/tab flex h-7 w-36 shrink-0 items-center gap-0.5 rounded-[7px] pl-2.5 pr-1 text-[12.5px] font-medium transition-colors duration-100 ${
+          className={`group/tab flex h-7 w-36 shrink-0 items-center gap-0.5 rounded-[7px] pl-2.5 pr-0.5 text-[12.5px] font-medium transition-colors duration-100 ${
             c.id === activeId ? "bg-hover-2 text-ink" : "text-ink-2 hover:bg-hover hover:text-ink"
           }`}
         >

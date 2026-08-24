@@ -136,6 +136,10 @@ export default function ApprovalCard({
   const [viewportH, setViewportH] = useState<number | undefined>(undefined);
   const [trackY, setTrackY] = useState(0);
   const [animate, setAnimate] = useState(false);
+  // Until the first question is measured, render only the active one so the
+  // initial (and SSR) height is Q1's height — not all questions stacked, which
+  // would flash to full height and then shrink on mount.
+  const [ready, setReady] = useState(false);
 
   const last = qi === QUESTIONS.length - 1;
   const selected = answers[qi] ?? [];
@@ -154,6 +158,7 @@ export default function ApprovalCard({
     const withAnim = measured.current;
     measured.current = true;
     sync(withAnim);
+    setReady(true);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [qi, answers, custom, open, sent]);
 
@@ -267,6 +272,9 @@ export default function ApprovalCard({
             >
               {QUESTIONS.map((question, qIdx) => {
                 const active = qIdx === qi;
+                // Before the first measure, mount only the active question so the
+                // card opens at its real height instead of flashing to full height.
+                if (!ready && !active) return null;
                 const picked = answers[qIdx] ?? [];
                 const questionStyle: CSSProperties = {
                   opacity: active ? 1 : 0,
@@ -281,7 +289,7 @@ export default function ApprovalCard({
                     style={questionStyle}
                   >
                     <div className="pr-7 text-[14px] font-medium text-ink">{question.q}</div>
-                    <div className="mt-2 flex flex-col gap-0.5">
+                    <div className="mt-2.5 flex flex-col gap-1">
                       {question.options.map((option, i) => {
                         const on = picked.includes(i);
                         return (
@@ -291,7 +299,7 @@ export default function ApprovalCard({
                             aria-pressed={on}
                             tabIndex={active ? 0 : -1}
                             onClick={() => { if (active) toggle(i); }}
-                            className="flex items-center gap-2 rounded-control px-1.5 py-1 text-left transition-colors duration-100 hover:bg-hover"
+                            className="flex items-center gap-1 rounded-control border border-line-soft pl-1 pr-2 py-1 text-left transition-colors duration-100 hover:bg-hover"
                           >
                             <span
                               className={`flex size-4 shrink-0 items-center justify-center transition-colors duration-200
@@ -304,14 +312,13 @@ export default function ApprovalCard({
                                 <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M20 6L9 17l-5-5" /></svg>
                               )}
                             </span>
-                            <span className={`text-[13px] transition-colors duration-200 ${on ? "text-ink" : "text-ink-2"}`}>
+                            <span className={`text-[13px] leading-none transition-colors duration-200 ${on ? "text-ink" : "text-ink-2"}`}>
                               {option}
                             </span>
                           </button>
                         );
                       })}
-                      <label className="flex items-center gap-2 rounded-control px-1.5 py-1 transition-colors duration-100 focus-within:bg-hover hover:bg-hover">
-                        <span aria-hidden="true" className="size-4 shrink-0" />
+                      <label className="flex items-center gap-1 rounded-control border border-line-soft pl-1 pr-2 py-1 transition-colors duration-100 focus-within:bg-hover hover:bg-hover">
                         <input
                           value={custom[qIdx] ?? ""}
                           tabIndex={active ? 0 : -1}
@@ -328,7 +335,7 @@ export default function ApprovalCard({
                           }}
                           placeholder="Something else…"
                           aria-label="Custom answer"
-                          className="min-w-0 flex-1 bg-transparent text-[13px] text-ink outline-none placeholder:text-ink-3"
+                          className="min-w-0 flex-1 bg-transparent pl-1.5 text-[13px] text-ink outline-none placeholder:text-ink-3"
                         />
                       </label>
                     </div>
@@ -366,7 +373,7 @@ export default function ApprovalCard({
           </div>
 
           <div className="-mr-0.5 flex items-center gap-1.5">
-            <Button variant="ghost" size="sm" onClick={() => setOpen(false)}>
+            <Button variant="ghost" size="sm" onClick={() => (last ? setOpen(false) : goTo(qi + 1))}>
               Skip
             </Button>
             <Button variant="accent" size="sm" disabled={!hasAnswer} onClick={advance}>
