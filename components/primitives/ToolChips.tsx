@@ -219,7 +219,7 @@ export default function ToolChips() {
                 aria-label={`Show diff for ${d.file}`}
                 onFocus={openPreview(d.file)}
                 onBlur={closePreview(d.file)}
-                className="inline-flex h-7 max-w-full items-center gap-1.5 rounded-chip
+                className="inline-flex h-7 max-w-full items-center gap-2 rounded-chip
                   bg-surface px-2 font-mono text-[11.5px] text-ink shadow-btn
                   transition-colors duration-100 hover:bg-hover"
                 style={{ animation: `pop-in 250ms cubic-bezier(0.23,1,0.32,1) ${i * 80}ms both` }}

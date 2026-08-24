@@ -1,52 +1,108 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useState, type ReactNode } from "react";
 
 /* ─────────────────────────────────────────────────────────
  * CODE BLOCK
- * Agent-written code streams line by line; copy is live.
+ * A light editor panel with two versions (switch in the card):
+ *   · Code — a line-numbered listing
+ *   · Diff — a unified diff: old/new gutters, a green/red accent
+ *     bar and row tint, plus word-level add/del highlights.
+ * Both share syntax coloring, insets, and wrapping behavior.
  * ───────────────────────────────────────────────────────── */
 
-const LINE_MS = 240;
-const HOLD_MS = 3200;
+const FILE = "churn.ts";
 
-type Tok = { t: string; c?: "kw" | "str" | "num" | "fn" | "dim" };
+const CODE_LINES = [
+  "export async function churnBatch() {",
+  '  const flavor = await getFlavor("pistachio");',
+  "  const base = await dairy.fetch({ flavor });",
+  '  await freezer.store(base, { temp: "-16C" });',
+  "  if (!base.approved) return null;",
+  "  return base.gallons;",
+  "}",
+];
+const RAW = CODE_LINES.join("\n");
 
-const LINES: Tok[][] = [
-  [{ t: "export async function ", c: "kw" }, { t: "churnBatch", c: "fn" }, { t: "() {", c: "dim" }],
-  [{ t: "  const ", c: "kw" }, { t: "flavor = " }, { t: "await ", c: "kw" }, { t: "getFlavor", c: "fn" }, { t: "(", c: "dim" }, { t: "\"pistachio\"", c: "str" }, { t: ");", c: "dim" }],
-  [{ t: "  const ", c: "kw" }, { t: "base = " }, { t: "await ", c: "kw" }, { t: "dairy." }, { t: "fetch", c: "fn" }, { t: "({ flavor });", c: "dim" }],
-  [{ t: "  await ", c: "kw" }, { t: "freezer." }, { t: "store", c: "fn" }, { t: "(base, { temp: ", c: "dim" }, { t: "\"-14C\"", c: "str" }, { t: " });", c: "dim" }],
-  [{ t: "  return ", c: "kw" }, { t: "base.gallons;" }],
-  [{ t: "}", c: "dim" }],
+type Piece = { text: string; change?: "add" | "del" };
+type Row = { old: number | null; cur: number | null; type: "ctx" | "add" | "del"; pieces: Piece[] };
+
+const DIFF: Row[] = [
+  { old: 1, cur: 1, type: "ctx", pieces: [{ text: "export async function churnBatch() {" }] },
+  { old: 2, cur: 2, type: "ctx", pieces: [{ text: '  const flavor = await getFlavor("pistachio");' }] },
+  { old: 3, cur: 3, type: "ctx", pieces: [{ text: "  const base = await dairy.fetch({ flavor });" }] },
+  { old: 4, cur: null, type: "del", pieces: [{ text: "  await freezer.store(base, { temp: " }, { text: '"-14C"', change: "del" }, { text: " });" }] },
+  { old: null, cur: 4, type: "add", pieces: [{ text: "  await freezer.store(base, { temp: " }, { text: '"-16C"', change: "add" }, { text: " });" }] },
+  { old: null, cur: 5, type: "add", pieces: [{ text: "  if (!base.approved) return null;" }] },
+  { old: 5, cur: 6, type: "ctx", pieces: [{ text: "  return base.gallons;" }] },
+  { old: 6, cur: 7, type: "ctx", pieces: [{ text: "}" }] },
 ];
 
-const COLORS: Record<string, string> = {
-  kw: "var(--accent-ink)",
-  str: "var(--green)",
-  num: "var(--orange)",
-  fn: "var(--ink)",
-  dim: "var(--ink-3)",
-};
+const HATCH = "repeating-linear-gradient(45deg, var(--red) 0, var(--red) 1.5px, transparent 1.5px, transparent 3px)";
 
-const RAW = `export async function churnBatch() {
-  const flavor = await getFlavor("pistachio");
-  const base = await dairy.fetch({ flavor });
-  await freezer.store(base, { temp: "-14C" });
-  return base.gallons;
-}`;
+/* light syntax coloring — keywords/imports/conditionals, functions, strings & numbers */
+const KEYWORDS = new Set(["import", "from", "export", "default", "async", "function", "const", "let", "var", "await", "return", "if", "else", "for", "while", "new", "throw", "try", "catch", "null", "true", "false", "undefined"]);
+const TOKEN = /("(?:\\.|[^"\\])*"|'(?:\\.|[^'\\])*'|`[^`]*`|\b\d+(?:\.\d+)?\b|\b(?:import|from|export|default|async|function|const|let|var|await|return|if|else|for|while|new|throw|try|catch|null|true|false|undefined)\b|[A-Za-z_$][\w$]*(?=\s*\())/g;
 
-export default function CodeBlock() {
-  const [count, setCount] = useState(0);
+function highlight(text: string): ReactNode[] {
+  const nodes: ReactNode[] = [];
+  let last = 0;
+  let k = 0;
+  for (const m of text.matchAll(TOKEN)) {
+    const idx = m.index ?? 0;
+    const t = m[0];
+    if (idx > last) nodes.push(<span key={k++}>{text.slice(last, idx)}</span>);
+    let color: string;
+    let weight: number | undefined;
+    if (/^["'`]/.test(t) || /^\d/.test(t)) color = "var(--orange)"; // string / number
+    else if (KEYWORDS.has(t)) color = "var(--accent-ink)"; // keyword / import / conditional
+    else { color = "var(--ink)"; weight = 500; } // function call
+    nodes.push(<span key={k++} style={{ color, fontWeight: weight }}>{t}</span>);
+    last = idx + t.length;
+  }
+  if (last < text.length) nodes.push(<span key={k++}>{text.slice(last)}</span>);
+  return nodes;
+}
+
+function Pieces({ pieces }: { pieces: Piece[] }) {
+  return (
+    <>
+      {pieces.map((p, i) => {
+        if (p.change) {
+          const add = p.change === "add";
+          return (
+            <span
+              key={i}
+              className="rounded-[3px]"
+              style={{
+                background: `color-mix(in srgb, var(--${add ? "green" : "red"}) 18%, transparent)`,
+                padding: "0 2px",
+                margin: "0 -1px",
+                boxDecorationBreak: "clone",
+                WebkitBoxDecorationBreak: "clone",
+              }}
+            >
+              {highlight(p.text)}
+            </span>
+          );
+        }
+        return <span key={i}>{highlight(p.text)}</span>;
+      })}
+    </>
+  );
+}
+
+function FileIcon() {
+  return (
+    <svg aria-hidden width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" className="shrink-0 text-ink-3">
+      <path d="M17.25 6.75 22.5 12l-5.25 5.25m-10.5 0L1.5 12l5.25-5.25m7.5-3-4.5 16.5" />
+    </svg>
+  );
+}
+
+export default function CodeBlock({ variant = "Code" }: { variant?: string }) {
   const [copied, setCopied] = useState(false);
-  const done = count >= LINES.length;
-
-  /* stream in once, then hold — replaying reads as noise */
-  useEffect(() => {
-    if (done) return;
-    const t = setTimeout(() => setCount((c) => c + 1), count === 0 ? 400 : LINE_MS);
-    return () => clearTimeout(t);
-  }, [count, done]);
+  const isDiff = variant === "Diff";
 
   const copy = useCallback(() => {
     navigator.clipboard.writeText(RAW).then(() => {
@@ -55,57 +111,81 @@ export default function CodeBlock() {
     });
   }, []);
 
+  const added = DIFF.filter((r) => r.type === "add").length;
+  const removed = DIFF.filter((r) => r.type === "del").length;
+
   return (
-    <div className="w-full max-w-95 overflow-hidden rounded-card bg-surface shadow-card">
-      {/* header */}
-      <div className="primitive-card-bar flex items-center justify-between border-b border-line">
-        <span className="flex items-center gap-2">
-          <svg aria-hidden width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" className="shrink-0 text-ink-3">
-            <path d="M17.25 6.75 22.5 12l-5.25 5.25m-10.5 0L1.5 12l5.25-5.25m7.5-3-4.5 16.5" />
-          </svg>
-          <span className="font-mono text-[12px] font-medium text-ink">churn.ts</span>
-          <span className="text-[11.5px] text-ink-3">TypeScript</span>
+    <div className="w-full max-w-105 overflow-hidden rounded-card bg-surface shadow-card">
+      {/* header — file · (diff stat | copy) */}
+      <div className="flex h-11 items-center gap-2 border-b border-line px-4 text-[12.5px]">
+        <span className="inline-flex min-w-0 items-center gap-[7px]">
+          <FileIcon />
+          <span className="truncate font-mono leading-none text-ink">{FILE}</span>
         </span>
-        <button
-          aria-label="Copy code"
-          onClick={copy}
-          className={`flex h-6 items-center gap-1 rounded-[6px] px-1.5 text-[11.5px]
-            font-medium transition-colors duration-100 hover:bg-hover
-            ${copied ? "text-green" : "text-ink-3 hover:text-ink"}`}
-        >
-          {copied ? (
-            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M20 6L9 17l-5-5" /></svg>
-          ) : (
-            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="9" y="9" width="12" height="12" rx="2.5" /><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" /></svg>
-          )}
-          {copied ? "Copied" : "Copy"}
-        </button>
+
+        {isDiff ? (
+          <span className="ml-auto inline-flex items-center gap-2 font-mono text-[12px] leading-none tabular-nums">
+            <span className="text-green">+{added}</span>
+            <span className="text-red">-{removed}</span>
+          </span>
+        ) : (
+          <button
+            type="button"
+            aria-label="Copy code"
+            onClick={copy}
+            className={`-mr-1 ml-auto flex h-6 items-center gap-1 rounded-[6px] px-1.5 text-[12px]
+              font-medium transition-colors duration-100 hover:bg-hover
+              ${copied ? "text-green" : "text-ink-3 hover:text-ink"}`}
+          >
+            {copied ? (
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M20 6L9 17l-5-5" /></svg>
+            ) : (
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="9" y="9" width="12" height="12" rx="2.5" /><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" /></svg>
+            )}
+            {copied ? "Copied" : "Copy"}
+          </button>
+        )}
       </div>
 
-      {/* code */}
-      <pre className="min-h-[137px] bg-inset px-3 py-2.5 font-mono text-[11.5px] leading-[1.7]">
-        {LINES.slice(0, count).map((line, i) => (
-          <div
-            key={i}
-            className="flex"
-            style={{ animation: "fade-up 250ms cubic-bezier(0.23,1,0.32,1) both" }}
-          >
-            <span className="w-7 shrink-0 border-r border-line pr-2 text-right text-[10.5px] leading-[1.86] text-ink-3/60 select-none">
-              {i + 1}
-            </span>
-            <span className="pl-3 whitespace-pre">
-              {line.map((tok, j) => (
-                <span key={j} style={{ color: tok.c ? COLORS[tok.c] : "var(--ink-2)" }}>
-                  {tok.t}
-                </span>
-              ))}
-              {i === count - 1 && !done && (
-                <span className="ml-0.5 inline-block h-3 w-[3px] translate-y-0.5 rounded-full bg-accent" />
-              )}
-            </span>
+      {/* body — equal 12px inset on top / left / right; lines wrap */}
+      <div className="py-3 font-mono text-[12.5px] leading-[1.65] text-ink-2">
+        {isDiff ? (
+          <div className="relative">
+            <span className="pointer-events-none absolute inset-y-0 left-5 w-px bg-line" />
+            {DIFF.map((r, i) => {
+              const add = r.type === "add";
+              const del = r.type === "del";
+              // one gutter column: removals keep the old number, additions/context show the new one
+              const num = del ? r.old : r.cur;
+              return (
+                <div
+                  key={i}
+                  className={`relative grid grid-cols-[20px_minmax(0,1fr)] items-start
+                    ${add ? "bg-green-tint" : del ? "bg-red-tint" : ""}`}
+                >
+                  {(add || del) && (
+                    <span className="absolute inset-y-0 left-0 w-[3px]" style={{ background: add ? "var(--green)" : HATCH }} />
+                  )}
+                  <span className={`select-none text-center text-[11px] ${add ? "text-green" : del ? "text-red" : "text-ink-3"}`}>{num ?? ""}</span>
+                  <code className="pr-3 pl-1 break-words whitespace-pre-wrap">
+                    <Pieces pieces={r.pieces} />
+                  </code>
+                </div>
+              );
+            })}
           </div>
-        ))}
-              </pre>
+        ) : (
+          <div className="relative">
+            <span className="pointer-events-none absolute inset-y-0 left-5 w-px bg-line" />
+            {CODE_LINES.map((line, i) => (
+              <div key={i} className="grid grid-cols-[20px_minmax(0,1fr)] items-start">
+                <span className="select-none text-center text-[11px] text-ink-3">{i + 1}</span>
+                <code className="pr-3 pl-1 break-words whitespace-pre-wrap">{highlight(line)}</code>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
     </div>
   );
 }

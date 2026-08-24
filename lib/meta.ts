@@ -116,8 +116,9 @@ export const META: Meta[] = [
   {
     id: "code-block",
     title: "Code Block",
-    caption: "Agent-written code streaming in line by line.",
+    caption: "A line-numbered listing and a unified diff.",
     file: "CodeBlock.tsx",
+    variants: ["Code", "Diff"],
   },
   {
     id: "fine-tune-card",
