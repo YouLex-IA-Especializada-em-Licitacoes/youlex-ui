@@ -1,18 +1,28 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import posthog from "posthog-js";
 
 /* ─────────────────────────────────────────────────────────
- * EMAIL CAPTURE — end-of-scroll signup for updates + new
- * components. Posts to /api/subscribe, which saves the
- * email as a Resend Contact (API key stays server-side).
+ * EMAIL CAPTURE — signup for updates + new components. Posts
+ * to /api/subscribe, which saves the email as a Resend Contact
+ * (API key stays server-side). The form is shared between the
+ * end-of-page section and the click-nudge modal.
  * ───────────────────────────────────────────────────────── */
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const DONE_KEY = "bui-email-nudge";
 type Status = "idle" | "loading" | "done" | "error";
 
-export function EmailCapture() {
+function markDone() {
+  try {
+    localStorage.setItem(DONE_KEY, "done");
+  } catch {
+    /* ignore */
+  }
+}
+
+function EmailForm() {
   const [email, setEmail] = useState("");
   const [status, setStatus] = useState<Status>("idle");
   const valid = EMAIL_RE.test(email.trim());
@@ -29,6 +39,7 @@ export function EmailCapture() {
       });
       if (!res.ok) throw new Error("bad status");
       posthog.capture("newsletter_signup_completed");
+      markDone();
       setStatus("done");
     } catch {
       setStatus("error");
@@ -36,7 +47,7 @@ export function EmailCapture() {
   };
 
   return (
-    <section className="px-5 py-12 sm:px-8 sm:py-14">
+    <>
       <h2 className="max-w-md text-[19px] leading-snug font-semibold tracking-[-0.02em] text-ink text-balance">
         New components, in your inbox.
       </h2>
@@ -116,6 +127,62 @@ export function EmailCapture() {
           )}
         </form>
       )}
+    </>
+  );
+}
+
+/** End-of-page signup section. */
+export function EmailCapture() {
+  return (
+    <section className="px-5 py-12 sm:px-8 sm:py-14">
+      <EmailForm />
     </section>
+  );
+}
+
+/** The same signup, in a fork-modal-style dialog (opened by the click nudge). */
+export function EmailModal({ open, onClose }: { open: boolean; onClose: () => void }) {
+  useEffect(() => {
+    if (!open) return;
+    const onKey = (e: KeyboardEvent) => e.key === "Escape" && onClose();
+    document.addEventListener("keydown", onKey);
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.removeEventListener("keydown", onKey);
+      document.body.style.overflow = "";
+    };
+  }, [open, onClose]);
+
+  if (!open) return null;
+
+  return (
+    <div
+      className="fixed inset-0 z-[70] flex items-center justify-center p-4 sm:p-8"
+      role="dialog"
+      aria-modal="true"
+      aria-label="Get new components in your inbox"
+    >
+      <div
+        className="absolute inset-0 bg-black/30 backdrop-blur-[2px] dark:bg-black/55"
+        style={{ animation: "fade-in 200ms ease-out both" }}
+        onClick={onClose}
+      />
+      <div
+        className="relative w-full max-w-[460px] overflow-hidden rounded-window bg-surface shadow-overlay"
+        style={{ animation: "pop-in 250ms cubic-bezier(0.23,1,0.32,1) both" }}
+      >
+        <button
+          type="button"
+          aria-label="Close"
+          onClick={onClose}
+          className="absolute top-3.5 right-3.5 z-10 flex size-8 items-center justify-center rounded-control text-ink-3 transition-colors duration-150 hover:bg-hover hover:text-ink"
+        >
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden><path d="M18 6L6 18M6 6l12 12" /></svg>
+        </button>
+        <div className="px-6 pt-6 pb-7">
+          <EmailForm />
+        </div>
+      </div>
+    </div>
   );
 }

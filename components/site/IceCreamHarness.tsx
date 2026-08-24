@@ -737,6 +737,25 @@ export default function IceCreamHarness() {
     if (el) el.scrollTo({ top: el.scrollHeight, behavior: "smooth" });
   }, [chat.messages, active]);
 
+  /* artifacts (charts, tables) reveal after the text streams in, growing the
+   * thread well after `messages` last changed. Follow that growth so a tall
+   * reply isn't left clipped above the fold — but only while the reader is
+   * already near the bottom, so scrolling up to re-read stays put. */
+  useEffect(() => {
+    if (!active) return;
+    const el = scrollRef.current;
+    const content = el?.firstElementChild;
+    if (!el || !content) return;
+    const pin = () => {
+      if (el.scrollHeight - el.scrollTop - el.clientHeight < 240) {
+        el.scrollTop = el.scrollHeight;
+      }
+    };
+    const observer = new ResizeObserver(pin);
+    observer.observe(content);
+    return () => observer.disconnect();
+  }, [active, activeId]);
+
   /* switching threads returns the inspector to the chat */
   useEffect(() => setPropView(null), [activeId]);
 
