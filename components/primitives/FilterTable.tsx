@@ -74,7 +74,7 @@ export default function FilterTable() {
         style={{ scrollbarWidth: "none" }}
       >
         <div className="min-w-[420px]">
-          <div className="grid grid-cols-[1.3fr_0.6fr_0.95fr_0.9fr] border-b border-line px-3 py-2 text-[11.5px] font-medium text-ink-3">
+          <div className="grid grid-cols-[1.3fr_0.6fr_0.95fr_0.9fr] gap-x-2 border-b border-line px-3 py-2 text-[12.5px] font-medium text-ink-3">
             <span>Task name</span>
             <span>Date</span>
             <span>Status</span>
@@ -95,16 +95,16 @@ export default function FilterTable() {
               >
                 <div className="overflow-hidden">
                   <div
-                    className="grid grid-cols-[1.3fr_0.6fr_0.95fr_0.9fr] items-center border-b
-                      border-line px-3 py-2 text-[12px] transition-colors duration-100
+                    className="grid grid-cols-[1.3fr_0.6fr_0.95fr_0.9fr] gap-x-2 items-center border-b
+                      border-line px-3 py-2 text-[13px] transition-colors duration-100
                       last:border-0 hover:bg-hover"
                   >
                     <span className="truncate font-medium text-ink">{row.task}</span>
                     <span className="text-ink-2 tabular-nums">{row.date}</span>
                     <span>
                       <span
-                        className={`inline-flex h-5 items-center rounded-[5px] px-1.5
-                          text-[11px] font-medium ${pill.cls}`}
+                        className={`inline-flex h-[23px] items-center rounded-[8px] border px-[7px]
+                          text-[13px] font-medium ${pill.cls}`}
                       >
                         {pill.label}
                       </span>

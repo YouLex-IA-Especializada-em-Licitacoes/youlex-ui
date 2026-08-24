@@ -56,10 +56,13 @@ export default function CodeBlock() {
   }, []);
 
   return (
-    <div className="w-full max-w-95 overflow-hidden rounded-card bg-surface shadow-hairline">
+    <div className="w-full max-w-95 overflow-hidden rounded-card bg-surface shadow-card">
       {/* header */}
       <div className="primitive-card-bar flex items-center justify-between border-b border-line">
-        <span className="flex items-baseline gap-2">
+        <span className="flex items-center gap-2">
+          <svg aria-hidden width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" className="shrink-0 text-ink-3">
+            <path d="M17.25 6.75 22.5 12l-5.25 5.25m-10.5 0L1.5 12l5.25-5.25m7.5-3-4.5 16.5" />
+          </svg>
           <span className="font-mono text-[12px] font-medium text-ink">churn.ts</span>
           <span className="text-[11.5px] text-ink-3">TypeScript</span>
         </span>
@@ -87,10 +90,10 @@ export default function CodeBlock() {
             className="flex"
             style={{ animation: "fade-up 250ms cubic-bezier(0.23,1,0.32,1) both" }}
           >
-            <span className="w-5 shrink-0 text-right text-[10.5px] leading-[1.86] text-ink-3/60 select-none">
+            <span className="w-7 shrink-0 border-r border-line pr-2 text-right text-[10.5px] leading-[1.86] text-ink-3/60 select-none">
               {i + 1}
             </span>
-            <span className="pl-2.5 whitespace-pre">
+            <span className="pl-3 whitespace-pre">
               {line.map((tok, j) => (
                 <span key={j} style={{ color: tok.c ? COLORS[tok.c] : "var(--ink-2)" }}>
                   {tok.t}
