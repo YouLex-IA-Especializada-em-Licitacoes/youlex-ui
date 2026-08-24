@@ -749,18 +749,29 @@ export default function IceCreamHarness() {
     const content = el?.firstElementChild;
     if (!el || !content) return;
     let stick = true;
+    let raf = 0;
     const onScroll = () => {
-      stick = el.scrollHeight - el.scrollTop - el.clientHeight < 96;
+      stick = el.scrollHeight - el.scrollTop - el.clientHeight < 120;
     };
     const pin = () => {
-      if (stick) el.scrollTop = el.scrollHeight;
+      if (!stick) return;
+      cancelAnimationFrame(raf);
+      raf = requestAnimationFrame(() => {
+        el.scrollTop = el.scrollHeight;
+      });
     };
     el.addEventListener("scroll", onScroll, { passive: true });
-    const observer = new ResizeObserver(pin);
-    observer.observe(content);
+    // ResizeObserver catches gradual growth (streaming); MutationObserver catches
+    // a whole artifact being inserted and its height-animation style ticks.
+    const resize = new ResizeObserver(pin);
+    resize.observe(content);
+    const mutate = new MutationObserver(pin);
+    mutate.observe(content, { childList: true, subtree: true, attributes: true, attributeFilter: ["style"] });
     return () => {
       el.removeEventListener("scroll", onScroll);
-      observer.disconnect();
+      resize.disconnect();
+      mutate.disconnect();
+      cancelAnimationFrame(raf);
     };
   }, [active, activeId]);
 
@@ -808,7 +819,7 @@ export default function IceCreamHarness() {
   const renderThread = (narrow: boolean) => (
     <div className="flex min-h-0 flex-1 flex-col">
       <div ref={scrollRef} className="min-h-0 flex-1 overflow-y-auto overscroll-contain">
-        <div className={`flex flex-col gap-8 py-8 ${narrow ? "px-4" : "px-4 sm:px-8 lg:px-12"}`}>
+        <div className={`flex flex-col gap-6 py-6 ${narrow ? "px-4" : "px-4 sm:px-8 lg:px-12"}`}>
           {chat.messages.map((message) => {
             const full = !narrow && message.role === "assistant" && SCENARIOS[message.scenarioId].fullBleed;
             return (
@@ -823,11 +834,10 @@ export default function IceCreamHarness() {
           })}
         </div>
       </div>
-      <div className={`shrink-0 bg-page ${narrow ? "p-3" : "px-4 pt-3 pb-6 sm:px-8 lg:px-12"}`}>
+      <div className={`shrink-0 bg-page ${narrow ? "p-3" : "px-4 pt-2 pb-4 sm:px-8 lg:px-12"}`}>
         <div className={narrow ? "" : "mx-auto max-w-[720px]"}>
           <PromptBar
             demo={false}
-            tall
             placeholder="Reply"
             onSend={(text) => send(text, matchScenario(text))}
           />

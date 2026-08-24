@@ -29,14 +29,26 @@ type Cue = "press" | "tick" | "release" | "page" | "pulse";
 /* Five short interaction cues, synthesized with @web-kits/audio. Built lazily
  * on the first user gesture so no AudioContext is created before it's allowed. */
 function buildCues(): Record<Cue, (opts?: PlayOptions) => VoiceHandle> {
+  /* Button-press candidates for the generic click. Flip PRESS to audition each,
+   * then tell me which to keep and I'll drop the rest.
+   *   A — soft round blip (clean sine, no hollow tone)
+   *   B — filtered-noise tap (physical "tk", no pitch)
+   *   C — bright pluck (higher, snappier)
+   *   D — crisp transient + a hint of body */
+  const pressOptions = {
+    A: defineSound({ source: { type: "sine", frequency: 520 }, envelope: { attack: 0.001, decay: 0.026, sustain: 0, release: 0.01 }, gain: 0.3 }),
+    B: defineSound({ source: { type: "noise", color: "white" }, filter: { type: "bandpass", frequency: 2400, resonance: 0.6 }, envelope: { attack: 0.0004, decay: 0.018, sustain: 0 }, gain: 0.24 }),
+    C: defineSound({ source: { type: "sine", frequency: 760 }, envelope: { attack: 0.0006, decay: 0.02, sustain: 0, release: 0.008 }, gain: 0.26 }),
+    D: defineSound({ layers: [
+      { source: { type: "noise", color: "white" }, filter: { type: "highpass", frequency: 2400 }, envelope: { attack: 0.0003, decay: 0.009, sustain: 0 }, gain: 0.13 },
+      { source: { type: "sine", frequency: 500 }, envelope: { attack: 0.0006, decay: 0.024, sustain: 0, release: 0.008 }, gain: 0.24 },
+    ] }),
+  };
+  const PRESS: keyof typeof pressOptions = "A";
+
   return {
-    // most buttons — a muted key-press knock
-    press: defineSound({
-      source: { type: "triangle", frequency: 174 },
-      filter: { type: "lowpass", frequency: 1300 },
-      envelope: { attack: 0.001, decay: 0.085, sustain: 0, release: 0.02 },
-      gain: 0.5,
-    }),
+    // most buttons — audition via PRESS above
+    press: pressOptions[PRESS],
     // toggles / tabs / inputs — a light, crisp tick
     tick: defineSound({
       source: { type: "square", frequency: 2100 },
