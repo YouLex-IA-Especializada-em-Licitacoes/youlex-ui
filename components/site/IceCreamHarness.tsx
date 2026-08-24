@@ -737,23 +737,31 @@ export default function IceCreamHarness() {
     if (el) el.scrollTo({ top: el.scrollHeight, behavior: "smooth" });
   }, [chat.messages, active]);
 
-  /* artifacts (charts, tables) reveal after the text streams in, growing the
-   * thread well after `messages` last changed. Follow that growth so a tall
-   * reply isn't left clipped above the fold — but only while the reader is
-   * already near the bottom, so scrolling up to re-read stays put. */
+  /* artifacts (charts, tables, approval cards) reveal after the text streams
+   * in, growing the thread well after `messages` last changed — often in one
+   * big jump. Track whether the reader is pinned to the bottom from their
+   * scroll position, then follow any later growth so a tall reply's footer
+   * isn't left clipped behind the composer. Scrolling up to re-read releases
+   * the pin. */
   useEffect(() => {
     if (!active) return;
     const el = scrollRef.current;
     const content = el?.firstElementChild;
     if (!el || !content) return;
-    const pin = () => {
-      if (el.scrollHeight - el.scrollTop - el.clientHeight < 240) {
-        el.scrollTop = el.scrollHeight;
-      }
+    let stick = true;
+    const onScroll = () => {
+      stick = el.scrollHeight - el.scrollTop - el.clientHeight < 96;
     };
+    const pin = () => {
+      if (stick) el.scrollTop = el.scrollHeight;
+    };
+    el.addEventListener("scroll", onScroll, { passive: true });
     const observer = new ResizeObserver(pin);
     observer.observe(content);
-    return () => observer.disconnect();
+    return () => {
+      el.removeEventListener("scroll", onScroll);
+      observer.disconnect();
+    };
   }, [active, activeId]);
 
   /* switching threads returns the inspector to the chat */
