@@ -299,7 +299,7 @@ export default function ApprovalCard({
                             aria-pressed={on}
                             tabIndex={active ? 0 : -1}
                             onClick={() => { if (active) toggle(i); }}
-                            className="flex items-center gap-1.5 rounded-control border border-[var(--line-soft)] pl-1 pr-2 py-1 text-left transition-colors duration-100 hover:bg-hover"
+                            className="flex items-center gap-1.5 rounded-control pl-1 pr-2 py-1 text-left transition-colors duration-100 hover:bg-hover"
                           >
                             <span
                               className={`flex size-4 shrink-0 items-center justify-center transition-colors duration-200
@@ -318,7 +318,7 @@ export default function ApprovalCard({
                           </button>
                         );
                       })}
-                      <label className="flex items-center gap-1.5 rounded-control border border-[var(--line-soft)] pl-1 pr-2 py-1 transition-colors duration-100 focus-within:bg-hover hover:bg-hover">
+                      <label className="flex items-center gap-1.5 rounded-control pl-1 pr-2 py-1 transition-colors duration-100 focus-within:bg-hover hover:bg-hover">
                         <input
                           value={custom[qIdx] ?? ""}
                           tabIndex={active ? 0 : -1}
