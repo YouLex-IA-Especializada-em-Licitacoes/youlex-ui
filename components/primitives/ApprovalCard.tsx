@@ -2,6 +2,7 @@
 
 import { useEffect, useLayoutEffect, useRef, useState, type CSSProperties } from "react";
 import { Button } from "@/components/atoms/Button";
+import GlideMenu from "@/components/primitives/GlideMenu";
 
 /* ─────────────────────────────────────────────────────────
  * APPROVAL CARD (human-in-the-loop)
@@ -289,17 +290,18 @@ export default function ApprovalCard({
                     style={questionStyle}
                   >
                     <div className="pr-7 text-[14px] font-medium text-ink">{question.q}</div>
-                    <div className="mt-2.5 flex flex-col gap-1">
+                    <GlideMenu className="mt-2.5 flex flex-col gap-1" highlightClassName="inset-x-0 rounded-control bg-hover">
                       {question.options.map((option, i) => {
                         const on = picked.includes(i);
                         return (
                           <button
                             key={option}
                             type="button"
+                            data-menu-row
                             aria-pressed={on}
                             tabIndex={active ? 0 : -1}
                             onClick={() => { if (active) toggle(i); }}
-                            className="flex items-center gap-1.5 rounded-control pl-1 pr-2 py-1 text-left transition-colors duration-100 hover:bg-hover"
+                            className="relative z-10 flex items-center gap-1.5 rounded-control pl-1 pr-2 py-1 text-left transition-colors duration-100"
                           >
                             <span
                               className={`flex size-4 shrink-0 items-center justify-center transition-colors duration-200
@@ -318,7 +320,7 @@ export default function ApprovalCard({
                           </button>
                         );
                       })}
-                      <label className="flex items-center gap-1.5 rounded-control pl-1 pr-2 py-1 transition-colors duration-100 focus-within:bg-hover hover:bg-hover">
+                      <label data-menu-row className="relative z-10 flex items-center gap-1.5 rounded-control pl-1 pr-2 py-1 transition-colors duration-100">
                         <input
                           value={custom[qIdx] ?? ""}
                           tabIndex={active ? 0 : -1}
@@ -338,7 +340,7 @@ export default function ApprovalCard({
                           className="min-w-0 flex-1 bg-transparent pl-1.5 text-[13px] text-ink outline-none placeholder:text-ink-3"
                         />
                       </label>
-                    </div>
+                    </GlideMenu>
                   </div>
                 );
               })}
