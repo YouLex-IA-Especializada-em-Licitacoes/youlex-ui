@@ -6,6 +6,10 @@
 
 @custom-variant dark (&:where(.dark, .dark *));
 
+/* GENERIC FOUNDATION — tokens, @theme, base rules, the primitive-*
+ * spacing utilities, and shared keyframes below are needed by EVERY
+ * component. Blocks tagged COMPONENT-SPECIFIC further down belong to
+ * one primitive each. */
 /* ──────────────────────────────────────────────────────────
  * Beautiful UI — design tokens
  * Cool near-white canvas, white cards, hairline borders, layered
@@ -30,6 +34,8 @@
   /* borders — solid and crisp, not alpha */
   --line: oklch(0.946 0.003 264.542);
   --line-strong: oklch(0.912 0.005 258.326);
+  --line-soft: oklch(0.966 0.002 264.542);
+  --grid-line: color-mix(in srgb, var(--line) 78%, transparent);
   --field: oklch(0.961 0.001 286.375);
   --stripe: oklch(0.405 0 0 / 0.075);
   --stripe-bg: oklch(0.97 0 0);
@@ -78,6 +84,7 @@
 
   --line: oklch(0.308 0.006 258.354);
   --line-strong: oklch(0.356 0.007 264.474);
+  --line-soft: oklch(0.278 0.006 258.354);
   --field: oklch(0.293 0.006 271.223);
   --stripe: oklch(1 0 0 / 0.055);
   --stripe-bg: oklch(0.226 0.004 264.485);
@@ -342,6 +349,12 @@ a:focus-visible .animated-underline::after {
   transform: scaleX(1);
 }
 
+/* ══════════════════════════════════════════════════════════
+ * COMPONENT-SPECIFIC — StreamingText / ContextCards
+ * Favicon source avatars.
+ * Copy this block only alongside StreamingText / ContextCards; it is not part of the
+ * generic foundation above.
+ * ══════════════════════════════════════════════════════════ */
 .source-avatar {
   box-shadow: 0 0 0 1px oklch(0.21 0.034 263.436 / 0.1);
 }
@@ -364,7 +377,7 @@ a:focus-visible .animated-underline::after {
 }
 
 .primitive-card-footer {
-  padding: 10px 12px;
+  padding: 10px;
 }
 
 .primitive-table-cell {
@@ -408,6 +421,12 @@ a:focus-visible .animated-underline::after {
 
 /* The sidebar is one persistent 224px tree clipped by a 52px shell.
  * Every rail glyph remains centered at x=26 in both states. */
+/* ══════════════════════════════════════════════════════════
+ * COMPONENT-SPECIFIC — SidebarNav
+ * The 52↔224px collapsible sidebar tree.
+ * Copy this block only alongside SidebarNav; it is not part of the
+ * generic foundation above.
+ * ══════════════════════════════════════════════════════════ */
 .sidebar-row {
   width: 208px;
   transition-duration: var(--sidebar-copy-duration);
@@ -484,6 +503,12 @@ a:focus-visible .animated-underline::after {
  * can move independently inside the table viewport.
  */
 
+/* ══════════════════════════════════════════════════════════
+ * COMPONENT-SPECIFIC — RecordsTable
+ * The full CRM grid, spreadsheet gutter, and AI column (~800 lines).
+ * Copy this block only alongside RecordsTable; it is not part of the
+ * generic foundation above.
+ * ══════════════════════════════════════════════════════════ */
 .records-shell {
   width: 100%;
   min-width: 0;
@@ -1304,12 +1329,24 @@ th.is-colsel .records-header-icon {
 
 /* ── filter table electric status colors ─────────────────── */
 
+/* ══════════════════════════════════════════════════════════
+ * COMPONENT-SPECIFIC — FilterTable
+ * Electric status-pill colors.
+ * Copy this block only alongside FilterTable; it is not part of the
+ * generic foundation above.
+ * ══════════════════════════════════════════════════════════ */
 .filter-status-todo,
 .filter-status-progress,
 .filter-status-done {
   border: 1px solid transparent;
 }
 
+/* ══════════════════════════════════════════════════════════
+ * COMPONENT-SPECIFIC — InsightCards
+ * Liveline chart tooltip + cursor.
+ * Copy this block only alongside InsightCards; it is not part of the
+ * generic foundation above.
+ * ══════════════════════════════════════════════════════════ */
 .insight-chart-stage {
   overflow: hidden;
 }
@@ -1417,6 +1454,12 @@ th.is-colsel .records-header-icon {
  * soft, masked blur so the leading edge resolves smoothly as
  * text flows in. The caret holds solid while streaming, then
  * blinks once the string settles. */
+/* ══════════════════════════════════════════════════════════
+ * COMPONENT-SPECIFIC — StreamText
+ * The streaming caret + tail.
+ * Copy this block only alongside StreamText; it is not part of the
+ * generic foundation above.
+ * ══════════════════════════════════════════════════════════ */
 .stream-tail {
   filter: blur(1.6px);
   -webkit-mask-image: linear-gradient(to right, oklch(0 0 0) 20%, oklch(0 0 0 / 0.2));

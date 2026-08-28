@@ -4,6 +4,7 @@ import { DialRoot } from "dialkit";
 import "dialkit/styles.css";
 import "./globals.css";
 import { DevToolbar } from "@/components/site/DevToolbar";
+import { EmailNudge } from "@/components/site/EmailNudge";
 import { InteractionSounds } from "@/components/site/InteractionSounds";
 import { ThemeSync } from "@/components/site/ThemeSync";
 
@@ -36,6 +37,7 @@ export default function RootLayout({
       <body className={`${inter.variable} ${mono.variable} font-sans`}>
         <ThemeSync />
         <InteractionSounds />
+        <EmailNudge />
         {children}
         {/* DialKit is a dev-only tuning panel — never render it in production. */}
         {process.env.NODE_ENV === "development" && (

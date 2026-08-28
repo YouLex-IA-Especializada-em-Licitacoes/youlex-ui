@@ -47,10 +47,31 @@ lib/
   meta.ts, registry.tsx    the gallery catalog
 ```
 
-The primitives are the product. Each file under `components/primitives/` is
-designed to be pasted into another project with no dependency beyond the
-foundation stylesheet `app/globals.css` — copy that once first (see
-[One-time setup](#one-time-setup)), then paste any component on top.
+The primitives are the product. Most files under `components/primitives/` paste
+in on their own; some also import a shared building block (`Button`, `GlideMenu`,
+`EntityChip`, …) or an npm package (`liveline`, `glimm`, `iconoir-react`, …). Every
+component's exact dependencies are listed on its gallery card, and the
+[component registry](#install-a-component) resolves them for you automatically.
+
+## Install a component
+
+**Recommended — the CLI resolves the whole dependency tree** (internal building
+blocks, npm packages, and only the CSS a component actually needs):
+
+```bash
+npx shadcn add https://www.beautifului.dev/r/approval-card.json
+```
+
+Browse the index at
+[`/r/registry.json`](https://www.beautifului.dev/r/registry.json). Each item
+declares its `registryDependencies`, npm `dependencies`, and `files`, so one
+`add` pulls the component, its building blocks, installs its packages, and drops
+in the foundation plus any component-specific CSS (e.g. `records-table.css`) —
+not the whole stylesheet.
+
+**Manual — copy-paste:** open a component's code view in the gallery; it lists
+exactly what to also copy and `npm i`. Add the [foundation](#one-time-setup)
+once, then paste the component and anything under "Requires".
 
 ## The design system
 

@@ -2,6 +2,8 @@
 
 import { useState } from "react";
 import { Button, type ButtonVariant } from "@/components/atoms/Button";
+import { EntityChip } from "@/components/atoms/EntityChip";
+import { ValuePill } from "@/components/atoms/ValuePill";
 
 /* ─────────────────────────────────────────────────────────
  * RECOMMENDATION CARD
@@ -21,47 +23,14 @@ type Option = {
   ctaVariant: ButtonVariant;
 };
 
-/* a supplier as a little logo chip — circular mark + name, no external arrow */
-function VendorChip({ name, color = "#e08a3c" }: { name: string; color?: string }) {
-  return (
-    <span className="mx-0.5 inline-flex items-center gap-1 rounded-full bg-field py-px pl-[3px] pr-1.5 align-middle shadow-hairline">
-      <span
-        className="flex size-4 shrink-0 items-center justify-center rounded-full text-[9px] font-semibold leading-none text-white"
-        style={{ background: color }}
-      >
-        {name.charAt(0)}
-      </span>
-      <span className="text-[12px] font-medium text-ink">{name}</span>
-    </span>
-  );
-}
-
-/* a plain value as a soft rounded badge — not a mono token */
-function Pill({ children, tone = "neutral" }: { children: React.ReactNode; tone?: "neutral" | "green" }) {
-  return (
-    <span
-      className={`mx-0.5 inline-flex items-center rounded-full px-1.5 py-0 align-middle text-[12px] font-medium ${
-        tone === "green" ? "bg-green-tint text-green" : "bg-field text-ink-2"
-      }`}
-      style={{
-        boxShadow: tone === "green"
-          ? "0 0 0 1px color-mix(in oklch, var(--green) 28%, transparent)"
-          : "var(--shadow-hairline)",
-      }}
-    >
-      {children}
-    </span>
-  );
-}
-
 const OPTIONS: Option[] = [
   {
     key: "high",
     body: (
       <>
         Reorder waffle cones from{" "}
-        <VendorChip name="Cone King" />{" "}
-        with lead time <Pill tone="green">7 days</Pill>
+        <EntityChip name="Cone King" />{" "}
+        with lead time <ValuePill tone="green">7 days</ValuePill>
       </>
     ),
     short: "Reorder from Cone King · 7-day lead",
@@ -75,7 +44,7 @@ const OPTIONS: Option[] = [
     key: "review",
     body: (
       <>
-        Switch vanilla to <Pill>Vanilla Madagascar</Pill> for peak season.
+        Switch vanilla to <ValuePill>Vanilla Madagascar</ValuePill> for peak season.
       </>
     ),
     short: "Switch to Vanilla Madagascar",

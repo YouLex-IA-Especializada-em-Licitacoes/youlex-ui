@@ -4,6 +4,21 @@ export type Meta = {
   caption: string;
   file: string;
   variants?: string[];
+  /** other files in this repo the component imports (ids in INTERNAL) — copy these too */
+  deps?: string[];
+  /** npm packages the component imports — install these */
+  npm?: string[];
+};
+
+/** Shared building blocks that primitives import but that don't get their own
+ * gallery card. Copy these alongside any component that lists them in `deps`. */
+export const INTERNAL: Record<string, { title: string; path: string }> = {
+  button: { title: "Button", path: "components/atoms/Button.tsx" },
+  "glide-menu": { title: "GlideMenu", path: "components/primitives/GlideMenu.tsx" },
+  "entity-chip": { title: "EntityChip", path: "components/atoms/EntityChip.tsx" },
+  "value-pill": { title: "ValuePill", path: "components/atoms/ValuePill.tsx" },
+  shimmer: { title: "Shimmer", path: "components/atoms/Shimmer.tsx" },
+  "stream-text": { title: "StreamText", path: "components/atoms/StreamText.tsx" },
 };
 
 export const META: Meta[] = [
@@ -32,6 +47,7 @@ export const META: Meta[] = [
     title: "Approval Card",
     caption: "Human-in-the-loop questions the agent asks before acting.",
     file: "ApprovalCard.tsx",
+    deps: ["button", "glide-menu"],
   },
   {
     id: "tool-chips",
@@ -51,12 +67,14 @@ export const META: Meta[] = [
     title: "Chat",
     caption: "Tabbed chat panel with reasoning replies and a composer.",
     file: "ChatComposer.tsx",
+    npm: ["posthog-js"],
   },
   {
     id: "prompt-bar",
     title: "Prompt Bar",
     caption: "Composer with @ sources, / commands, model picker, and dictation.",
     file: "PromptBar.tsx",
+    npm: ["glimm"],
     variants: ["Rounded", "Pill"],
   },
   {
@@ -64,6 +82,7 @@ export const META: Meta[] = [
     title: "Recommendation Card",
     caption: "Agent suggestion with a confidence meter and actions.",
     file: "RecommendationCard.tsx",
+    deps: ["button", "entity-chip", "value-pill"],
   },
   {
     id: "context-cards",
@@ -76,12 +95,14 @@ export const META: Meta[] = [
     title: "Diff Table",
     caption: "AI-proposed edits sweeping through tabular data.",
     file: "DiffTable.tsx",
+    deps: ["button"],
   },
   {
     id: "records-table",
     title: "Records Table",
     caption: "CRM-style grid with tags, sorting, and relationship status.",
     file: "RecordsTable.tsx",
+    deps: ["glide-menu"],
   },
   {
     id: "filter-table",
@@ -94,12 +115,15 @@ export const META: Meta[] = [
     title: "Sidebar Nav",
     caption: "Collapsible workspace and chat navigation with gliding hover states.",
     file: "SidebarNav.tsx",
+    deps: ["glide-menu"],
+    npm: ["@central-icons-react/round-outlined-radius-2-stroke-2"],
   },
   {
     id: "search",
     title: "Search",
     caption: "Command search with live filtering and an empty state.",
     file: "SearchList.tsx",
+    deps: ["glide-menu"],
   },
   {
     id: "flowchart",
@@ -112,23 +136,28 @@ export const META: Meta[] = [
     title: "Insight Cards",
     caption: "Paged agent insights with scrub-ready live charts.",
     file: "InsightCards.tsx",
+    npm: ["liveline"],
   },
   {
     id: "code-block",
     title: "Code Block",
-    caption: "Agent-written code streaming in line by line.",
+    caption: "A line-numbered listing and a unified diff.",
     file: "CodeBlock.tsx",
+    variants: ["Code", "Diff"],
   },
   {
     id: "fine-tune-card",
     title: "Fine-tune Card",
     caption: "The agent adjusts design properties in an inspector.",
     file: "FineTuneCard.tsx",
+    deps: ["glide-menu"],
   },
   {
     id: "selection-actions",
     title: "Selection Actions",
     caption: "Highlight a passage and hand it to the agent to rewrite.",
     file: "SelectionActions.tsx",
+    deps: ["shimmer", "stream-text"],
+    npm: ["iconoir-react"],
   },
 ];

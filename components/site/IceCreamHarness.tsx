@@ -638,6 +638,8 @@ export default function IceCreamHarness() {
   const chatIdRef = useRef(1);
   const msgIdRef = useRef(0);
   const scrollRef = useRef<HTMLDivElement>(null);
+  const composerRef = useRef<HTMLDivElement>(null);
+  const [composerH, setComposerH] = useState(150);
 
   const chat = chats.find((c) => c.id === activeId) ?? chats[0];
   const active = chat.messages.length > 0;
@@ -737,6 +739,57 @@ export default function IceCreamHarness() {
     if (el) el.scrollTo({ top: el.scrollHeight, behavior: "smooth" });
   }, [chat.messages, active]);
 
+  /* the composer floats over the thread (ChatGPT-style), so the thread pads its
+   * bottom by the composer's height — that lets the last message rest flush with
+   * the bar and older content scroll behind it. Measure it as it changes. */
+  useEffect(() => {
+    const el = composerRef.current;
+    if (!el) return;
+    const measure = () => setComposerH(el.offsetHeight);
+    measure();
+    const ro = new ResizeObserver(measure);
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, [active, activeId]);
+
+  /* artifacts (charts, tables, approval cards) reveal after the text streams
+   * in, growing the thread well after `messages` last changed — often in one
+   * big jump. Track whether the reader is pinned to the bottom from their
+   * scroll position, then follow any later growth so a tall reply's footer
+   * isn't left clipped behind the composer. Scrolling up to re-read releases
+   * the pin. */
+  useEffect(() => {
+    if (!active) return;
+    const el = scrollRef.current;
+    const content = el?.firstElementChild;
+    if (!el || !content) return;
+    let stick = true;
+    let raf = 0;
+    const onScroll = () => {
+      stick = el.scrollHeight - el.scrollTop - el.clientHeight < 120;
+    };
+    const pin = () => {
+      if (!stick) return;
+      cancelAnimationFrame(raf);
+      raf = requestAnimationFrame(() => {
+        el.scrollTop = el.scrollHeight;
+      });
+    };
+    el.addEventListener("scroll", onScroll, { passive: true });
+    // ResizeObserver catches gradual growth (streaming); MutationObserver catches
+    // a whole artifact being inserted and its height-animation style ticks.
+    const resize = new ResizeObserver(pin);
+    resize.observe(content);
+    const mutate = new MutationObserver(pin);
+    mutate.observe(content, { childList: true, subtree: true, attributes: true, attributeFilter: ["style"] });
+    return () => {
+      el.removeEventListener("scroll", onScroll);
+      resize.disconnect();
+      mutate.disconnect();
+      cancelAnimationFrame(raf);
+    };
+  }, [active, activeId]);
+
   /* switching threads returns the inspector to the chat */
   useEffect(() => setPropView(null), [activeId]);
 
@@ -748,7 +801,7 @@ export default function IceCreamHarness() {
           key={c.id}
           /* fixed width so every close button sits in the same spot — you can
            * close a run of tabs without chasing the next × across the bar */
-          className={`group/tab flex h-7 w-36 shrink-0 items-center gap-0.5 rounded-[7px] pl-2.5 pr-1 text-[12.5px] font-medium transition-colors duration-100 ${
+          className={`group/tab flex h-7 w-36 shrink-0 items-center gap-0.5 rounded-[7px] pl-2.5 pr-0.5 text-[12.5px] font-medium transition-colors duration-100 ${
             c.id === activeId ? "bg-hover-2 text-ink" : "text-ink-2 hover:bg-hover hover:text-ink"
           }`}
         >
@@ -779,9 +832,14 @@ export default function IceCreamHarness() {
   /* the message thread + composer — reused as the main column (wide) or the
    * docked assistant panel in spreadsheet mode (narrow) */
   const renderThread = (narrow: boolean) => (
-    <div className="flex min-h-0 flex-1 flex-col">
+    <div className="relative flex min-h-0 flex-1 flex-col">
       <div ref={scrollRef} className="min-h-0 flex-1 overflow-y-auto overscroll-contain">
-        <div className={`flex flex-col gap-8 py-8 ${narrow ? "px-4" : "px-4 sm:px-8 lg:px-12"}`}>
+        <div
+          className={`flex flex-col gap-8 pt-8 ${narrow ? "px-4" : "px-4 sm:px-8 lg:px-12"}`}
+          /* pad the bottom by the floating composer's height so the last message
+             can rest flush with the bar and older content scrolls behind it */
+          style={{ paddingBottom: composerH + 16 }}
+        >
           {chat.messages.map((message) => {
             const full = !narrow && message.role === "assistant" && SCENARIOS[message.scenarioId].fullBleed;
             return (
@@ -796,7 +854,18 @@ export default function IceCreamHarness() {
           })}
         </div>
       </div>
-      <div className={`shrink-0 bg-page ${narrow ? "p-3" : "px-4 pt-3 pb-6 sm:px-8 lg:px-12"}`}>
+
+      {/* soft fade so content dissolves into the bar instead of hard-clipping */}
+      <div
+        className="pointer-events-none absolute inset-x-0 bottom-0"
+        style={{ height: composerH + 32, background: "linear-gradient(to top, var(--page) 64%, transparent)" }}
+      />
+
+      {/* the composer floats over the thread; content scrolls behind it */}
+      <div
+        ref={composerRef}
+        className={`absolute inset-x-0 bottom-0 ${narrow ? "p-3" : "px-4 pb-6 sm:px-8 lg:px-12"}`}
+      >
         <div className={narrow ? "" : "mx-auto max-w-[720px]"}>
           <PromptBar
             demo={false}

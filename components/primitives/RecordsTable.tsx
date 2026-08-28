@@ -705,7 +705,7 @@ export default function RecordsTable({ fill = false }: { fill?: boolean; variant
             </tr>
           </thead>
           {/* data cells stay silent — the papery link/flick sound is too much when scanning rows */}
-          <tbody data-cuelume-silent>
+          <tbody data-sound-silent>
             {visibleRows.map((row, index) => {
               const selectedRow = selected.has(row.id);
               const strength = STRENGTH[row.strength];

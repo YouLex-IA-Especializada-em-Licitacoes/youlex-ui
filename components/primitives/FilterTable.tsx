@@ -74,11 +74,11 @@ export default function FilterTable() {
         style={{ scrollbarWidth: "none" }}
       >
         <div className="min-w-[420px]">
-          <div className="grid grid-cols-[1.3fr_0.6fr_0.95fr_0.9fr] gap-x-2 border-b border-line px-3 py-2 text-[12.5px] font-medium text-ink-3">
-            <span>Task name</span>
-            <span>Date</span>
-            <span>Status</span>
-            <span>Advisor</span>
+          <div className="grid grid-cols-[minmax(0,1.3fr)_minmax(0,0.6fr)_minmax(0,0.95fr)_minmax(0,0.9fr)] border-b border-[var(--grid-line)] text-[12.5px] font-medium text-ink-2">
+            <span className="border-r border-[var(--grid-line)] px-3 py-2">Task name</span>
+            <span className="border-r border-[var(--grid-line)] px-3 py-2">Date</span>
+            <span className="border-r border-[var(--grid-line)] px-3 py-2">Status</span>
+            <span className="px-3 py-2">Advisor</span>
           </div>
           {ROWS.map((row) => {
             const shown = filter === "all" || row.status === filter;
@@ -95,21 +95,26 @@ export default function FilterTable() {
               >
                 <div className="overflow-hidden">
                   <div
-                    className="grid grid-cols-[1.3fr_0.6fr_0.95fr_0.9fr] gap-x-2 items-center border-b
-                      border-line px-3 py-2 text-[13px] transition-colors duration-100
-                      last:border-0 hover:bg-hover"
+                    className="grid grid-cols-[minmax(0,1.3fr)_minmax(0,0.6fr)_minmax(0,0.95fr)_minmax(0,0.9fr)] border-b
+                      border-[var(--grid-line)] text-[13px] transition-colors duration-100 hover:bg-hover"
                   >
-                    <span className="truncate font-medium text-ink">{row.task}</span>
-                    <span className="text-ink-2 tabular-nums">{row.date}</span>
-                    <span>
+                    <span className="flex min-w-0 items-center border-r border-[var(--grid-line)] px-3 py-2">
+                      <span className="truncate font-medium text-ink">{row.task}</span>
+                    </span>
+                    <span className="flex items-center whitespace-nowrap border-r border-[var(--grid-line)] px-3 py-2 text-ink-2 tabular-nums">
+                      {row.date}
+                    </span>
+                    <span className="flex items-center border-r border-[var(--grid-line)] px-3 py-2">
                       <span
-                        className={`inline-flex h-[23px] items-center rounded-[8px] border px-[7px]
+                        className={`inline-flex h-[23px] shrink-0 items-center whitespace-nowrap rounded-[8px] border px-[7px]
                           text-[13px] font-medium ${pill.cls}`}
                       >
                         {pill.label}
                       </span>
                     </span>
-                    <span className="truncate text-ink-2">{row.owner}</span>
+                    <span className="flex min-w-0 items-center px-3 py-2 text-ink-2">
+                      <span className="truncate">{row.owner}</span>
+                    </span>
                   </div>
                 </div>
               </div>
