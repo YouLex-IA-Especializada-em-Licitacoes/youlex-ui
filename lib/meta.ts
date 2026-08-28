@@ -156,7 +156,7 @@ export const META: Meta[] = [
     title: "Selection Actions",
     caption: "Highlight a passage and hand it to the agent to rewrite.",
     file: "SelectionActions.tsx",
-    deps: ["shimmer", "stream-text"],
+    deps: ["button", "shimmer", "stream-text"],
     npm: ["iconoir-react"],
   },
 ];

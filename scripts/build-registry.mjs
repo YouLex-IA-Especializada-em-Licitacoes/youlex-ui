@@ -49,7 +49,7 @@ const PRIMITIVES = [
   ["insight-cards", "Insight Cards", "InsightCards.tsx", [], ["liveline"]],
   ["code-block", "Code Block", "CodeBlock.tsx", [], []],
   ["fine-tune-card", "Fine-tune Card", "FineTuneCard.tsx", ["glide-menu"], []],
-  ["selection-actions", "Selection Actions", "SelectionActions.tsx", ["shimmer", "stream-text"], ["iconoir-react"]],
+  ["selection-actions", "Selection Actions", "SelectionActions.tsx", ["button", "shimmer", "stream-text"], ["iconoir-react"]],
 ];
 
 const CAPTION = Object.fromEntries(

@@ -20,6 +20,7 @@ import {
   TextBox,
   Xmark,
 } from "iconoir-react";
+import { Button } from "@/components/atoms/Button";
 import { Shimmer } from "@/components/atoms/Shimmer";
 import { StreamText } from "@/components/atoms/StreamText";
 
@@ -107,11 +108,11 @@ const icons = {
   retry: <Refresh {...iconProps} />,
 };
 
-const control =
-  "inline-flex h-7 shrink-0 items-center gap-1 rounded-full px-2.5 text-[12px] font-normal text-ink transition-[background-color,color,transform] duration-150 hover:bg-hover active:scale-[0.96]";
-
+/* the single "keep" affirm — solid ink with a hairline (not the atom's filled
+ * highlight) shadow, so it stays a local one-off rather than a Button variant */
 const primary =
   "inline-flex h-7 shrink-0 items-center gap-1 rounded-full bg-ink px-2.5 text-[12.5px] font-normal text-canvas shadow-hairline transition-[opacity,transform] duration-150 hover:opacity-90 active:scale-[0.96]";
+
 
 const DEFAULT_ACTIONS: SelectionActionSet = {
   primary: [
@@ -387,10 +388,10 @@ export default function SelectionActions({
                   {icons.check}
                   {copy.keep}
                 </button>
-                <button type="button" onClick={reset} className={control}>
+                <Button type="button" variant="quiet" size="xs" className="shrink-0" onClick={reset}>
                   {icons.close}
                   {copy.discard}
-                </button>
+                </Button>
                 <span className="mx-0.5 h-4 w-px shrink-0 bg-line" />
                 <button
                   type="button"
@@ -466,15 +467,17 @@ export default function SelectionActions({
                     <span className="mx-1 h-4 w-px shrink-0 bg-line-strong" />
                   )}
                   {actions.primary.map((item) => (
-                    <button
+                    <Button
                       key={item.id}
                       type="button"
+                      variant="quiet"
+                      size="xs"
+                      className="shrink-0"
                       onClick={item.action ? () => run(item.action!) : undefined}
-                      className={control}
                     >
                       {item.icon}
                       {item.id}
-                    </button>
+                    </Button>
                   ))}
 
                   <div
@@ -487,15 +490,17 @@ export default function SelectionActions({
                     }}
                   >
                   {actions.more.map((item) => (
-                    <button
+                    <Button
                       key={item.id}
                       type="button"
+                      variant="quiet"
+                      size="xs"
+                      className="shrink-0"
                       onClick={item.action ? () => run(item.action!) : undefined}
-                      className={control}
                     >
                       {item.icon}
                       {item.id}
-                    </button>
+                    </Button>
                   ))}
                   </div>
 
