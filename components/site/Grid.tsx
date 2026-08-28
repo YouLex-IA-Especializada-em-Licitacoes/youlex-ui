@@ -209,6 +209,12 @@ function Overlay({
             ) : (
               <p className="mt-1 text-[11.5px] text-ink-3">Self-contained — needs only the foundation tokens.</p>
             )}
+            <p
+              className="mt-1.5 truncate font-mono text-[11px] text-ink-3"
+              title={`npx shadcn add https://www.beautifului.dev/r/${entry.id}.json`}
+            >
+              <span className="text-ink-2">$</span> npx shadcn add https://www.beautifului.dev/r/{entry.id}.json
+            </p>
           </div>
           <div className="flex items-center gap-1.5">
             <button
