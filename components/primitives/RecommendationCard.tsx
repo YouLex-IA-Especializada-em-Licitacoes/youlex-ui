@@ -12,7 +12,7 @@ import { ValuePill } from "@/components/atoms/ValuePill";
  * it to the recommendation. The primary action confirms.
  * ───────────────────────────────────────────────────────── */
 
-type Option = {
+export type RecommendationOption = {
   key: string;
   body: React.ReactNode;
   short: string;
@@ -23,7 +23,21 @@ type Option = {
   ctaVariant: ButtonVariant;
 };
 
-const OPTIONS: Option[] = [
+export type RecommendationLabels = {
+  title: string;
+  alternatives: string;
+  otherOptions: string;
+  accepted: string;
+};
+
+const DEFAULT_LABELS: RecommendationLabels = {
+  title: "Want me to place this restock order?",
+  alternatives: "Alternatives",
+  otherOptions: "Other options",
+  accepted: "Accepted",
+};
+
+const OPTIONS: RecommendationOption[] = [
   {
     key: "high",
     body: (
@@ -84,19 +98,27 @@ function Meter({ signal, tone }: { signal: number; tone: string }) {
   );
 }
 
-export default function RecommendationCard() {
+export default function RecommendationCard({
+  options = OPTIONS,
+  labels,
+}: {
+  options?: RecommendationOption[];
+  labels?: Partial<RecommendationLabels>;
+  variant?: string;
+} = {}) {
+  const t = { ...DEFAULT_LABELS, ...labels };
   const [selected, setSelected] = useState(0);
   const [open, setOpen] = useState(false);
   const [accepted, setAccepted] = useState(false);
 
-  const active = OPTIONS[selected];
-  const others = OPTIONS.map((o, i) => ({ o, i })).filter(({ i }) => i !== selected);
+  const active = options[selected];
+  const others = options.map((o, i) => ({ o, i })).filter(({ i }) => i !== selected);
 
   return (
     <div className="w-full max-w-95 overflow-hidden rounded-card bg-surface shadow-card">
       <div className="primitive-card-pad">
         <span className="text-[14px] font-medium text-ink">
-          Want me to place this restock order?
+          {t.title}
         </span>
         <p
           key={active.key}
@@ -119,7 +141,7 @@ export default function RecommendationCard() {
         <div className="overflow-hidden">
           <div className="border-t border-line bg-surface px-2 py-2">
             <p className="px-1.5 pb-1 text-[11px] font-medium text-ink-3">
-              Other options
+              {t.otherOptions}
             </p>
             {others.map(({ o, i }) => (
               <button
@@ -155,7 +177,7 @@ export default function RecommendationCard() {
             onClick={() => setOpen((current) => !current)}
             className="px-2.5 text-[12.5px]"
           >
-            Alternatives
+            {t.alternatives}
           </Button>
           <Button
             variant={accepted ? "success" : active.ctaVariant}
@@ -163,7 +185,7 @@ export default function RecommendationCard() {
             onClick={() => setAccepted(true)}
             className="text-[12.5px]"
           >
-            {accepted ? "Accepted" : active.cta}
+            {accepted ? t.accepted : active.cta}
           </Button>
         </span>
       </div>

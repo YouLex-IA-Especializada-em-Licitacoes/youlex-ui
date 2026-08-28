@@ -13,23 +13,45 @@ import GlideMenu from "@/components/primitives/GlideMenu";
  * Single-choice answers auto-advance; multi-select waits.
  * ───────────────────────────────────────────────────────── */
 
-const QUESTIONS = [
+export type ApprovalQuestion = {
+  q: string;
+  type: "radio" | "check";
+  options: string[];
+};
+
+const QUESTIONS: ApprovalQuestion[] = [
   {
     q: "How many flavors should we launch?",
-    type: "radio" as const,
+    type: "radio",
     options: ["Three (core line)", "Five (full case)", "Just one hero"],
   },
   {
     q: "Which mix-ins should we stock?",
-    type: "check" as const,
+    type: "check",
     options: ["Chocolate chips", "Waffle bits", "Sprinkles"],
   },
   {
     q: "Which market do we enter first?",
-    type: "radio" as const,
+    type: "radio",
     options: ["Food trucks", "Grocery freezers", "Scoop shops"],
   },
 ];
+
+export type ApprovalLabels = {
+  skip: string;
+  continue: string;
+  send: string;
+  customPlaceholder: string;
+  sentMessage: string;
+};
+
+const DEFAULT_LABELS: ApprovalLabels = {
+  skip: "Skip",
+  continue: "Continue",
+  send: "Send",
+  customPlaceholder: "Something else…",
+  sentMessage: "Answers sent",
+};
 
 const ROLL_MS = 400;
 const SLIDE = "360ms cubic-bezier(0.22, 1, 0.36, 1)";
@@ -118,13 +140,20 @@ function Ico({ path, size = 14, sw = 2 }: { path: React.ReactNode; size?: number
 }
 
 export default function ApprovalCard({
+  questions = QUESTIONS,
+  labels,
   onSubmitted,
+  onAnswerChange,
   resettable = true,
 }: {
-  onSubmitted?: () => void;
+  questions?: ApprovalQuestion[];
+  labels?: Partial<ApprovalLabels>;
+  onSubmitted?: (answers: Record<number, number[]>) => void;
+  onAnswerChange?: (questionIndex: number, answer: number[]) => void;
   resettable?: boolean;
   variant?: string;
 } = {}) {
+  const t = { ...DEFAULT_LABELS, ...labels };
   const [qi, setQi] = useState(0);
   const [answers, setAnswers] = useState<Record<number, number[]>>({});
   const [custom, setCustom] = useState<Record<number, string>>({});
@@ -142,7 +171,7 @@ export default function ApprovalCard({
   // would flash to full height and then shrink on mount.
   const [ready, setReady] = useState(false);
 
-  const last = qi === QUESTIONS.length - 1;
+  const last = qi === questions.length - 1;
   const selected = answers[qi] ?? [];
   const hasAnswer = selected.length > 0 || Boolean(custom[qi]?.trim());
 
@@ -173,13 +202,13 @@ export default function ApprovalCard({
 
   const goTo = (next: number) => {
     if (advanceTimer.current) clearTimeout(advanceTimer.current);
-    setQi(Math.min(Math.max(next, 0), QUESTIONS.length - 1));
+    setQi(Math.min(Math.max(next, 0), questions.length - 1));
   };
 
   const send = () => {
     if (advanceTimer.current) clearTimeout(advanceTimer.current);
     setSent(true);
-    onSubmitted?.();
+    onSubmitted?.(answers);
   };
 
   const advance = () => {
@@ -188,7 +217,7 @@ export default function ApprovalCard({
   };
 
   const toggle = (index: number) => {
-    const type = QUESTIONS[qi].type;
+    const type = questions[qi].type;
     setAnswers((current) => {
       const picked = current[qi] ?? [];
       const next = type === "radio"
@@ -196,6 +225,7 @@ export default function ApprovalCard({
         : picked.includes(index)
           ? picked.filter((item) => item !== index)
           : [...picked, index];
+      onAnswerChange?.(qi, next);
       return { ...current, [qi]: next };
     });
     if (type === "radio") {
@@ -203,7 +233,7 @@ export default function ApprovalCard({
       if (advanceTimer.current) clearTimeout(advanceTimer.current);
       advanceTimer.current = setTimeout(() => {
         if (last) send();
-        else setQi((current) => Math.min(QUESTIONS.length - 1, current + 1));
+        else setQi((current) => Math.min(questions.length - 1, current + 1));
       }, 480);
     }
   };
@@ -232,7 +262,7 @@ export default function ApprovalCard({
           <span className="flex size-4.5 items-center justify-center rounded-full bg-green text-white">
             <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M20 6L9 17l-5-5" /></svg>
           </span>
-          Answers sent
+          {t.sentMessage}
         </span>
         {resettable && (
           <button type="button" onClick={reset} className="text-[12px] font-medium text-ink-3 transition-colors duration-150 hover:text-ink">
@@ -271,7 +301,7 @@ export default function ApprovalCard({
                 willChange: "transform",
               }}
             >
-              {QUESTIONS.map((question, qIdx) => {
+              {questions.map((question, qIdx) => {
                 const active = qIdx === qi;
                 // Before the first measure, mount only the active question so the
                 // card opens at its real height instead of flashing to full height.
@@ -335,7 +365,7 @@ export default function ApprovalCard({
                               advance();
                             }
                           }}
-                          placeholder="Something else…"
+                          placeholder={t.customPlaceholder}
                           aria-label="Custom answer"
                           className="min-w-0 flex-1 bg-transparent pl-1.5 text-[13px] text-ink outline-none placeholder:text-ink-3"
                         />
@@ -361,7 +391,7 @@ export default function ApprovalCard({
               <Ico size={14} path={<path d="M18 15l-6-6-6 6" />} />
             </button>
             <span className="inline-flex items-center text-[12px] font-medium tabular-nums text-ink-3" style={{ letterSpacing: "-0.1px", lineHeight: 1 }}>
-              <RollingDigits value={`${qi + 1} / ${QUESTIONS.length}`} />
+              <RollingDigits value={`${qi + 1} / ${questions.length}`} />
             </span>
             <button
               type="button"
@@ -376,10 +406,10 @@ export default function ApprovalCard({
 
           <div className="-mr-0.5 flex items-center gap-1.5">
             <Button variant="ghost" size="sm" onClick={() => (last ? setOpen(false) : goTo(qi + 1))}>
-              Skip
+              {t.skip}
             </Button>
             <Button variant="accent" size="sm" disabled={!hasAnswer} onClick={advance}>
-              {last ? "Send" : "Continue"}
+              {last ? t.send : t.continue}
             </Button>
           </div>
         </div>

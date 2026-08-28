@@ -112,68 +112,73 @@ function ChartTooltip({ rows }: { rows: { label: string; value: string; color: s
   );
 }
 
+/* content shape for the return-comparison card's two plotted series */
+export type CompareSeries = {
+  name: string;
+  values: number[];
+  sub: string;
+  tone: "red" | "green";
+  dot: string;
+  color: string;
+  tooltipColor: string;
+};
+
+const COMPARE_SERIES: CompareSeries[] = [
+  {
+    name: "Mint Chip",
+    values: [-2.9, -3.4, -3.05, -3.86, -3.52, -4.1, -3.82, -4.41],
+    sub: "-$2,377.66",
+    tone: "red",
+    dot: "bg-orange",
+    color: "#f68f3c",
+    tooltipColor: "var(--orange)",
+  },
+  {
+    name: "Pistachio",
+    values: [0.22, 0.58, 0.42, 0.91, 0.76, 1.08, 0.96, 1.15],
+    sub: "+$617.22",
+    tone: "green",
+    dot: "bg-accent",
+    color: "#3d9aff",
+    tooltipColor: "var(--accent)",
+  },
+];
+
 /* 1 — return comparison: 2 series, legend + big deltas + line chart */
-function CompareCard() {
+function CompareCard({ series = COMPARE_SERIES }: { series?: CompareSeries[] }) {
   const dark = useDarkMode();
   const [hoverIndex, setHoverIndex] = useState<number | null>(null);
-  const data = useMemo(
-    () => ({
-      mint: smoothPoints([-2.9, -3.4, -3.05, -3.86, -3.52, -4.1, -3.82, -4.41], 42),
-      pistachio: smoothPoints([0.22, 0.58, 0.42, 0.91, 0.76, 1.08, 0.96, 1.15], 42),
-    }),
-    [],
+  const points = useMemo(
+    () => series.map((s) => smoothPoints(s.values, 42)),
+    [series],
   );
+  const pointCount = points[0]?.length ?? 0;
 
-  const latestMint = data.mint.at(-1)?.value ?? -4.41;
-  const latestPistachio = data.pistachio.at(-1)?.value ?? 1.15;
-  const series: LivelineSeries[] = useMemo(
-    () => [
-      {
-        id: "mint",
+  const chartSeries: LivelineSeries[] = useMemo(
+    () =>
+      series.map((s, i) => ({
+        id: s.name,
         label: "",
-        data: data.mint,
-        value: latestMint,
-        color: "#f68f3c",
-      },
-      {
-        id: "pistachio",
-        label: "",
-        data: data.pistachio,
-        value: latestPistachio,
-        color: "#3d9aff",
-      },
-    ],
-    [data.mint, data.pistachio, latestMint, latestPistachio],
+        data: points[i],
+        value: points[i].at(-1)?.value ?? (s.values.at(-1) ?? 0),
+        color: s.color,
+      })),
+    [series, points],
   );
 
   return (
     <div className="min-h-[278px] rounded-card bg-surface p-3 shadow-hairline">
       <div className="flex items-center gap-4">
-        {[
-          {
-            name: "Mint Chip",
-            delta: formatPercent(latestMint),
-            sub: "-$2,377.66",
-            tone: "red",
-            dot: "bg-orange",
-          },
-          {
-            name: "Pistachio",
-            delta: formatPercent(latestPistachio),
-            sub: "+$617.22",
-            tone: "green",
-            dot: "bg-accent",
-          },
-        ].map((s) => (
+        {series.map((s, i) => (
           <div key={s.name} className="flex-1">
             <span className="flex items-center gap-1.5 text-[11.5px] text-ink-2">
               <span className={`size-2 rounded-full ${s.dot}`} />
               {s.name}
             </span>
             <span className={`block text-[17px] font-semibold tracking-[-0.01em] tabular-nums ${s.tone === "red" ? "text-red" : "text-green"}`}>
-              {s.delta}
+              {formatPercent(points[i].at(-1)?.value ?? (s.values.at(-1) ?? 0))}
             </span>
-            <Mono tone={s.tone as "red" | "green"}>{s.sub}</Mono>
+            <Mono tone={s.tone}>{s.sub}</Mono>
           </div>
         ))}
       </div>
@@ -188,8 +193,8 @@ function CompareCard() {
         </div>
         <div
           className="insight-chart-stage relative h-[166px]"
-          onPointerDown={(event) => setHoverIndex(chartIndexFromPointer(event, data.mint.length))}
-          onPointerMove={(event) => setHoverIndex(chartIndexFromPointer(event, data.mint.length))}
+          onPointerDown={(event) => setHoverIndex(chartIndexFromPointer(event, pointCount))}
+          onPointerMove={(event) => setHoverIndex(chartIndexFromPointer(event, pointCount))}
           onPointerLeave={() => setHoverIndex(null)}
           onPointerCancel={() => setHoverIndex(null)}
           onPointerUp={() => setHoverIndex(null)}
@@ -197,7 +202,7 @@ function CompareCard() {
           <Liveline
             data={[]}
             value={0}
-            series={series}
+            series={chartSeries}
             theme={dark ? "dark" : "light"}
             grid={false}
             pulse={false}
@@ -210,9 +215,9 @@ function CompareCard() {
             formatValue={formatPercent}
           />
           {hoverIndex !== null && <>
-            <span className="insight-chart-cursor" style={{ left: `${(hoverIndex / (data.mint.length - 1)) * 100}%` }} />
-            <span className="insight-chart-tooltip-anchor" style={{ left: `${Math.min(Math.max((hoverIndex / (data.mint.length - 1)) * 100, 28), 72)}%` }}>
-              <ChartTooltip rows={[{ label: "Mint Chip", value: formatPercent(data.mint[hoverIndex].value), color: "var(--orange)" }, { label: "Pistachio", value: formatPercent(data.pistachio[hoverIndex].value), color: "var(--accent)" }]} />
+            <span className="insight-chart-cursor" style={{ left: `${(hoverIndex / (pointCount - 1)) * 100}%` }} />
+            <span className="insight-chart-tooltip-anchor" style={{ left: `${Math.min(Math.max((hoverIndex / (pointCount - 1)) * 100, 28), 72)}%` }}>
+              <ChartTooltip rows={series.map((s, i) => ({ label: s.name, value: formatPercent(points[i][hoverIndex].value), color: s.tooltipColor }))} />
             </span>
           </>}
         </div>
@@ -221,18 +226,29 @@ function CompareCard() {
   );
 }
 
+/* content shape for the anomaly card's two toggled metric series */
+export type AnomalyData = {
+  spend: number[];
+  usage: number[];
+};
+
+const ANOMALY_DATA: AnomalyData = {
+  spend: [274, 289, 264, 307, 331, 1210, 1718, 2112],
+  usage: [18, 19, 17, 21, 22, 58, 81, 96],
+};
+
 /* 2 — anomaly: bars with threshold + big spent value */
-function AnomalyCard() {
+function AnomalyCard({ data: anomaly = ANOMALY_DATA }: { data?: AnomalyData }) {
   const dark = useDarkMode();
   const [metric, setMetric] = useState<"spend" | "usage">("spend");
   const [hoverIndex, setHoverIndex] = useState<number | null>(null);
   const spend = useMemo(
-    () => makePoints([274, 289, 264, 307, 331, 1210, 1718, 2112], 7),
-    [],
+    () => makePoints(anomaly.spend, 7),
+    [anomaly],
   );
   const usage = useMemo(
-    () => makePoints([18, 19, 17, 21, 22, 58, 81, 96], 7),
-    [],
+    () => makePoints(anomaly.usage, 7),
+    [anomaly],
   );
 
   const data = metric === "spend" ? spend : usage;
@@ -320,13 +336,24 @@ function AnomalyCard() {
   );
 }
 
+/* content shape for one allocation segment */
+export type AllocationSegment = {
+  name: string;
+  label: string;
+  pct: number;
+  amount: string;
+  cls: string;
+  tone: string;
+};
+
+const ALLOCATION_SEGMENTS: AllocationSegment[] = [
+  { name: "VAN", label: "Vanilla", pct: 72.5, amount: "$51,785", cls: "bg-orange", tone: "text-orange" },
+  { name: "CHOC", label: "Chocolate", pct: 22.8, amount: "$16,278", cls: "bg-line-strong", tone: "text-ink-2" },
+  { name: "MINT", label: "Mint", pct: 4.7, amount: "$3,357", cls: "bg-line", tone: "text-ink-3" },
+];
+
 /* 3 — allocation: hero number + segmented bar + legend */
-function AllocationCard() {
-  const segments = [
-    { name: "VAN", label: "Vanilla", pct: 72.5, amount: "$51,785", cls: "bg-orange", tone: "text-orange" },
-    { name: "CHOC", label: "Chocolate", pct: 22.8, amount: "$16,278", cls: "bg-line-strong", tone: "text-ink-2" },
-    { name: "MINT", label: "Mint", pct: 4.7, amount: "$3,357", cls: "bg-line", tone: "text-ink-3" },
-  ];
+function AllocationCard({ segments = ALLOCATION_SEGMENTS }: { segments?: AllocationSegment[] }) {
   const [selected, setSelected] = useState(segments[0].name);
   const active = segments.find((segment) => segment.name === selected) ?? segments[0];
 
@@ -398,7 +425,15 @@ function AllocationCard() {
   );
 }
 
-const PAGES = [
+/* content shape for one insight page in the carousel */
+export type InsightPage = {
+  key: string;
+  prose: React.ReactNode;
+  Card: React.ComponentType;
+  pill: string;
+};
+
+const PAGES: InsightPage[] = [
   {
     key: "compare",
     prose: (
@@ -434,22 +469,39 @@ const PAGES = [
   },
 ];
 
-export default function InsightCards() {
+export type InsightCardsLabels = {
+  /** carousel heading shown before the page count */
+  title: string;
+};
+
+const DEFAULT_INSIGHT_LABELS: InsightCardsLabels = {
+  title: "Insights",
+};
+
+export default function InsightCards({
+  pages = PAGES,
+  labels,
+}: {
+  variant?: string;
+  pages?: InsightPage[];
+  labels?: Partial<InsightCardsLabels>;
+} = {}) {
+  const l = { ...DEFAULT_INSIGHT_LABELS, ...labels };
   const [page, setPage] = useState(0);
 
   const move = (direction: -1 | 1) => {
-    setPage((current) => (current + direction + PAGES.length) % PAGES.length);
+    setPage((current) => (current + direction + pages.length) % pages.length);
   };
 
-  const { prose, Card, pill } = PAGES[page];
+  const { prose, Card, pill } = pages[page];
 
   return (
     <div className="min-h-[408px] w-full max-w-86">
       {/* pager header */}
       <div className="flex items-center justify-between">
         <span className="flex items-baseline gap-1.5">
-          <span className="text-[13px] font-semibold text-ink">Insights</span>
-          <span className="text-[13px] text-ink-3 tabular-nums">{PAGES.length}</span>
+          <span className="text-[13px] font-semibold text-ink">{l.title}</span>
+          <span className="text-[13px] text-ink-3 tabular-nums">{pages.length}</span>
         </span>
         <span className="flex items-center gap-0.5">
           {(["M15 18l-6-6 6-6", "M9 6l6 6-6 6"] as const).map((d, i) => (

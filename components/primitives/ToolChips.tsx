@@ -20,9 +20,32 @@ const Icons: Record<string, React.ReactNode> = {
   read: <g fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" /><path d="M14 2v6h6" /></g>,
 };
 
-type DetailLine = { text: string; tone?: "add" };
+export type ToolDetailLine = { text: string; tone?: "add" };
 
-const ROWS: { icon: string; label: string; chip: string; mono: boolean; detailMono: boolean; detail: DetailLine[] }[] = [
+export type ToolStep = {
+  icon: string;
+  label: string;
+  chip: string;
+  mono: boolean;
+  detailMono: boolean;
+  detail: ToolDetailLine[];
+};
+
+export type ToolDiff = { file: string; add: number; del: number };
+
+export type ToolDiffLine = { text: string; tone: "add" | "del" | "ctx" };
+
+export type ToolChipsLabels = {
+  header: string;
+  more: string;
+};
+
+const DEFAULT_LABELS: ToolChipsLabels = {
+  header: "4 tool calls, 2 messages",
+  more: "+2 more",
+};
+
+const ROWS: ToolStep[] = [
   {
     icon: "think", label: "Thinking", chip: "Planning the churn schedule…", mono: false, detailMono: false,
     detail: [
@@ -53,15 +76,14 @@ const ROWS: { icon: string; label: string; chip: string; mono: boolean; detailMo
   },
 ];
 
-const DIFFS = [
+const DIFFS: ToolDiff[] = [
   { file: "flavors.css", add: 13, del: 0 },
   { file: "ChurnSchedule.tsx", add: 74, del: 41 },
   { file: "menu.ts", add: 8, del: 2 },
 ];
 
 /* hovering a file chip opens its diff — green added, red removed */
-type DiffLine = { text: string; tone: "add" | "del" | "ctx" };
-const DIFF_LINES: Record<string, DiffLine[]> = {
+const DIFF_LINES: Record<string, ToolDiffLine[]> = {
   "flavors.css": [
     { text: ".scoop-card {", tone: "ctx" },
     { text: "  gap: 14px;", tone: "del" },
@@ -82,7 +104,26 @@ const DIFF_LINES: Record<string, DiffLine[]> = {
   ],
 };
 
-export default function ToolChips() {
+export default function ToolChips({
+  steps = ROWS,
+  diffs = DIFFS,
+  diffLines = DIFF_LINES,
+  labels,
+  className,
+  onOpenChange,
+  onToggleRow,
+}: {
+  /** Accepted for gallery/registry parity; ToolChips has no visual variants. */
+  variant?: string;
+  steps?: ToolStep[];
+  diffs?: ToolDiff[];
+  diffLines?: Record<string, ToolDiffLine[]>;
+  labels?: Partial<ToolChipsLabels>;
+  className?: string;
+  onOpenChange?: (open: boolean) => void;
+  onToggleRow?: (label: string, open: boolean) => void;
+} = {}) {
+  const copy = { ...DEFAULT_LABELS, ...labels };
   const [step, setStep] = useState(0);
   const [open, setOpen] = useState(true);
   const [openRows, setOpenRows] = useState<Set<string>>(new Set());
@@ -96,7 +137,7 @@ export default function ToolChips() {
   } | null>(null);
   const openPreview = (file: string) => (event: React.SyntheticEvent) => {
     const rect = (event.currentTarget as Element).closest("[data-diffchip]")!.getBoundingClientRect();
-    const previewHeight = 38 + (DIFF_LINES[file]?.length ?? 0) * 19;
+    const previewHeight = 38 + (diffLines[file]?.length ?? 0) * 19;
     const fitsBelow = rect.bottom + 6 + previewHeight <= window.innerHeight - 12;
     setPreview({
       file,
@@ -108,7 +149,7 @@ export default function ToolChips() {
   };
   const closePreview = (file: string) => () =>
     setPreview((current) => (current?.file === file ? null : current));
-  const total = ROWS.length + 1; // rows, then diff chips
+  const total = steps.length + 1; // rows, then diff chips
 
   useEffect(() => {
     if (step >= total) return;
@@ -120,22 +161,28 @@ export default function ToolChips() {
     setOpenRows((current) => {
       const next = new Set(current);
       next.has(label) ? next.delete(label) : next.add(label);
+      onToggleRow?.(label, next.has(label));
       return next;
     });
 
   return (
-    <div className="min-h-[220px] w-full max-w-80 pb-1">
+    <div className={`min-h-[220px] w-full max-w-80 pb-1${className ? ` ${className}` : ""}`}>
       {/* collapsed run header */}
       <button
         type="button"
         aria-expanded={open}
-        onClick={() => setOpen((current) => !current)}
+        onClick={() =>
+          setOpen((current) => {
+            onOpenChange?.(!current);
+            return !current;
+          })
+        }
         className="-mx-1.5 flex w-fit items-center gap-1.5 rounded-control px-1.5 py-1 text-[12.5px] text-ink-2 transition-colors duration-100 hover:bg-hover-2"
       >
         <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" className="transition-transform duration-200" style={{ transform: open ? "rotate(0deg)" : "rotate(-90deg)" }}>
           <path d="M6 9l6 6 6-6" />
         </svg>
-        <span className="tabular-nums">4 tool calls, 2 messages</span>
+        <span className="tabular-nums">{copy.header}</span>
       </button>
 
       {/* tool call rows */}
@@ -144,7 +191,7 @@ export default function ToolChips() {
             row hover pills room inside this overflow-hidden clip box */}
         <div className="-mx-1 overflow-hidden px-1.5 pb-1">
         <div className="mt-1.5 flex flex-col gap-1">
-          {ROWS.slice(0, step).map((row) => {
+          {steps.slice(0, step).map((row) => {
             const rowOpen = openRows.has(row.label);
             return (
             <div key={row.label} style={{ animation: "fade-up 300ms cubic-bezier(0.23,1,0.32,1) both" }}>
@@ -205,7 +252,7 @@ export default function ToolChips() {
       {/* file-diff chips */}
       {step >= total && (
         <div className="mt-2.5 flex max-w-full flex-wrap gap-1.5 border-t border-line pt-2.5">
-          {DIFFS.map((d, i) => (
+          {diffs.map((d, i) => (
             <span
               key={d.file}
               data-diffchip
@@ -236,9 +283,9 @@ export default function ToolChips() {
             className="inline-flex h-7 items-center rounded-chip px-1.5 font-mono text-[11.5px] text-ink-3
               underline decoration-transparent underline-offset-2 transition-colors duration-100
               hover:text-ink-2 hover:decoration-current"
-            style={{ animation: `fade-in 300ms ease-out ${DIFFS.length * 80}ms both` }}
+            style={{ animation: `fade-in 300ms ease-out ${diffs.length * 80}ms both` }}
           >
-            +2 more
+            {copy.more}
           </button>
         </div>
       )}
@@ -258,14 +305,14 @@ export default function ToolChips() {
           <div className="flex items-center justify-between border-b border-line px-2.5 py-1.5 font-mono text-[11px]">
             <span className="min-w-0 truncate text-ink-2">{preview.file}</span>
             <span className="shrink-0 tabular-nums">
-              <span className="text-green">+{DIFFS.find((diff) => diff.file === preview.file)?.add}</span>
-              {(DIFFS.find((diff) => diff.file === preview.file)?.del ?? 0) > 0 && (
-                <span className="text-red"> −{DIFFS.find((diff) => diff.file === preview.file)?.del}</span>
+              <span className="text-green">+{diffs.find((diff) => diff.file === preview.file)?.add}</span>
+              {(diffs.find((diff) => diff.file === preview.file)?.del ?? 0) > 0 && (
+                <span className="text-red"> −{diffs.find((diff) => diff.file === preview.file)?.del}</span>
               )}
             </span>
           </div>
           <div className="py-1 font-mono text-[11px] leading-[1.8]">
-            {(DIFF_LINES[preview.file] ?? []).map((line, index) => (
+            {(diffLines[preview.file] ?? []).map((line, index) => (
               <div
                 key={index}
                 className={`flex gap-2 px-2.5 whitespace-pre ${

@@ -103,22 +103,108 @@ function SegmentIcon({ kind }: { kind: string }) {
   );
 }
 
-export default function FineTuneCard() {
+/* A single scrub-able number property. `value` is the initial/default value. */
+export type FineTuneField = {
+  key: string;
+  label: string;
+  value: number;
+  min: number;
+  max: number;
+  step?: number;
+  suffix?: string;
+};
+/* Prominent copy strings on the card. */
+export type FineTuneCardLabels = {
+  title: string;
+  layout: string;
+  type: string;
+  placeholder: string;
+  adjust: string;
+  edited: string;
+};
+/* The editable state emitted by `onChange`. */
+export type FineTuneState = {
+  segment: number;
+  values: Record<string, number>;
+  type: string;
+};
+
+const FIELDS: FineTuneField[] = [
+  { key: "width", label: "W", value: 324, min: 40, max: 999 },
+  { key: "height", label: "H", value: 96, min: 24, max: 999 },
+  { key: "radius", label: "Radius", value: 28, min: 0, max: 64 },
+  { key: "opacity", label: "Opacity", value: 100, min: 0, max: 100, suffix: "%" },
+];
+
+const OPTIONS = ["Seasonal", "Classic", "Limited"];
+
+const DEFAULT_LABELS: FineTuneCardLabels = {
+  title: "Flavor card",
+  layout: "Layout",
+  type: "Type",
+  placeholder: "Select type",
+  adjust: "Adjust",
+  edited: "Edited",
+};
+
+function chunk<T>(items: T[], size: number): T[][] {
+  const rows: T[][] = [];
+  for (let i = 0; i < items.length; i += size) rows.push(items.slice(i, i + size));
+  return rows;
+}
+
+export type FineTuneCardProps = {
+  /** Accepted for gallery/registry parity; not used by this card. */
+  variant?: string;
+  /** The scrub-able properties shown in the layout grid (rendered in pairs). */
+  fields?: FineTuneField[];
+  /** Options offered in the Type menu. */
+  options?: string[];
+  /** Prominent copy strings. */
+  labels?: Partial<FineTuneCardLabels>;
+  /** Called with the full editable state whenever the user edits it. */
+  onChange?: (state: FineTuneState) => void;
+};
+
+export default function FineTuneCard({
+  fields = FIELDS,
+  options = OPTIONS,
+  labels,
+  onChange,
+}: FineTuneCardProps) {
+  const text = { ...DEFAULT_LABELS, ...labels };
   const [seg, setSeg] = useState(0);
-  const [width, setWidth] = useState(324);
-  const [height, setHeight] = useState(96);
-  const [radius, setRadius] = useState(28);
-  const [opacity, setOpacity] = useState(100);
+  const [values, setValues] = useState<Record<string, number>>(() =>
+    Object.fromEntries(fields.map((f) => [f.key, f.value])),
+  );
   const [menuOpen, setMenuOpen] = useState(false);
-  const [typeValue, setTypeValue] = useState("Select type");
-  const done =
-    seg !== 0 || width !== 324 || height !== 96 || radius !== 28 || opacity !== 100 || typeValue !== "Select type";
+  const [typeValue, setTypeValue] = useState(text.placeholder);
+
+  const selectSeg = (i: number) => {
+    setSeg(i);
+    onChange?.({ segment: i, values, type: typeValue });
+  };
+  const setValue = (key: string, v: number) => {
+    setValues((current) => {
+      const next = { ...current, [key]: v };
+      onChange?.({ segment: seg, values: next, type: typeValue });
+      return next;
+    });
+  };
+  const selectType = (value: string) => {
+    setTypeValue(value);
+    setMenuOpen(false);
+    onChange?.({ segment: seg, values, type: value });
+  };
+
+  const changed = fields.some((f) => values[f.key] !== f.value);
+  const done = seg !== 0 || changed || typeValue !== text.placeholder;
 
   return (
     <div className="relative w-full max-w-60 rounded-card bg-surface shadow-raised">
       {/* header */}
       <div className="primitive-card-bar flex items-center justify-between border-b border-line">
-        <span className="text-[13px] font-medium text-ink">Flavor card</span>
+        <span className="text-[13px] font-medium text-ink">{text.title}</span>
         {done ? (
           <span
             className="flex items-center gap-1.5 text-[12px] font-medium text-green"
@@ -127,7 +213,7 @@ export default function FineTuneCard() {
             <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
               <path d="M20 6L9 17l-5-5" />
             </svg>
-            Edited
+            {text.edited}
           </span>
         ) : (
           <span className="flex items-center gap-1.5">
@@ -145,7 +231,7 @@ export default function FineTuneCard() {
                 animation: "shimmer-text 1.4s linear infinite",
               }}
             >
-              Adjust
+              {text.adjust}
             </span>
           </span>
         )}
@@ -153,7 +239,7 @@ export default function FineTuneCard() {
 
       {/* layout section */}
       <div className="primitive-card-pad flex flex-col gap-2 border-b border-line">
-        <p className="text-[12.5px] font-medium text-ink">Layout</p>
+        <p className="text-[12.5px] font-medium text-ink">{text.layout}</p>
         {/* segmented control: gray track, raised white thumb */}
         <div className="relative grid grid-cols-3 rounded-control bg-field p-0.5">
           <span
@@ -172,7 +258,7 @@ export default function FineTuneCard() {
               type="button"
               aria-label={`${s} layout`}
               aria-pressed={i === seg}
-              onClick={() => setSeg(i)}
+              onClick={() => selectSeg(i)}
               className={`relative z-10 flex h-6 items-center justify-center transition-colors duration-200
                 ${i === seg ? "text-accent" : "text-ink-3"}`}
             >
@@ -180,19 +266,28 @@ export default function FineTuneCard() {
             </button>
           ))}
         </div>
-        <div className="grid min-w-0 grid-cols-2 gap-2">
-          <ScrubField label="W" value={width} onChange={setWidth} min={40} max={999} active={width !== 324} />
-          <ScrubField label="H" value={height} onChange={setHeight} min={24} max={999} active={height !== 96} />
-        </div>
-        <div className="grid min-w-0 grid-cols-2 gap-2">
-          <ScrubField label="Radius" value={radius} onChange={setRadius} min={0} max={64} active={radius !== 28} />
-          <ScrubField label="Opacity" value={opacity} onChange={setOpacity} min={0} max={100} suffix="%" active={opacity !== 100} />
-        </div>
+        {chunk(fields, 2).map((pair, ri) => (
+          <div key={ri} className="grid min-w-0 grid-cols-2 gap-2">
+            {pair.map((f) => (
+              <ScrubField
+                key={f.key}
+                label={f.label}
+                value={values[f.key]}
+                onChange={(v) => setValue(f.key, v)}
+                min={f.min}
+                max={f.max}
+                step={f.step}
+                suffix={f.suffix}
+                active={values[f.key] !== f.value}
+              />
+            ))}
+          </div>
+        ))}
       </div>
 
       {/* interaction section */}
       <div className="primitive-card-footer flex items-center justify-between">
-        <span className="text-[12px] text-ink-3">Type</span>
+        <span className="text-[12px] text-ink-3">{text.type}</span>
         <div className="relative -mr-0.5 w-30">
           <button
             type="button"
@@ -202,7 +297,7 @@ export default function FineTuneCard() {
               shadow-hairline transition-shadow duration-200 focus-visible:outline-none"
             style={{ boxShadow: menuOpen ? "0 0 0 1px var(--accent)" : undefined }}
           >
-            <span className={`text-[12px] ${typeValue !== "Select type" ? "text-ink" : "text-ink-3"}`}>
+            <span className={`text-[12px] ${typeValue !== text.placeholder ? "text-ink" : "text-ink-3"}`}>
               {typeValue}
             </span>
             <svg
@@ -223,15 +318,12 @@ export default function FineTuneCard() {
               }}
             >
               <GlideMenu className="flex flex-col gap-px" highlightClassName="inset-x-0 rounded-[6px] bg-field">
-                {["Seasonal", "Classic", "Limited"].map((item) => (
+                {options.map((item) => (
                   <button
                     key={item}
                     data-menu-row
                     type="button"
-                    onClick={() => {
-                      setTypeValue(item);
-                      setMenuOpen(false);
-                    }}
+                    onClick={() => selectType(item)}
                     className={`relative z-10 flex h-6.5 w-full items-center rounded-[6px] px-2 text-left text-[12.5px] text-ink ${
                       item === typeValue ? "bg-field group-hover/glide-menu:bg-transparent" : ""
                     }`}

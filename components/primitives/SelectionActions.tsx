@@ -6,6 +6,7 @@ import {
   useLayoutEffect,
   useRef,
   useState,
+  type ReactNode,
 } from "react";
 import {
   ArrowUp,
@@ -35,6 +36,47 @@ const PICKED =
   "Churn it first thing Saturday so the batch has time to firm up before the afternoon rush.";
 const REWRITE =
   "Churn pistachio first thing Saturday so the batch has time to fully firm before the afternoon rush.";
+
+/* The passage: lead-in text, the selected `original`, and the streamed `rewrite`. */
+export type SelectionText = {
+  lead: string;
+  original: string;
+  rewrite: string;
+};
+
+/* A single AI action offered in the bar. Omit `action` for a no-op button
+ * (e.g. Explain); `busyLabel` is the gerund shown while it runs. */
+export type SelectionAction = {
+  id: string;
+  icon: ReactNode;
+  action?: string;
+  busyLabel?: string;
+};
+
+/* The action set: `primary` are always visible; `more` reveal on expand. */
+export type SelectionActionSet = {
+  primary: SelectionAction[];
+  more: SelectionAction[];
+};
+
+/* Prominent copy strings. */
+export type SelectionActionsLabels = {
+  keep: string;
+  discard: string;
+  placeholder: string;
+};
+
+const DEFAULT_TEXT: SelectionText = {
+  lead: LEAD,
+  original: PICKED,
+  rewrite: REWRITE,
+};
+
+const DEFAULT_LABELS: SelectionActionsLabels = {
+  keep: "Keep",
+  discard: "Discard",
+  placeholder: "Describe edits",
+};
 
 type Mode = "idle" | "thinking" | "streaming" | "result";
 
@@ -71,7 +113,39 @@ const control =
 const primary =
   "inline-flex h-7 shrink-0 items-center gap-1 rounded-full bg-ink px-2.5 text-[12.5px] font-normal text-canvas shadow-hairline transition-[opacity,transform] duration-150 hover:opacity-90 active:scale-[0.96]";
 
-export default function SelectionActions() {
+const DEFAULT_ACTIONS: SelectionActionSet = {
+  primary: [
+    { id: "Explain", icon: icons.explain },
+    { id: "Improve", icon: icons.improve, action: "Improve", busyLabel: "Improving" },
+  ],
+  more: [
+    { id: "Shorten", icon: icons.shorten, action: "Shorten", busyLabel: "Shortening" },
+    { id: "Tone", icon: icons.tone, action: "Change tone", busyLabel: "Changing tone" },
+    { id: "Grammar", icon: icons.grammar, action: "Fix grammar" },
+  ],
+};
+
+export type SelectionActionsProps = {
+  /** Accepted for gallery/registry parity; not used by this bar. */
+  variant?: string;
+  /** The passage shown above the bar. */
+  text?: Partial<SelectionText>;
+  /** The AI actions offered in the bar. */
+  actions?: SelectionActionSet;
+  /** Prominent copy strings. */
+  labels?: Partial<SelectionActionsLabels>;
+  /** Called with the action name whenever an edit is run. */
+  onAction?: (action: string) => void;
+};
+
+export default function SelectionActions({
+  text: textProp,
+  actions = DEFAULT_ACTIONS,
+  labels,
+  onAction,
+}: SelectionActionsProps = {}) {
+  const passage = { ...DEFAULT_TEXT, ...textProp };
+  const copy = { ...DEFAULT_LABELS, ...labels };
   const [shown, setShown] = useState(false);
   const [mode, setMode] = useState<Mode>("idle");
   const [action, setAction] = useState("Improve");
@@ -205,6 +279,7 @@ export default function SelectionActions() {
     setAction(nextAction);
     setExpanded(false);
     setMode("thinking");
+    onAction?.(nextAction);
   };
 
   const reset = () => {
@@ -218,34 +293,31 @@ export default function SelectionActions() {
   const busy = mode === "thinking" || mode === "streaming";
   const visible = shown && positioned;
   const hasPrompt = prompt.trim().length > 0;
-  const busyLabel =
-    action === "Improve"
-      ? "Improving"
-      : action === "Shorten"
-        ? "Shortening"
-        : action === "Change tone"
-          ? "Changing tone"
-          : "Editing";
+  const busyLabelMap: Record<string, string> = {};
+  for (const item of [...actions.primary, ...actions.more]) {
+    if (item.action && item.busyLabel) busyLabelMap[item.action] = item.busyLabel;
+  }
+  const busyLabel = busyLabelMap[action] ?? "Editing";
 
   return (
     <div className="w-full max-w-[460px]">
       <div ref={hostRef} className="relative select-none pb-12">
         <p className="text-[13px] leading-relaxed text-ink">
-          {LEAD}
+          {passage.lead}
           <span
             ref={selectionRef}
             className="box-decoration-clone rounded-[3px] bg-[color-mix(in_srgb,var(--accent)_14%,var(--surface))] text-ink dark:bg-accent-tint"
           >
             {mode === "idle" || mode === "thinking" ? (
-              PICKED
+              passage.original
             ) : mode === "streaming" ? (
               <StreamText
-                text={REWRITE}
+                text={passage.rewrite}
                 onProgress={place}
                 onDone={() => setMode("result")}
               />
             ) : (
-              REWRITE
+              passage.rewrite
             )}
           </span>
         </p>
@@ -313,11 +385,11 @@ export default function SelectionActions() {
                   className={primary}
                 >
                   {icons.check}
-                  Keep
+                  {copy.keep}
                 </button>
                 <button type="button" onClick={reset} className={control}>
                   {icons.close}
-                  Discard
+                  {copy.discard}
                 </button>
                 <span className="mx-0.5 h-4 w-px shrink-0 bg-line" />
                 <button
@@ -374,8 +446,8 @@ export default function SelectionActions() {
                         }
                         setPrompt(next);
                       }}
-                      aria-label="Describe edits"
-                      placeholder="Describe edits"
+                      aria-label={copy.placeholder}
+                      placeholder={copy.placeholder}
                       className="h-7 w-full bg-transparent pr-2.5 pl-3 text-[12.5px] text-ink placeholder:text-ink-3"
                     />
                   </form>
@@ -393,18 +465,17 @@ export default function SelectionActions() {
                   {!expanded && (
                     <span className="mx-1 h-4 w-px shrink-0 bg-line-strong" />
                   )}
-                  <button type="button" className={control}>
-                    {icons.explain}
-                    Explain
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => run("Improve")}
-                    className={control}
-                  >
-                    {icons.improve}
-                    Improve
-                  </button>
+                  {actions.primary.map((item) => (
+                    <button
+                      key={item.id}
+                      type="button"
+                      onClick={item.action ? () => run(item.action!) : undefined}
+                      className={control}
+                    >
+                      {item.icon}
+                      {item.id}
+                    </button>
+                  ))}
 
                   <div
                     className="flex min-w-0 items-center gap-0.5 overflow-hidden transition-[max-width,opacity,margin] duration-400"
@@ -415,30 +486,17 @@ export default function SelectionActions() {
                       transitionTimingFunction: "cubic-bezier(0.23,1,0.32,1)",
                     }}
                   >
-                  <button
-                    type="button"
-                    onClick={() => run("Shorten")}
-                    className={control}
-                  >
-                    {icons.shorten}
-                    Shorten
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => run("Change tone")}
-                    className={control}
-                  >
-                    {icons.tone}
-                    Tone
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => run("Fix grammar")}
-                    className={control}
-                  >
-                    {icons.grammar}
-                    Grammar
-                  </button>
+                  {actions.more.map((item) => (
+                    <button
+                      key={item.id}
+                      type="button"
+                      onClick={item.action ? () => run(item.action!) : undefined}
+                      className={control}
+                    >
+                      {item.icon}
+                      {item.id}
+                    </button>
+                  ))}
                   </div>
 
                   <span className="mx-0.5 h-4 w-px shrink-0 bg-line" />

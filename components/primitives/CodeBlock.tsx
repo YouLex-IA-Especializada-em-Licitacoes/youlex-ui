@@ -22,10 +22,22 @@ const CODE_LINES = [
   "  return base.gallons;",
   "}",
 ];
-const RAW = CODE_LINES.join("\n");
 
-type Piece = { text: string; change?: "add" | "del" };
-type Row = { old: number | null; cur: number | null; type: "ctx" | "add" | "del"; pieces: Piece[] };
+/* A single run of code within a diff row; `change` tints it as an add/del. */
+export type CodePiece = { text: string; change?: "add" | "del" };
+/* One row of a unified diff: old/new line numbers, its kind, and its pieces. */
+export type DiffRow = {
+  old: number | null;
+  cur: number | null;
+  type: "ctx" | "add" | "del";
+  pieces: CodePiece[];
+};
+/* Prominent copy strings on the code block. */
+export type CodeBlockLabels = { copy: string; copied: string };
+
+// Back-compat internal aliases for the local component signatures.
+type Piece = CodePiece;
+type Row = DiffRow;
 
 const DIFF: Row[] = [
   { old: 1, cur: 1, type: "ctx", pieces: [{ text: "export async function churnBatch() {" }] },
@@ -100,19 +112,49 @@ function FileIcon() {
   );
 }
 
-export default function CodeBlock({ variant = "Code" }: { variant?: string }) {
+const DEFAULT_LABELS: CodeBlockLabels = { copy: "Copy", copied: "Copied" };
+
+export type CodeBlockProps = {
+  /** Which view to render — "Code" (line-numbered listing) or "Diff". */
+  variant?: string;
+  /** The lines shown in the Code view. */
+  lines?: string[];
+  /** Raw text placed on the clipboard by Copy. Defaults to `lines` joined. */
+  code?: string;
+  /** The unified-diff rows shown in the Diff view. */
+  diff?: DiffRow[];
+  /** Filename shown in the header. */
+  filename?: string;
+  /** Prominent copy strings. */
+  labels?: Partial<CodeBlockLabels>;
+  /** Called with the copied text after a successful copy. */
+  onCopy?: (text: string) => void;
+};
+
+export default function CodeBlock({
+  variant = "Code",
+  lines = CODE_LINES,
+  code,
+  diff = DIFF,
+  filename = FILE,
+  labels,
+  onCopy,
+}: CodeBlockProps) {
   const [copied, setCopied] = useState(false);
   const isDiff = variant === "Diff";
+  const text = { ...DEFAULT_LABELS, ...labels };
+  const raw = code ?? lines.join("\n");
 
   const copy = useCallback(() => {
-    navigator.clipboard.writeText(RAW).then(() => {
+    navigator.clipboard.writeText(raw).then(() => {
       setCopied(true);
+      onCopy?.(raw);
       setTimeout(() => setCopied(false), 1500);
     });
-  }, []);
+  }, [raw, onCopy]);
 
-  const added = DIFF.filter((r) => r.type === "add").length;
-  const removed = DIFF.filter((r) => r.type === "del").length;
+  const added = diff.filter((r) => r.type === "add").length;
+  const removed = diff.filter((r) => r.type === "del").length;
 
   return (
     <div className="w-full max-w-105 overflow-hidden rounded-card bg-surface shadow-card">
@@ -120,7 +162,7 @@ export default function CodeBlock({ variant = "Code" }: { variant?: string }) {
       <div className="flex h-11 items-center gap-2 border-b border-line px-4 text-[12.5px]">
         <span className="inline-flex min-w-0 items-center gap-[7px]">
           <FileIcon />
-          <span className="truncate font-mono leading-none text-ink">{FILE}</span>
+          <span className="truncate font-mono leading-none text-ink">{filename}</span>
         </span>
 
         {isDiff ? (
@@ -142,7 +184,7 @@ export default function CodeBlock({ variant = "Code" }: { variant?: string }) {
             ) : (
               <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="9" y="9" width="12" height="12" rx="2.5" /><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" /></svg>
             )}
-            {copied ? "Copied" : "Copy"}
+            {copied ? text.copied : text.copy}
           </button>
         )}
       </div>
@@ -152,7 +194,7 @@ export default function CodeBlock({ variant = "Code" }: { variant?: string }) {
         {isDiff ? (
           <div className="relative">
             <span className="pointer-events-none absolute inset-y-0 left-5 w-px bg-line" />
-            {DIFF.map((r, i) => {
+            {diff.map((r, i) => {
               const add = r.type === "add";
               const del = r.type === "del";
               // one gutter column: removals keep the old number, additions/context show the new one
@@ -177,7 +219,7 @@ export default function CodeBlock({ variant = "Code" }: { variant?: string }) {
         ) : (
           <div className="relative">
             <span className="pointer-events-none absolute inset-y-0 left-5 w-px bg-line" />
-            {CODE_LINES.map((line, i) => (
+            {lines.map((line, i) => (
               <div key={i} className="grid grid-cols-[20px_minmax(0,1fr)] items-start">
                 <span className="select-none text-center text-[11px] text-ink-3">{i + 1}</span>
                 <code className="pr-3 pl-1 break-words whitespace-pre-wrap">{highlight(line)}</code>
