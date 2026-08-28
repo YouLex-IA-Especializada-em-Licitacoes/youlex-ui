@@ -67,7 +67,6 @@ export const META: Meta[] = [
     title: "Chat",
     caption: "Tabbed chat panel with reasoning replies and a composer.",
     file: "ChatComposer.tsx",
-    npm: ["posthog-js"],
   },
   {
     id: "prompt-bar",
