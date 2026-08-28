@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { REGISTRY, type Entry } from "@/lib/registry";
+import { INTERNAL } from "@/lib/meta";
 
 /* ─────────────────────────────────────────────────────────
  * GRID + CODE OVERLAY
@@ -195,6 +196,19 @@ function Overlay({
             <p className="truncate font-mono text-[11.5px] text-ink-3">
               components/{entry.file}
             </p>
+            {(entry.deps?.length || entry.npm?.length) ? (
+              <p className="mt-1 text-[11.5px] leading-relaxed text-ink-3">
+                <span className="font-medium text-ink-2">Requires</span>
+                {entry.deps?.length ? (
+                  <> · also copy {entry.deps.map((d) => INTERNAL[d]?.title ?? d).join(", ")}</>
+                ) : null}
+                {entry.npm?.length ? (
+                  <> · <code className="rounded bg-inset px-1 py-0.5 font-mono text-[11px] text-ink-2">npm i {entry.npm.join(" ")}</code></>
+                ) : null}
+              </p>
+            ) : (
+              <p className="mt-1 text-[11.5px] text-ink-3">Self-contained — needs only the foundation tokens.</p>
+            )}
           </div>
           <div className="flex items-center gap-1.5">
             <button

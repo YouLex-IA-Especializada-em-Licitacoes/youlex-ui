@@ -6,6 +6,10 @@
 
 @custom-variant dark (&:where(.dark, .dark *));
 
+/* GENERIC FOUNDATION — tokens, @theme, base rules, the primitive-*
+ * spacing utilities, and shared keyframes below are needed by EVERY
+ * component. Blocks tagged COMPONENT-SPECIFIC further down belong to
+ * one primitive each. */
 /* ──────────────────────────────────────────────────────────
  * Beautiful UI — design tokens
  * Cool near-white canvas, white cards, hairline borders, layered
@@ -345,6 +349,12 @@ a:focus-visible .animated-underline::after {
   transform: scaleX(1);
 }
 
+/* ══════════════════════════════════════════════════════════
+ * COMPONENT-SPECIFIC — StreamingText / ContextCards
+ * Favicon source avatars.
+ * Copy this block only alongside StreamingText / ContextCards; it is not part of the
+ * generic foundation above.
+ * ══════════════════════════════════════════════════════════ */
 .source-avatar {
   box-shadow: 0 0 0 1px oklch(0.21 0.034 263.436 / 0.1);
 }
@@ -411,6 +421,12 @@ a:focus-visible .animated-underline::after {
 
 /* The sidebar is one persistent 224px tree clipped by a 52px shell.
  * Every rail glyph remains centered at x=26 in both states. */
+/* ══════════════════════════════════════════════════════════
+ * COMPONENT-SPECIFIC — SidebarNav
+ * The 52↔224px collapsible sidebar tree.
+ * Copy this block only alongside SidebarNav; it is not part of the
+ * generic foundation above.
+ * ══════════════════════════════════════════════════════════ */
 .sidebar-row {
   width: 208px;
   transition-duration: var(--sidebar-copy-duration);
@@ -487,6 +503,12 @@ a:focus-visible .animated-underline::after {
  * can move independently inside the table viewport.
  */
 
+/* ══════════════════════════════════════════════════════════
+ * COMPONENT-SPECIFIC — RecordsTable
+ * The full CRM grid, spreadsheet gutter, and AI column (~800 lines).
+ * Copy this block only alongside RecordsTable; it is not part of the
+ * generic foundation above.
+ * ══════════════════════════════════════════════════════════ */
 .records-shell {
   width: 100%;
   min-width: 0;
@@ -1307,12 +1329,24 @@ th.is-colsel .records-header-icon {
 
 /* ── filter table electric status colors ─────────────────── */
 
+/* ══════════════════════════════════════════════════════════
+ * COMPONENT-SPECIFIC — FilterTable
+ * Electric status-pill colors.
+ * Copy this block only alongside FilterTable; it is not part of the
+ * generic foundation above.
+ * ══════════════════════════════════════════════════════════ */
 .filter-status-todo,
 .filter-status-progress,
 .filter-status-done {
   border: 1px solid transparent;
 }
 
+/* ══════════════════════════════════════════════════════════
+ * COMPONENT-SPECIFIC — InsightCards
+ * Liveline chart tooltip + cursor.
+ * Copy this block only alongside InsightCards; it is not part of the
+ * generic foundation above.
+ * ══════════════════════════════════════════════════════════ */
 .insight-chart-stage {
   overflow: hidden;
 }
@@ -1420,6 +1454,12 @@ th.is-colsel .records-header-icon {
  * soft, masked blur so the leading edge resolves smoothly as
  * text flows in. The caret holds solid while streaming, then
  * blinks once the string settles. */
+/* ══════════════════════════════════════════════════════════
+ * COMPONENT-SPECIFIC — StreamText
+ * The streaming caret + tail.
+ * Copy this block only alongside StreamText; it is not part of the
+ * generic foundation above.
+ * ══════════════════════════════════════════════════════════ */
 .stream-tail {
   filter: blur(1.6px);
   -webkit-mask-image: linear-gradient(to right, oklch(0 0 0) 20%, oklch(0 0 0 / 0.2));
