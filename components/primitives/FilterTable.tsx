@@ -9,6 +9,12 @@ import { useState } from "react";
 
 type Status = "todo" | "progress" | "done";
 
+export type TableRow = { task: string; date: string; status: Status; owner: string };
+
+export type FilterTableLabels = {
+  columns: { task: string; date: string; status: string; owner: string };
+};
+
 const FILTERS: { key: "all" | Status; label: string; dot?: string; count: number }[] = [
   { key: "all", label: "All", count: 5 },
   { key: "todo", label: "To do", dot: "#f09a2f", count: 2 },
@@ -16,7 +22,7 @@ const FILTERS: { key: "all" | Status; label: string; dot?: string; count: number
   { key: "done", label: "Completed", dot: "#25a878", count: 1 },
 ];
 
-const ROWS: { task: string; date: string; status: Status; owner: string }[] = [
+const ROWS: TableRow[] = [
   { task: "Restock mango sorbet", date: "Dec 03", status: "todo", owner: "Mango Moon Gelato" },
   { task: "Churn black sesame", date: "Sep 22", status: "progress", owner: "Kumo Creamery" },
   { task: "Print summer menu", date: "Jan 02", status: "todo", owner: "Coral Coast Sorbet" },
@@ -24,13 +30,24 @@ const ROWS: { task: string; date: string; status: Status; owner: string }[] = [
   { task: "Order waffle cones", date: "Apr 14", status: "done", owner: "Aurora Scoops" },
 ];
 
+const LABELS: FilterTableLabels = {
+  columns: { task: "Task name", date: "Date", status: "Status", owner: "Advisor" },
+};
+
 const PILLS: Record<Status, { label: string; cls: string }> = {
   todo: { label: "To do", cls: "filter-status-todo" },
   progress: { label: "In Progress", cls: "filter-status-progress" },
   done: { label: "Completed", cls: "filter-status-done" },
 };
 
-export default function FilterTable() {
+export default function FilterTable({
+  rows = ROWS,
+  labels = LABELS,
+}: {
+  rows?: TableRow[];
+  labels?: FilterTableLabels;
+  variant?: string;
+} = {}) {
   const [filter, setFilter] = useState<"all" | Status>("all");
 
   return (
@@ -75,12 +92,12 @@ export default function FilterTable() {
       >
         <div className="min-w-[420px]">
           <div className="grid grid-cols-[minmax(0,1.3fr)_minmax(0,0.6fr)_minmax(0,0.95fr)_minmax(0,0.9fr)] border-b border-[var(--grid-line)] text-[12.5px] font-medium text-ink-2">
-            <span className="border-r border-[var(--grid-line)] px-3 py-2">Task name</span>
-            <span className="border-r border-[var(--grid-line)] px-3 py-2">Date</span>
-            <span className="border-r border-[var(--grid-line)] px-3 py-2">Status</span>
-            <span className="px-3 py-2">Advisor</span>
+            <span className="border-r border-[var(--grid-line)] px-3 py-2">{labels.columns.task}</span>
+            <span className="border-r border-[var(--grid-line)] px-3 py-2">{labels.columns.date}</span>
+            <span className="border-r border-[var(--grid-line)] px-3 py-2">{labels.columns.status}</span>
+            <span className="px-3 py-2">{labels.columns.owner}</span>
           </div>
-          {ROWS.map((row) => {
+          {rows.map((row) => {
             const shown = filter === "all" || row.status === filter;
             const pill = PILLS[row.status];
             return (

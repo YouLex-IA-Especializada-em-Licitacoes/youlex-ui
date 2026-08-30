@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import posthog from "posthog-js";
 
 /* ─────────────────────────────────────────────────────────
  * CHAT — interactive panel with tabs, replies, and composer.
@@ -9,6 +8,43 @@ import posthog from "posthog-js";
  * ───────────────────────────────────────────────────────── */
 
 type Phase = "idle" | "sent" | "reply1" | "reply2" | "done";
+
+/* one scripted agent reply in the thread */
+export type ChatMessage = {
+  label: string;
+  sub: string;
+  time: string;
+  body: string;
+};
+
+const MESSAGES: ChatMessage[] = [
+  {
+    label: "Sales History",
+    sub: "Flavor Data",
+    time: "4s",
+    body: "Pulled 3 summers of mint chip sales for comparison.",
+  },
+  {
+    label: "Comparison",
+    sub: "Trend Detection",
+    time: "2s",
+    body: "Mint chip is up 12% with stronger weekend peaks.",
+  },
+];
+
+const SUGGESTIONS = ["Flavors", "Suppliers"];
+
+export type ChatComposerLabels = {
+  /** the pre-filled prompt shown in the first user bubble */
+  initialPrompt: string;
+  /** composer input placeholder */
+  placeholder: string;
+};
+
+const DEFAULT_LABELS: ChatComposerLabels = {
+  initialPrompt: "Compare mint chip to last summer",
+  placeholder: "Prompt or tag a flavor with @",
+};
 
 function Section({
   label,
@@ -45,11 +81,27 @@ function Section({
   );
 }
 
-export default function ChatComposer() {
+export default function ChatComposer({
+  messages = MESSAGES,
+  suggestions = SUGGESTIONS,
+  labels,
+  onSend,
+}: {
+  variant?: string;
+  /** scripted agent replies revealed in sequence after the user sends */
+  messages?: ChatMessage[];
+  /** header chips (tabs) for switching context */
+  suggestions?: string[];
+  /** prominent copy strings */
+  labels?: Partial<ChatComposerLabels>;
+  /** fired with the trimmed prompt text when the user sends */
+  onSend?: (text: string) => void;
+} = {}) {
+  const l = { ...DEFAULT_LABELS, ...labels };
   const [phase, setPhase] = useState<Phase>("done");
   const [draft, setDraft] = useState("");
-  const [submitted, setSubmitted] = useState("Compare mint chip to last summer");
-  const [tab, setTab] = useState("Flavors");
+  const [submitted, setSubmitted] = useState(l.initialPrompt);
+  const [tab, setTab] = useState(suggestions[0] ?? "");
   const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -66,8 +118,9 @@ export default function ChatComposer() {
 
   const send = () => {
     if (!canSend) return;
-    setSubmitted(draft.trim());
-    posthog.capture("chat_composer_prompt_sent");
+    const text = draft.trim();
+    setSubmitted(text);
+    onSend?.(text);
     setDraft("");
     setPhase("sent");
   };
@@ -77,7 +130,7 @@ export default function ChatComposer() {
       {/* header — tabs + actions */}
       <div className="flex shrink-0 items-center justify-between border-b border-line p-1.5">
         <div className="flex items-center">
-          {["Flavors", "Suppliers"].map((item) => (
+          {suggestions.map((item) => (
             <button
               key={item}
               type="button"
@@ -127,20 +180,20 @@ export default function ChatComposer() {
           </div>
         </div>
 
-        {phase === "reply1" || phase === "reply2" || phase === "done" ? (
+        {messages[0] && (phase === "reply1" || phase === "reply2" || phase === "done") ? (
           <Section
-            label="Sales History"
-            sub="Flavor Data"
-            time="4s"
-            body="Pulled 3 summers of mint chip sales for comparison."
+            label={messages[0].label}
+            sub={messages[0].sub}
+            time={messages[0].time}
+            body={messages[0].body}
           />
         ) : null}
-        {phase === "reply2" || phase === "done" ? (
+        {messages[1] && (phase === "reply2" || phase === "done") ? (
           <Section
-            label="Comparison"
-            sub="Trend Detection"
-            time="2s"
-            body="Mint chip is up 12% with stronger weekend peaks."
+            label={messages[1].label}
+            sub={messages[1].sub}
+            time={messages[1].time}
+            body={messages[1].body}
             resolving={phase === "reply2"}
           />
         ) : null}
@@ -160,7 +213,7 @@ export default function ChatComposer() {
             onKeyDown={(event) => {
               if (event.key === "Enter") send();
             }}
-            placeholder="Prompt or tag a flavor with @"
+            placeholder={l.placeholder}
             aria-label="Chat prompt"
             className="min-h-4.5 bg-transparent text-[13px] leading-[1.4] text-ink outline-none placeholder:text-ink-3"
           />

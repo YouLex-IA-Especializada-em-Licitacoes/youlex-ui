@@ -64,7 +64,7 @@ const TAG_COLORS: Record<string, TagColor> = {
   Wholesale: TAG_PALETTE.amber,
 };
 
-type Row = {
+export type RecordRow = {
   id: string;
   name: string;
   tags: string[];
@@ -73,7 +73,7 @@ type Row = {
   website?: string;
 };
 
-const INITIAL_ROWS: Row[] = [
+const INITIAL_ROWS: RecordRow[] = [
   { id: "aurora", name: "Aurora Scoops — Reykjavík", tags: ["Gelato", "Seasonal"], last: "9 days ago", strength: "strong", website: "aurora-scoops.example.com" },
   { id: "kumo", name: "Kumo Creamery — Tokyo", tags: ["B2C", "Cafe", "Vegan"], last: "3 weeks ago", strength: "strong", website: "kumo-creamery.example.com" },
   { id: "sol-nieve", name: "Sol y Nieve — Buenos Aires", tags: ["Gelato", "Local"], last: "2 months ago", strength: "weak", website: "sol-y-nieve.example.com" },
@@ -431,8 +431,7 @@ function InputPicker({
   );
 }
 
-export default function RecordsTable({ fill = false }: { fill?: boolean; variant?: string }) {
-  const rows = INITIAL_ROWS;
+export default function RecordsTable({ rows = INITIAL_ROWS, fill = false }: { rows?: RecordRow[]; fill?: boolean; variant?: string }) {
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [sort, setSort] = useState<{ key: SortKey; dir: 1 | -1 }>({ key: "name", dir: 1 });
   const [columnWidths, setColumnWidths] = useState(DEFAULT_COLUMN_WIDTHS);
@@ -496,7 +495,7 @@ export default function RecordsTable({ fill = false }: { fill?: boolean; variant
           : STRENGTH[a.strength].rank - STRENGTH[b.strength].rank;
       return value * sort.dir;
     });
-  }, [sort]);
+  }, [rows, sort]);
 
   /* stagger: one row resolves every beat */
   useEffect(() => {

@@ -22,7 +22,15 @@ function useStage(steps: number[]) {
 
 const STAGE_DELAYS = [180, 260];
 
-const ROWS = [
+export type DiffRow = {
+  key: string;
+  id: string;
+  dept: string;
+  email: string;
+  removed: boolean;
+};
+
+const ROWS: DiffRow[] = [
   { key: "rocky", id: "Rocky Road", dept: "Classic", email: "aurora-scoops", removed: true },
   { key: "bubblegum", id: "Bubblegum", dept: "Retro", email: "kumo-creamery", removed: true },
   { key: "mint", id: "Mint Chip", dept: "Classic", email: "maple-orbit", removed: false },
@@ -52,7 +60,12 @@ function IncludedMark({ included, tone }: { included: boolean; tone: "red" | "gr
   );
 }
 
-export default function DiffTable() {
+export default function DiffTable({
+  rows = ROWS,
+}: {
+  rows?: DiffRow[];
+  variant?: string;
+} = {}) {
   const stage = useStage(STAGE_DELAYS);
   // 0 plain · 1 removals · 2 completed diff
   const tinted = stage >= 1;
@@ -90,7 +103,7 @@ export default function DiffTable() {
             </tr>
           </thead>
           <tbody>
-            {ROWS.map((row) => {
+            {rows.map((row) => {
               const out = row.removed && tinted && edits[row.key];
               const interactive = row.removed && settled && !accepted;
               return (

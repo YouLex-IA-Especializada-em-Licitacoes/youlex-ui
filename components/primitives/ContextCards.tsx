@@ -7,7 +7,26 @@ import { useEffect, useState } from "react";
  * Retrieved chunks enter once, then remain available.
  * ───────────────────────────────────────────────────────── */
 
-const CHUNKS = [
+export type ContextChunk = {
+  title: string;
+  chars: string;
+  body: string;
+  source: string;
+  badge: string;
+  tone: string;
+};
+
+export type ContextCardsLabels = {
+  header: string;
+  count: string;
+};
+
+const DEFAULT_LABELS: ContextCardsLabels = {
+  header: "All chunks",
+  count: "32",
+};
+
+const CHUNKS: ContextChunk[] = [
   {
     title: "Vendor onboarding rule",
     chars: "290 characters",
@@ -26,8 +45,19 @@ const CHUNKS = [
   },
 ];
 
-export default function ContextCards() {
+export default function ContextCards({
+  chunks = CHUNKS,
+  labels,
+  className,
+}: {
+  /** Accepted for gallery/registry parity; ContextCards has no visual variants. */
+  variant?: string;
+  chunks?: ContextChunk[];
+  labels?: Partial<ContextCardsLabels>;
+  className?: string;
+} = {}) {
   const [chipsShown, setChipsShown] = useState(false);
+  const copy = { ...DEFAULT_LABELS, ...labels };
 
   useEffect(() => {
     const chips = setTimeout(() => setChipsShown(true), 700);
@@ -35,18 +65,18 @@ export default function ContextCards() {
   }, []);
 
   return (
-    <div className="flex w-full max-w-95 flex-col gap-2">
+    <div className={`flex w-full max-w-95 flex-col gap-2${className ? ` ${className}` : ""}`}>
       <div
         className="flex items-center gap-2 px-0.5"
         style={{ animation: "fade-in 400ms ease-out both" }}
       >
-        <span className="text-[13px] font-semibold text-ink">All chunks</span>
+        <span className="text-[13px] font-semibold text-ink">{copy.header}</span>
         <span className="inline-flex h-5 items-center rounded-md bg-inset px-1.5 text-[11.5px] font-medium text-ink-2 shadow-hairline tabular-nums">
-          32
+          {copy.count}
         </span>
       </div>
 
-      {CHUNKS.map((chunk, i) => (
+      {chunks.map((chunk, i) => (
         <div
           key={chunk.title}
           className="overflow-hidden rounded-card bg-surface shadow-card"

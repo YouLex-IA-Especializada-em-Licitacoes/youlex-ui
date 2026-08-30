@@ -12,6 +12,8 @@
   "dependencies": {
     "@central-icons-react/round-outlined-radius-2-stroke-2": "^1.1.315",
     "@web-kits/audio": "^0.1.0",
+    "class-variance-authority": "^0.7.1",
+    "clsx": "^2.1.1",
     "dialkit": "^1.4.3",
     "glimm": "^0.3.0",
     "iconoir-react": "^7.11.1",
@@ -21,7 +23,8 @@
     "posthog-js": "^1.417.2",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
-    "shadow-plugin": "^2.1.0"
+    "shadow-plugin": "^2.1.0",
+    "tailwind-merge": "^3.6.0"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4.1.8",

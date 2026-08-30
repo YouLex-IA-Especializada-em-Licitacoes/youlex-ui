@@ -20,7 +20,7 @@ const IMPORT_NOTE = (file) =>
 
 /* ── the shared building blocks (no gallery card of their own) ── */
 const INTERNAL = {
-  button: { title: "Button", path: "components/atoms/Button.tsx", type: "registry:ui" },
+  button: { title: "Button", path: "components/atoms/Button.tsx", type: "registry:ui", npm: ["class-variance-authority"] },
   "glide-menu": { title: "GlideMenu", path: "components/primitives/GlideMenu.tsx", type: "registry:ui" },
   "entity-chip": { title: "EntityChip", path: "components/atoms/EntityChip.tsx", type: "registry:ui" },
   "value-pill": { title: "ValuePill", path: "components/atoms/ValuePill.tsx", type: "registry:ui" },
@@ -36,7 +36,7 @@ const PRIMITIVES = [
   ["approval-card", "Approval Card", "ApprovalCard.tsx", ["button", "glide-menu"], []],
   ["tool-chips", "Tool Chips", "ToolChips.tsx", [], []],
   ["task-rows", "Task Rows", "TaskRows.tsx", [], []],
-  ["chat-composer", "Chat", "ChatComposer.tsx", [], ["posthog-js"]],
+  ["chat-composer", "Chat", "ChatComposer.tsx", [], []],
   ["prompt-bar", "Prompt Bar", "PromptBar.tsx", [], ["glimm"]],
   ["recommendation-card", "Recommendation Card", "RecommendationCard.tsx", ["button", "entity-chip", "value-pill"], []],
   ["context-cards", "Context Cards", "ContextCards.tsx", [], []],
@@ -49,7 +49,7 @@ const PRIMITIVES = [
   ["insight-cards", "Insight Cards", "InsightCards.tsx", [], ["liveline"]],
   ["code-block", "Code Block", "CodeBlock.tsx", [], []],
   ["fine-tune-card", "Fine-tune Card", "FineTuneCard.tsx", ["glide-menu"], []],
-  ["selection-actions", "Selection Actions", "SelectionActions.tsx", ["shimmer", "stream-text"], ["iconoir-react"]],
+  ["selection-actions", "Selection Actions", "SelectionActions.tsx", ["button", "shimmer", "stream-text"], ["iconoir-react"]],
 ];
 
 const CAPTION = Object.fromEntries(
@@ -98,6 +98,7 @@ for (const [name, meta] of Object.entries(INTERNAL)) {
     type: meta.type,
     title: meta.title,
     description: `Shared building block used by other Beautiful UI components.`,
+    ...(meta.npm?.length ? { dependencies: meta.npm } : {}),
     registryDependencies: [foundationDep],
     files: [
       { path: meta.path, content: read(meta.path), type: meta.type, target: meta.path },

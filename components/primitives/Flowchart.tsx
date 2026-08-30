@@ -22,7 +22,7 @@ const PAD_Y = 24;
 const ROW_GAP = 64;
 const PILL_OFFSET = 30; // kind pill + gap above a card
 
-type StepNode = {
+export type StepNode = {
   id: string;
   row: number;
   x: number; // 0–1 center of the node
@@ -326,7 +326,7 @@ function StepBody({ node }: { node: StepNode }) {
 }
 
 /* ── the canvas ── */
-export default function Flowchart() {
+export default function Flowchart({ steps = NODES }: { steps?: StepNode[]; variant?: string } = {}) {
   const canvasRef = useRef<HTMLDivElement>(null);
   const nodeRefs = useRef(new Map<string, HTMLElement>());
   const [width, setWidth] = useState(0);
@@ -370,9 +370,9 @@ export default function Flowchart() {
   }, []);
 
   /* rows → y offsets from measured node heights */
-  const rows = [...new Set(NODES.map((n) => n.row))].sort((a, b) => a - b);
+  const rows = [...new Set(steps.map((n) => n.row))].sort((a, b) => a - b);
   const rowH = rows.map((r) =>
-    Math.max(...NODES.filter((n) => n.row === r).map((n) => heights[n.id] ?? 90)),
+    Math.max(...steps.filter((n) => n.row === r).map((n) => heights[n.id] ?? 90)),
   );
   const rowY: number[] = [];
   rows.forEach((_, i) => {
@@ -401,8 +401,8 @@ export default function Flowchart() {
   };
 
   const bezier = (edge: { from: string; to: string }) => {
-    const from = anchors(NODES.find((n) => n.id === edge.from)!).bottom;
-    const to = anchors(NODES.find((n) => n.id === edge.to)!).top;
+    const from = anchors(steps.find((n) => n.id === edge.from)!).bottom;
+    const to = anchors(steps.find((n) => n.id === edge.to)!).top;
     const k = Math.min(Math.max(Math.abs(to.y - from.y) * 0.55, 24), 84);
     return `M ${from.x} ${from.y} C ${from.x} ${from.y + k}, ${to.x} ${to.y - k}, ${to.x} ${to.y}`;
   };
@@ -480,7 +480,7 @@ export default function Flowchart() {
       </svg>
 
       {/* nodes */}
-      {NODES.map((node) => {
+      {steps.map((node) => {
         const { w, cx, top } = place(node);
         const active = selected === node.id;
         return (

@@ -8,7 +8,16 @@ import GlideMenu from "@/components/primitives/GlideMenu";
  * The field, clear action, and results are directly usable.
  * ───────────────────────────────────────────────────────── */
 
-const ITEMS = [
+export type SearchItem = string;
+
+export type SearchListLabels = {
+  placeholder: string;
+  ariaLabel: string;
+  emptyTitle: string;
+  emptyHint: string;
+};
+
+const ITEMS: SearchItem[] = [
   "Forecast summer demand",
   "Find waffle cone suppliers",
   "Compare seasonal flavors",
@@ -18,11 +27,25 @@ const ITEMS = [
   "Retire low sellers",
 ];
 
-export default function SearchList() {
+const LABELS: SearchListLabels = {
+  placeholder: "Search flavors…",
+  ariaLabel: "Search flavors",
+  emptyTitle: "No results found",
+  emptyHint: "Adjust your search to try again",
+};
+
+export default function SearchList({
+  items = ITEMS,
+  labels = LABELS,
+}: {
+  items?: SearchItem[];
+  labels?: SearchListLabels;
+  variant?: string;
+} = {}) {
   const [query, setQuery] = useState("");
   const results = query
-    ? ITEMS.filter((i) => i.toLowerCase().includes(query.toLowerCase()))
-    : ITEMS.slice(0, 5);
+    ? items.filter((i) => i.toLowerCase().includes(query.toLowerCase()))
+    : items.slice(0, 5);
   const empty = query.length > 2 && results.length === 0;
 
   return (
@@ -37,8 +60,8 @@ export default function SearchList() {
           <input
             value={query}
             onChange={(event) => setQuery(event.target.value)}
-            placeholder="Search flavors…"
-            aria-label="Search flavors"
+            placeholder={labels.placeholder}
+            aria-label={labels.ariaLabel}
             className="min-w-0 flex-1 bg-transparent text-[13px] text-ink outline-none placeholder:text-ink-3"
           />
           {query && (
@@ -66,8 +89,8 @@ export default function SearchList() {
                 <path d="M21 21l-4.3-4.3" />
               </svg>
             </span>
-            <span className="text-[13px] font-medium text-ink">No results found</span>
-            <span className="text-[12px] text-ink-3">Adjust your search to try again</span>
+            <span className="text-[13px] font-medium text-ink">{labels.emptyTitle}</span>
+            <span className="text-[12px] text-ink-3">{labels.emptyHint}</span>
           </div>
         ) : (
           <div className="p-1">
