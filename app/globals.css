@@ -18,7 +18,10 @@
  * ────────────────────────────────────────────────────────── */
 
 :root {
-  /* surfaces — identidade YouLex (YLX-189, app/globals.css do YOULEX-FRONTEND) */
+  /* YLX-192 — identidade YouLex (YLX-189, camada 1). Fonte:
+   * origin/develop:app/globals.css do YOULEX-FRONTEND, bloco a partir da
+   * linha 310 ("YLX-189 — Identidade YouLex em tokens oklch"). */
+  /* surfaces */
   --page: oklch(0.9986 0.0066 106.52);
   --canvas: oklch(0.976 0.004 100);
   --surface: oklch(1 0 0);
@@ -31,16 +34,19 @@
   --ink-2: oklch(0.5544 0.0407 257.42);
   --ink-3: oklch(0.72 0.02 258);
 
-  /* borders — solid e crisp, não alpha */
+  /* borders — solid and crisp, not alpha */
   --line: oklch(0.9288 0.0126 255.51);
   --line-strong: oklch(0.86 0.015 255);
   --line-soft: oklch(0.96 0.008 255);
+  /* --grid-line, --stripe, --stripe-bg, --tooltip-*: fora do escopo da
+   * YLX-189 (não definidos na camada 1) — mantidos do upstream até
+   * outro card os portar (usados por RecordsTable/tooltips, não por atoms). */
   --grid-line: color-mix(in srgb, var(--line) 78%, transparent);
   --field: oklch(0.978 0.003 255);
   --stripe: oklch(0.405 0 0 / 0.075);
   --stripe-bg: oklch(0.97 0 0);
 
-  /* accent (#2A9CFF / #1E84E0, marca YouLex) */
+  /* accent da marca (#2A9CFF / #1E84E0) */
   --accent: oklch(0.6801 0.1755 250.09);
   --accent-ink: oklch(0.6058 0.1648 251.33);
   --accent-tint: oklch(0.955 0.025 250);
@@ -53,47 +59,49 @@
   --red: oklch(0.6368 0.2078 25.33);
   --red-tint: oklch(0.971 0.013 17.38);
 
-  /* chart overlays — neutral system colors with enough contrast on either theme */
+  /* chart overlays — fora do escopo da YLX-189, mantidos do upstream */
   --tooltip-bg: oklch(0.272 0.008 264.435);
   --tooltip-fg: oklch(0.976 0.002 247.839);
   --tooltip-muted: oklch(0.731 0.008 260.731);
   --tooltip-border: oklch(0.356 0.007 264.474);
 
-  /* shadows — our solid hairline ring + shadow-plugin's smooth layered stacks
-   * (--shadow-xs…lg come from shadow-plugin/unprefixed) so every surface reads
-   * consistently across the app. */
+  /* shadows — anel sólido de 1px + camada difusa tingida do --ink da marca */
   --shadow-hairline: 0 0 0 1px var(--line);
-  --shadow-btn: 0 0 0 1px var(--line-strong), var(--shadow-xs);
-  --shadow-card: 0 0 0 1px var(--line), var(--shadow-sm);
-  --shadow-raised: 0 0 0 1px var(--line), var(--shadow-md);
-  --shadow-overlay: 0 0 0 1px var(--line), var(--shadow-lg);
+  --shadow-btn: 0 0 0 1px var(--line-strong), 0 1px 2px oklch(0.1363 0.0364 259.2 / 0.05);
+  --shadow-card: 0 0 0 1px var(--line), 0 1px 3px oklch(0.1363 0.0364 259.2 / 0.06), 0 1px 2px oklch(0.1363 0.0364 259.2 / 0.04);
+  --shadow-raised: 0 0 0 1px var(--line), 0 4px 6px oklch(0.1363 0.0364 259.2 / 0.07), 0 2px 4px oklch(0.1363 0.0364 259.2 / 0.05);
+  --shadow-overlay: 0 0 0 1px var(--line), 0 10px 15px oklch(0.1363 0.0364 259.2 / 0.1), 0 4px 6px oklch(0.1363 0.0364 259.2 / 0.05);
   --shadow-inset-field: inset 0 1px 2px oklch(0.1363 0.0364 259.2 / 0.08);
 }
 
 .dark {
-  /* superfícies — âncora real: #06031F/#160A54 (hero escuro da landing) */
+  /* superfícies — âncora real: #06031F/#160A54 (landing, hero escuro) */
   --page: oklch(0.1328 0.0606 281.57);
   --canvas: oklch(0.165 0.05 280);
   --surface: oklch(0.231 0.1223 278.21);
   --inset: oklch(0.19 0.09 279);
   --hover: oklch(0.27 0.1 278);
   --hover-2: oklch(0.32 0.09 277);
+  --field: oklch(0.26 0.1 278);
 
+  /* ink ramp — âncora real: #FFFFFF / rgba(255,255,255,.55) */
   --ink: oklch(1 0 0);
   --ink-2: oklch(1 0 0 / 0.55);
   --ink-3: oklch(1 0 0 / 0.35);
 
+  /* bordas — âncora real: rgba(255,255,255,.10) */
   --line: oklch(1 0 0 / 0.10);
   --line-strong: oklch(1 0 0 / 0.16);
   --line-soft: oklch(1 0 0 / 0.06);
-  --field: oklch(0.26 0.1 278);
   --stripe: oklch(1 0 0 / 0.055);
   --stripe-bg: oklch(0.226 0.004 264.485);
 
+  /* accent — mesma marca, accent-ink mais claro p/ legibilidade no escuro */
   --accent: oklch(0.6801 0.1755 250.09);
   --accent-ink: oklch(0.75 0.14 250);
   --accent-tint: oklch(0.6801 0.1755 250.09 / 0.12);
 
+  /* status — um degrau mais claro p/ contraste no escuro */
   --green: oklch(0.696 0.17 162.48);
   --green-tint: oklch(0.696 0.17 162.48 / 0.14);
   --orange: oklch(0.769 0.188 70.08);
@@ -106,20 +114,13 @@
   --tooltip-muted: oklch(0.731 0.008 260.731);
   --tooltip-border: oklch(0.308 0.006 258.354);
 
+  /* sombras — anel claro translúcido + camada difusa preta */
   --shadow-hairline: 0 0 0 1px var(--line);
-  /* Elevation rings go to a subtle *light* hairline in dark mode: the ring
-   * paints over the surface behind the element, so a low-alpha white edge
-   * dissolves into the shadow as one continuous stroke (per smooth-shadow-ring),
-   * graduated by how far the surface floats. */
-  --shadow-btn: 0 0 0 1px oklch(1 0 0 / 0.1), 0 1px 2px oklch(0 0 0 / 0.3);
-  --shadow-card:
-    0 0 0 1px oklch(1 0 0 / 0.11), 0 1px 2px oklch(0 0 0 / 0.2),
-    0 2px 6px oklch(0 0 0 / 0.2);
-  --shadow-raised:
-    0 0 0 1px oklch(1 0 0 / 0.13), 0 2px 10px oklch(0 0 0 / 0.22);
-  --shadow-overlay:
-    0 0 0 1px oklch(1 0 0 / 0.15), 0 8px 28px oklch(0 0 0 / 0.34);
-  --shadow-inset-field: inset 0 1px 2px oklch(0 0 0 / 0.4);
+  --shadow-btn: 0 0 0 1px oklch(1 0 0 / 0.08), 0 1px 2px oklch(0 0 0 / 0.4);
+  --shadow-card: 0 0 0 1px oklch(1 0 0 / 0.09), 0 2px 6px oklch(0 0 0 / 0.35);
+  --shadow-raised: 0 0 0 1px oklch(1 0 0 / 0.11), 0 4px 12px oklch(0 0 0 / 0.4);
+  --shadow-overlay: 0 0 0 1px oklch(1 0 0 / 0.13), 0 10px 28px oklch(0 0 0 / 0.5);
+  --shadow-inset-field: inset 0 1px 2px oklch(0 0 0 / 0.5);
 }
 
 @theme inline {
