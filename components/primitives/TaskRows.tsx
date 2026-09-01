@@ -94,41 +94,41 @@ export type TaskRowsLabels = {
 };
 
 const DEFAULT_LABELS: TaskRowsLabels = {
-  completed: "Completed",
-  failed: "Failed",
+  completed: "Concluído",
+  failed: "Falhou",
 };
 
 const TASK_ROWS: TaskRow[] = [
   {
     key: "verify",
-    label: "Verified vendor records",
-    amount: "12 suppliers",
+    label: "Verificação de documentos de habilitação",
+    amount: "12 documentos",
     status: "done",
     details: [
-      { label: "Matched tax and contact IDs", meta: "12/12" },
-      { label: "Flagged stale records", meta: "0" },
+      { label: "Certidões negativas conferidas", meta: "12/12" },
+      { label: "Documentos vencidos sinalizados", meta: "0" },
     ],
   },
   {
     key: "index",
-    label: "Build reorder task list",
-    amount: "7 SKUs",
+    label: "Montar minuta de recurso administrativo",
+    amount: "7 cláusulas",
     status: "running",
     step: 2,
     details: [
-      { label: "Reading POS export", meta: "3 files" },
-      { label: "Scoring stockout risk", meta: "68%" },
+      { label: "Lendo edital de Pregão Eletrônico nº 014-2026", meta: "3 arquivos" },
+      { label: "Avaliando risco de inabilitação", meta: "68%" },
     ],
   },
   {
     key: "draft",
-    label: "Draft supplier emails",
-    amount: "2 messages",
+    label: "Redigir petições",
+    amount: "2 minutas",
     status: "sequence",
     step: 3,
     details: [
-      { label: "Cone supplier follow-up", meta: "draft" },
-      { label: "Pistachio reorder note", meta: "draft" },
+      { label: "Impugnação ao edital", meta: "rascunho" },
+      { label: "Pedido de esclarecimento", meta: "rascunho" },
     ],
   },
 ];

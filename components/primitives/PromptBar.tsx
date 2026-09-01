@@ -79,31 +79,31 @@ type Source = {
 };
 
 const SOURCES: Source[] = [
-  { key: "attach", name: "Add photos & files", desc: "Upload from your computer", glyph: "clip", attach: true },
-  { key: "scoop", name: "Scoop Data", desc: "Sales & churn metrics", glyph: "chart" },
-  { key: "flavors", name: "Flavor records", desc: "26 makers, tags, links", glyph: "layers" },
-  { key: "web", name: "Web search", desc: "Real-time news and info", glyph: "globe" },
-  { key: "figma", name: "Figma", desc: "Design-to-code workflows", brand: "figma" },
-  { key: "slack", name: "Slack", desc: "Read and manage Slack", brand: "slack" },
-  { key: "gmail", name: "Gmail", desc: "Read and manage Gmail", brand: "gmail", connect: true },
+  { key: "attach", name: "Adicionar fotos e arquivos", desc: "Enviar do seu computador", glyph: "clip", attach: true },
+  { key: "scoop", name: "Base de Processos", desc: "Editais e prazos processuais", glyph: "chart" },
+  { key: "flavors", name: "Registros jurisprudenciais", desc: "26 acórdãos, tags, links", glyph: "layers" },
+  { key: "web", name: "Busca na web", desc: "Notícias e informações em tempo real", glyph: "globe" },
+  { key: "figma", name: "Figma", desc: "Fluxos design-to-code", brand: "figma" },
+  { key: "slack", name: "Slack", desc: "Ler e gerenciar o Slack", brand: "slack" },
+  { key: "gmail", name: "Gmail", desc: "Ler e gerenciar o Gmail", brand: "gmail", connect: true },
 ];
 
 const COMMANDS = [
-  { key: "compare", name: "/compare", desc: "Flavor vs. last summer" },
-  { key: "churn-plan", name: "/churn-plan", desc: "Draft a churn schedule" },
-  { key: "restock", name: "/restock", desc: "Build a reorder list" },
-  { key: "draft-email", name: "/draft-email", desc: "Write a supplier email" },
-  { key: "summarize", name: "/summarize", desc: "Digest the thread so far" },
+  { key: "compare", name: "/comparar", desc: "Comparar com o julgamento anterior" },
+  { key: "churn-plan", name: "/plano-recurso", desc: "Rascunhar um plano de recurso" },
+  { key: "restock", name: "/checklist", desc: "Montar checklist de habilitação" },
+  { key: "draft-email", name: "/rascunhar-oficio", desc: "Redigir ofício ao órgão licitante" },
+  { key: "summarize", name: "/resumir", desc: "Resumir a conversa até aqui" },
 ];
 
 const MODELS = [
-  { key: "sprinkles-5", name: "Sprinkles 5", tag: "Flagship" },
-  { key: "vanilla-1", name: "Vanilla 1", tag: "Basic" },
-  { key: "freezer-burn", name: "Freezer Burn 0.4", tag: "Stale" },
+  { key: "sprinkles-5", name: "YouLex 5", tag: "Principal" },
+  { key: "vanilla-1", name: "YouLex 1", tag: "Básico" },
+  { key: "freezer-burn", name: "YouLex Legado 0.4", tag: "Desatualizado" },
 ];
 
-const FILES = ["flavor-chart.png", "summer-menu.pdf", "pos-export.csv"];
-const DICTATION = "Compare pistachio weekends to last summer";
+const FILES = ["ata-julgamento.pdf", "edital-014-2026.pdf", "planilha-precos.csv"];
+const DICTATION = "Compare este edital com o julgamento do ano passado";
 
 /* self-running demo: walk the @ menu, then the / menu, and repeat.
  * Any pointer or key interaction hands control to the user. */
@@ -636,7 +636,7 @@ export default function PromptBar({
                 send();
               }
             }}
-            placeholder={listening ? "Listening…" : placeholder ?? "Write a message…"}
+            placeholder={listening ? "Ouvindo…" : placeholder ?? "Escreva uma mensagem…"}
             aria-label="Prompt"
             className={`${tall ? "min-h-[68px] px-2 py-2 text-[14px] leading-5" : "min-h-7 px-1 py-[5px] text-[13px] leading-[18px]"} min-w-0 w-full resize-none bg-transparent text-ink outline-none [overflow-wrap:anywhere] placeholder:text-ink-3 ${
               wide ? "col-span-full col-start-1 row-start-1" : "col-start-2 row-start-1"

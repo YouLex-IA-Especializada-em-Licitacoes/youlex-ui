@@ -39,40 +39,40 @@ const VARIANTS: Record<
   { active: string; done: string; rows: Row[]; query?: string }
 > = {
   Steps: {
-    active: "Thinking",
-    done: "Thought for 4 seconds",
+    active: "Pensando",
+    done: "Pensou por 4 segundos",
     rows: [
-      { primary: "Reading flavor briefs" },
-      { primary: "Scanning supplier lists" },
-      { primary: "Comparing tasting notes", secondary: "6 flavors" },
-      { primary: "Writing the scoop report" },
+      { primary: "Lendo o edital" },
+      { primary: "Verificando prazos recursais" },
+      { primary: "Comparando com jurisprudência do TCU", secondary: "6 acórdãos" },
+      { primary: "Redigindo a minuta de recurso" },
     ],
   },
   Reasoning: {
-    active: "Thinking",
-    done: "Thought for 4 seconds",
+    active: "Pensando",
+    done: "Pensou por 4 segundos",
     rows: [
-      { primary: "Summer demand spikes for stone-fruit flavors — peach and apricot lead." },
-      { primary: "I should check cone inventory before promoting a waffle-bowl special." },
+      { primary: "O edital exige atestado de capacidade técnica em quantidade superior à jurisprudência do TCU admite como razoável." },
+      { primary: "Devo verificar o prazo decadencial antes de recomendar a impugnação." },
     ],
   },
   Search: {
-    active: "Searching the web",
-    done: "Searched the web",
-    query: "best waffle cone supplier",
+    active: "Pesquisando na web",
+    done: "Pesquisou na web",
+    query: "acórdão TCU julgamento por lotes licitação",
     rows: [
-      { primary: "Joy Cone", secondary: "joycone.com", href: "https://joycone.com/fs_products/waffle-cones/" },
-      { primary: "WebstaurantStore", secondary: "webstaurantstore.com", href: "https://www.webstaurantstore.com/ice-cream-shop-supplies.html" },
-      { primary: "The Konery", secondary: "thekonery.com", href: "https://www.thekonery.com/" },
+      { primary: "TCU — Portal de Jurisprudência", secondary: "tcu.gov.br", href: "https://portal.tcu.gov.br/jurisprudencia/" },
+      { primary: "Planalto — Lei 14.133/2021", secondary: "planalto.gov.br", href: "https://www.planalto.gov.br/ccivil_03/_ato2019-2022/2021/lei/l14133.htm" },
+      { primary: "ComprasNet — Editais", secondary: "comprasnet.gov.br", href: "https://www.gov.br/compras/pt-br" },
     ],
   },
   Coding: {
-    active: "Running tools",
-    done: "Ran 3 tools",
+    active: "Executando ferramentas",
+    done: "Executou 3 ferramentas",
     rows: [
-      { primary: "Read", secondary: "flavors.ts", mono: true },
-      { primary: "Edit", secondary: "ChurnSchedule.tsx", mono: true, add: 74, del: 41 },
-      { primary: "Run", secondary: "npm run freeze", mono: true },
+      { primary: "Ler", secondary: "edital_pregao_014-2026.pdf", mono: true },
+      { primary: "Editar", secondary: "minuta_recurso.docx", mono: true, add: 74, del: 41 },
+      { primary: "Executar", secondary: "protocolar_peticao.sh", mono: true },
     ],
   },
 };
@@ -261,7 +261,7 @@ export default function ThinkingState({ variant = "Steps", onSettled }: { varian
             })}
             {variant === "Search" && stage >= 3 && (
               <span className="text-[12px] text-ink-3" style={{ animation: "fade-in 300ms ease-out both" }}>
-                +7 more
+                +7 resultados
               </span>
             )}
             </div>

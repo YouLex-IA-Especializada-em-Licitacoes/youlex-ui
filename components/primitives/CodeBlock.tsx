@@ -11,15 +11,15 @@ import { useCallback, useState, type ReactNode } from "react";
  * Both share syntax coloring, insets, and wrapping behavior.
  * ───────────────────────────────────────────────────────── */
 
-const FILE = "churn.ts";
+const FILE = "calcula-prazo-recursal.ts";
 
 const CODE_LINES = [
-  "export async function churnBatch() {",
-  '  const flavor = await getFlavor("pistachio");',
-  "  const base = await dairy.fetch({ flavor });",
-  '  await freezer.store(base, { temp: "-16C" });',
-  "  if (!base.approved) return null;",
-  "  return base.gallons;",
+  "export async function calcularPrazoRecursal() {",
+  '  const edital = await getEdital("pregao-014-2026");',
+  "  const intimacao = await ata.fetch({ edital });",
+  '  await prazo.registrar(intimacao, { dias: "3-uteis" });',
+  "  if (!intimacao.publicada) return null;",
+  "  return intimacao.dataLimite;",
   "}",
 ];
 
@@ -40,13 +40,13 @@ type Piece = CodePiece;
 type Row = DiffRow;
 
 const DIFF: Row[] = [
-  { old: 1, cur: 1, type: "ctx", pieces: [{ text: "export async function churnBatch() {" }] },
-  { old: 2, cur: 2, type: "ctx", pieces: [{ text: '  const flavor = await getFlavor("pistachio");' }] },
-  { old: 3, cur: 3, type: "ctx", pieces: [{ text: "  const base = await dairy.fetch({ flavor });" }] },
-  { old: 4, cur: null, type: "del", pieces: [{ text: "  await freezer.store(base, { temp: " }, { text: '"-14C"', change: "del" }, { text: " });" }] },
-  { old: null, cur: 4, type: "add", pieces: [{ text: "  await freezer.store(base, { temp: " }, { text: '"-16C"', change: "add" }, { text: " });" }] },
-  { old: null, cur: 5, type: "add", pieces: [{ text: "  if (!base.approved) return null;" }] },
-  { old: 5, cur: 6, type: "ctx", pieces: [{ text: "  return base.gallons;" }] },
+  { old: 1, cur: 1, type: "ctx", pieces: [{ text: "export async function calcularPrazoRecursal() {" }] },
+  { old: 2, cur: 2, type: "ctx", pieces: [{ text: '  const edital = await getEdital("pregao-014-2026");' }] },
+  { old: 3, cur: 3, type: "ctx", pieces: [{ text: "  const intimacao = await ata.fetch({ edital });" }] },
+  { old: 4, cur: null, type: "del", pieces: [{ text: "  await prazo.registrar(intimacao, { dias: " }, { text: '"5-uteis"', change: "del" }, { text: " });" }] },
+  { old: null, cur: 4, type: "add", pieces: [{ text: "  await prazo.registrar(intimacao, { dias: " }, { text: '"3-uteis"', change: "add" }, { text: " });" }] },
+  { old: null, cur: 5, type: "add", pieces: [{ text: "  if (!intimacao.publicada) return null;" }] },
+  { old: 5, cur: 6, type: "ctx", pieces: [{ text: "  return intimacao.dataLimite;" }] },
   { old: 6, cur: 7, type: "ctx", pieces: [{ text: "}" }] },
 ];
 
@@ -112,7 +112,7 @@ function FileIcon() {
   );
 }
 
-const DEFAULT_LABELS: CodeBlockLabels = { copy: "Copy", copied: "Copied" };
+const DEFAULT_LABELS: CodeBlockLabels = { copy: "Copiar", copied: "Copiado" };
 
 export type CodeBlockProps = {
   /** Which view to render — "Code" (line-numbered listing) or "Diff". */
