@@ -15,18 +15,18 @@ const HOLD_MS = 3400;
 export type StreamingToken = { text: string; cite?: boolean };
 
 const TOKENS: StreamingToken[] = [
-  ..."Pistachio is your fastest-growing flavor — sales are up 23% this month and margins beat vanilla by 8 points."
+  ..."O julgamento por lotes neste edital só se sustenta se a divisão do objeto em itens for tecnicamente inviável — do contrário, restringe indevidamente a competitividade."
     .split(" ")
     .map((text) => ({ text })),
   { text: "", cite: true },
-  ..."Stone-fruit flavors are trending in the same range."
+  ..."O TCU já pacificou esse entendimento em precedentes recentes."
     .split(" ")
     .map((text) => ({ text })),
 ];
 
 const FOLLOW_UPS = [
-  "Which flavors sell best in winter",
-  "Compare gelato and soft serve margins",
+  "Quais os prazos recursais aplicáveis a este edital",
+  "Comparar este julgado com o Acórdão 2.622/2015",
 ];
 
 const SOURCE_IMAGES = {
@@ -42,9 +42,9 @@ const SOURCE_IMAGES = {
 export type StreamingSource = { name: string; domain: string; href: string; image: string };
 
 const SOURCES: StreamingSource[] = [
-  { name: "Scoop Data", domain: "scoopdata.io", href: "https://scoopdata.io/", image: SOURCE_IMAGES.scoop },
-  { name: "Trends Index", domain: "trends.google.com", href: "https://trends.google.com/trends/", image: SOURCE_IMAGES.trends },
-  { name: "Market Basket", domain: "marketbasket.io", href: "https://marketbasket.io/", image: SOURCE_IMAGES.market },
+  { name: "Jurisprudência TCU", domain: "tcu.gov.br", href: "https://portal.tcu.gov.br/jurisprudencia/", image: SOURCE_IMAGES.scoop },
+  { name: "Lei 14.133/2021", domain: "planalto.gov.br", href: "https://www.planalto.gov.br/ccivil_03/_ato2019-2022/2021/lei/l14133.htm", image: SOURCE_IMAGES.trends },
+  { name: "ComprasNet", domain: "comprasnet.gov.br", href: "https://www.gov.br/compras/pt-br", image: SOURCE_IMAGES.market },
 ];
 
 function sourceImage(source: StreamingSource) {
@@ -84,8 +84,8 @@ export type StreamingLabels = {
 };
 
 const DEFAULT_LABELS: StreamingLabels = {
-  sources: "10 sources",
-  followUps: "Follow-ups",
+  sources: "10 fontes",
+  followUps: "Perguntas relacionadas",
 };
 
 export default function StreamingText({

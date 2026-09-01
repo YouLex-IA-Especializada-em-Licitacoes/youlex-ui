@@ -22,24 +22,24 @@ export type ContextCardsLabels = {
 };
 
 const DEFAULT_LABELS: ContextCardsLabels = {
-  header: "All chunks",
+  header: "Todos os trechos",
   count: "32",
 };
 
 const CHUNKS: ContextChunk[] = [
   {
-    title: "Vendor onboarding rule",
-    chars: "290 characters",
-    body: "Cold-chain certification must be verified before a new dairy can be added to the reorder workflow.",
-    source: "Dairy Onboarding SOP.pdf",
+    title: "Habilitação jurídica — cláusula 7.2",
+    chars: "290 caracteres",
+    body: "A comprovação de regularidade fiscal e trabalhista deve ser verificada antes da assinatura do contrato administrativo com o licitante vencedor.",
+    source: "Edital de Pregão Eletrônico nº 014-2026.pdf",
     badge: "PDF",
     tone: "bg-red",
   },
   {
-    title: "Seasonal demand row",
-    chars: "1,250 characters",
-    body: "Q4 velocity table: pistachio +18%, vanilla +6%, rocky road -11%; retire flavors below 40 scoops weekly.",
-    source: "Sales Velocity Export.csv",
+    title: "Jurisprudência — julgamento por lotes",
+    chars: "1.250 caracteres",
+    body: "TCU, Acórdão 2.622/2015: o julgamento por lotes só se justifica quando a divisão do objeto em itens for tecnicamente inviável, sob pena de restrição à competitividade.",
+    source: "Acordao_TCU_2622-2015.csv",
     badge: "CSV",
     tone: "bg-green",
   },

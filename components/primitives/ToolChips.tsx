@@ -41,66 +41,66 @@ export type ToolChipsLabels = {
 };
 
 const DEFAULT_LABELS: ToolChipsLabels = {
-  header: "4 tool calls, 2 messages",
-  more: "+2 more",
+  header: "4 chamadas de ferramenta, 2 mensagens",
+  more: "+2 mais",
 };
 
 const ROWS: ToolStep[] = [
   {
-    icon: "think", label: "Thinking", chip: "Planning the churn schedule…", mono: false, detailMono: false,
+    icon: "think", label: "Pensando", chip: "Planejando a estratégia recursal…", mono: false, detailMono: false,
     detail: [
-      { text: "Weekend demand carries pistachio, so it churns first." },
-      { text: "Batch capacity leaves two evening freezer windows." },
+      { text: "O prazo recursal de 3 dias úteis conta a partir da intimação em ata." },
+      { text: "Há dois fundamentos: preço inexequível e restrição indevida de competitividade." },
     ],
   },
   {
-    icon: "write", label: "Write 204 lines", chip: "ChurnSchedule.tsx", mono: true, detailMono: true,
+    icon: "write", label: "Escrever 204 linhas", chip: "minuta_recurso.docx", mono: true, detailMono: true,
     detail: [
-      { text: "+ const windows = slots.filter((s) => s.temp <= -12)", tone: "add" },
-      { text: "+ return schedule(windows, { hero: \"pistachio\" })", tone: "add" },
+      { text: "+ Fundamento: art. 59, Lei 14.133/2021 — julgamento por lotes", tone: "add" },
+      { text: "+ Pedido: reabertura do prazo para nova diligência", tone: "add" },
     ],
   },
   {
-    icon: "run", label: "Rebuild and verify", chip: "npm run freeze", mono: true, detailMono: true,
+    icon: "run", label: "Revisar e protocolar", chip: "protocolar_peticao.sh", mono: true, detailMono: true,
     detail: [
-      { text: "✓ built in 1.2s" },
-      { text: "✓ 34 checks passed" },
+      { text: "✓ formatação da petição validada" },
+      { text: "✓ 34 verificações concluídas" },
     ],
   },
   {
-    icon: "read", label: "Read image", chip: "flavor-chart.png", mono: true, detailMono: false,
+    icon: "read", label: "Ler imagem", chip: "grafico-prazos.png", mono: true, detailMono: false,
     detail: [
-      { text: "1280 × 720 · line chart, three summers." },
-      { text: "Mint chip trends up 12% through July." },
+      { text: "1280 × 720 · gráfico de linha, três exercícios." },
+      { text: "Prazo médio de julgamento sobe 12% até julho." },
     ],
   },
 ];
 
 const DIFFS: ToolDiff[] = [
-  { file: "flavors.css", add: 13, del: 0 },
-  { file: "ChurnSchedule.tsx", add: 74, del: 41 },
-  { file: "menu.ts", add: 8, del: 2 },
+  { file: "clausulas.css", add: 13, del: 0 },
+  { file: "minuta_recurso.docx", add: 74, del: 41 },
+  { file: "sumario.ts", add: 8, del: 2 },
 ];
 
 /* hovering a file chip opens its diff — green added, red removed */
 const DIFF_LINES: Record<string, ToolDiffLine[]> = {
-  "flavors.css": [
-    { text: ".scoop-card {", tone: "ctx" },
+  "clausulas.css": [
+    { text: ".clausula-card {", tone: "ctx" },
     { text: "  gap: 14px;", tone: "del" },
     { text: "  gap: 12px;", tone: "add" },
     { text: "  container-type: inline-size;", tone: "add" },
     { text: "}", tone: "ctx" },
   ],
-  "ChurnSchedule.tsx": [
-    { text: "const slots = coldSlots(week);", tone: "ctx" },
-    { text: "const windows = slots;", tone: "del" },
-    { text: "const windows = slots.filter(", tone: "add" },
-    { text: "  (s) => s.temp <= -12,", tone: "add" },
+  "minuta_recurso.docx": [
+    { text: "const fundamentos = art59(edital);", tone: "ctx" },
+    { text: "const pedido = fundamentos;", tone: "del" },
+    { text: "const pedido = fundamentos.filter(", tone: "add" },
+    { text: "  (f) => f.prazo <= 3,", tone: "add" },
     { text: ");", tone: "add" },
   ],
-  "menu.ts": [
-    { text: "export const hero = \"mint-chip\";", tone: "del" },
-    { text: "export const hero = \"pistachio\";", tone: "add" },
+  "sumario.ts": [
+    { text: "export const tese = \"preco-inexequivel\";", tone: "del" },
+    { text: "export const tese = \"restricao-competitividade\";", tone: "add" },
   ],
 };
 

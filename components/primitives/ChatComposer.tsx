@@ -19,20 +19,20 @@ export type ChatMessage = {
 
 const MESSAGES: ChatMessage[] = [
   {
-    label: "Sales History",
-    sub: "Flavor Data",
+    label: "Histórico Processual",
+    sub: "Dados do Edital",
     time: "4s",
-    body: "Pulled 3 summers of mint chip sales for comparison.",
+    body: "Recuperei os 3 últimos julgamentos do TCU sobre julgamento por lotes para comparação.",
   },
   {
-    label: "Comparison",
-    sub: "Trend Detection",
+    label: "Comparação",
+    sub: "Detecção de Tese",
     time: "2s",
-    body: "Mint chip is up 12% with stronger weekend peaks.",
+    body: "A tese de restrição à competitividade tem 12% mais chance de acolhimento com picos em recursos recentes.",
   },
 ];
 
-const SUGGESTIONS = ["Flavors", "Suppliers"];
+const SUGGESTIONS = ["Editais", "Jurisprudência"];
 
 export type ChatComposerLabels = {
   /** the pre-filled prompt shown in the first user bubble */
@@ -42,8 +42,8 @@ export type ChatComposerLabels = {
 };
 
 const DEFAULT_LABELS: ChatComposerLabels = {
-  initialPrompt: "Compare mint chip to last summer",
-  placeholder: "Prompt or tag a flavor with @",
+  initialPrompt: "Compare este edital com o julgamento do TCU do ano passado",
+  placeholder: "Pergunte algo ou marque um documento com @",
 };
 
 function Section({
@@ -74,7 +74,7 @@ function Section({
       <div className="flex items-center gap-1 text-[12px] leading-[1.3]">
         <span className="font-medium text-ink">{label}</span>
         <span className="text-ink-2">{sub}</span>
-        <span className="text-ink">for {time}</span>
+        <span className="text-ink">em {time}</span>
       </div>
       <p className="text-[13px] leading-normal text-ink">{body}</p>
     </div>

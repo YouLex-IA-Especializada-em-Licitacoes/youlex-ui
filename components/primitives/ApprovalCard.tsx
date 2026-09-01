@@ -21,19 +21,19 @@ export type ApprovalQuestion = {
 
 const QUESTIONS: ApprovalQuestion[] = [
   {
-    q: "How many flavors should we launch?",
+    q: "Deseja que eu prossiga com a impugnação ao edital?",
     type: "radio",
-    options: ["Three (core line)", "Five (full case)", "Just one hero"],
+    options: ["Sim, protocolar impugnação", "Não, apenas registrar ressalva em ata", "Aguardar orientação do cliente"],
   },
   {
-    q: "Which mix-ins should we stock?",
+    q: "Quais anexos devo incluir na petição de recurso?",
     type: "check",
-    options: ["Chocolate chips", "Waffle bits", "Sprinkles"],
+    options: ["Ata da sessão de julgamento", "Parecer técnico da área de engenharia", "Jurisprudência do TCU citada"],
   },
   {
-    q: "Which market do we enter first?",
+    q: "Em qual processo devo aplicar esta minuta de contrato?",
     type: "radio",
-    options: ["Food trucks", "Grocery freezers", "Scoop shops"],
+    options: ["Pregão Eletrônico nº 014-2026", "Concorrência nº 002-2026", "Dispensa de Licitação nº 031-2026"],
   },
 ];
 
@@ -46,11 +46,11 @@ export type ApprovalLabels = {
 };
 
 const DEFAULT_LABELS: ApprovalLabels = {
-  skip: "Skip",
-  continue: "Continue",
-  send: "Send",
-  customPlaceholder: "Something else…",
-  sentMessage: "Answers sent",
+  skip: "Pular",
+  continue: "Continuar",
+  send: "Enviar",
+  customPlaceholder: "Outra resposta…",
+  sentMessage: "Respostas enviadas",
 };
 
 const ROLL_MS = 400;
@@ -250,7 +250,7 @@ export default function ApprovalCard({
   if (!open) {
     return (
       <button type="button" onClick={() => setOpen(true)} className="rounded-control bg-surface px-3 py-2 text-[12.5px] font-medium text-ink shadow-btn transition-colors duration-150 hover:bg-hover">
-        Open approval
+        Abrir aprovação
       </button>
     );
   }
@@ -266,7 +266,7 @@ export default function ApprovalCard({
         </span>
         {resettable && (
           <button type="button" onClick={reset} className="text-[12px] font-medium text-ink-3 transition-colors duration-150 hover:text-ink">
-            Start over
+            Recomeçar
           </button>
         )}
       </div>
