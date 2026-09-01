@@ -23,11 +23,11 @@ import GlideMenu from "@/components/primitives/GlideMenu";
  * chat history, and a collapse that preserves icon alignment.
  * ───────────────────────────────────────────────────────── */
 
-const WORKSPACE = { key: "creamery", name: "Creamery Ops", monogram: "C" };
+const WORKSPACE = { key: "youlex", name: "YouLex Jurídico", monogram: "Y" };
 
 const NAV_ITEMS = [
-  { key: "home", label: "Home", icon: <IconHome size={18} /> },
-  { key: "invite", label: "Invite users", icon: <IconUserAdd size={18} />, count: "3/10" },
+  { key: "home", label: "Início", icon: <IconHome size={18} /> },
+  { key: "invite", label: "Convidar advogados", icon: <IconUserAdd size={18} />, count: "3/10" },
 ];
 
 export type SidebarRecent = {
@@ -37,14 +37,14 @@ export type SidebarRecent = {
 };
 
 const DEFAULT_RECENTS: SidebarRecent[] = [
-  { id: "suppliers", label: "Supplier records" },
-  { id: "todos", label: "Urgent to-dos this morning" },
-  { id: "flavor", label: "Flavor page ticket" },
-  { id: "workload", label: "Workload summary" },
-  { id: "offboarding", label: "Off-board a supplier" },
-  { id: "restock", label: "Batch restock function" },
-  { id: "edits", label: "Propose flavor edits" },
-  { id: "subway", label: "Subway surfing" },
+  { id: "editais", label: "Editais em análise" },
+  { id: "urgentes", label: "Pendências urgentes de hoje" },
+  { id: "ticket", label: "Chamado sobre edital nº 042/2026" },
+  { id: "resumo", label: "Resumo da carga de trabalho" },
+  { id: "encerrar", label: "Encerrar acompanhamento de licitação" },
+  { id: "protocolo", label: "Protocolar recursos em lote" },
+  { id: "recurso", label: "Propor minuta de recurso" },
+  { id: "prazos", label: "Prazos da semana" },
 ];
 
 type SidebarNavProps = {
@@ -168,9 +168,9 @@ function WorkspaceMenu({
         </button>
         <div className="my-1 h-px bg-line" />
         {[
-          { label: "New workspace", icon: <IconPlusMedium size={16} /> },
-          { label: "Workspace settings", icon: <IconSettingsGear1 size={16} /> },
-          { label: "Invite team members", icon: <IconUserAdd size={16} /> },
+          { label: "Novo espaço de trabalho", icon: <IconPlusMedium size={16} /> },
+          { label: "Configurações do espaço", icon: <IconSettingsGear1 size={16} /> },
+          { label: "Convidar membros da equipe", icon: <IconUserAdd size={16} /> },
         ].map((item) => (
           <button
             key={item.label}
@@ -191,7 +191,7 @@ function WorkspaceMenu({
           className="relative z-10 flex h-9 w-full items-center gap-1.5 rounded-[8px] px-2 text-left"
         >
           <span className="flex size-5 shrink-0 items-center justify-center text-ink-2"><IconArrowBoxLeft size={16} /></span>
-          <span className="min-w-0 flex-1 truncate text-[13.5px] text-ink">Sign out</span>
+          <span className="min-w-0 flex-1 truncate text-[13.5px] text-ink">Sair</span>
         </button>
       </GlideMenu>
     </div>,
@@ -207,7 +207,7 @@ export default function SidebarNav({
   onPick,
   activeNav,
   onNavigate,
-  footerLabel = "Upgrade",
+  footerLabel = "Fazer upgrade",
   footerIcon,
   onFooterClick,
   recents = DEFAULT_RECENTS,
@@ -256,7 +256,7 @@ export default function SidebarNav({
   return (
     <aside
       data-sidebar-collapsed={collapsed}
-      aria-label="Workspace navigation"
+      aria-label="Navegação do espaço de trabalho"
       className={`relative flex shrink-0 overflow-hidden transition-[width] ${fill ? "h-full" : "h-[600px]"} ${className}`}
       style={{
         width: collapsed ? SIDEBAR_MOTION.collapsedWidth : SIDEBAR_MOTION.expandedWidth,
@@ -300,7 +300,7 @@ export default function SidebarNav({
 
           <button
             type="button"
-            aria-label="Collapse sidebar"
+            aria-label="Recolher barra lateral"
             aria-hidden={collapsed}
             tabIndex={collapsed ? -1 : 0}
             onClick={collapse}
@@ -310,7 +310,7 @@ export default function SidebarNav({
           </button>
           <button
             type="button"
-            aria-label="Expand sidebar"
+            aria-label="Expandir barra lateral"
             aria-hidden={!collapsed}
             tabIndex={collapsed ? 0 : -1}
             onClick={() => setCollapsed(false)}
@@ -323,7 +323,7 @@ export default function SidebarNav({
         <GlideGroup>
           <RailButton
             icon={<IconEditBig size={18} />}
-            label="New chat"
+            label="Nova conversa"
             onClick={() => {
               if (activeTitle === undefined) setDemoActiveTitle(null);
               selectNav("chats");
@@ -350,12 +350,12 @@ export default function SidebarNav({
               style={{ transitionDuration: `${CHAT_SEARCH_MOTION.duration}ms`, transitionTimingFunction: CHAT_SEARCH_MOTION.easing }}
             >
               <IconChevronDownSmall size={16} />
-              <span>Chats</span>
+              <span>Conversas</span>
             </div>
 
             <button
               type="button"
-              aria-label="Search chats"
+              aria-label="Buscar conversas"
               aria-expanded={searchOpen}
               onClick={() => setSearchOpen(true)}
               className={`absolute right-0 top-0 z-10 flex size-8 items-center justify-center rounded-[8px] text-ink-3 transition-[opacity,background-color,color,transform] hover:bg-hover-2 hover:text-ink active:scale-[0.96] ${searchOpen ? "pointer-events-none opacity-0" : "opacity-100"}`}
@@ -385,13 +385,13 @@ export default function SidebarNav({
                     setQuery("");
                   }
                 }}
-                placeholder="Search chats"
-                aria-label="Search chat history"
+                placeholder="Buscar conversas"
+                aria-label="Buscar histórico de conversas"
                 className="ml-1.5 min-w-0 flex-1 bg-transparent text-[13px] font-medium text-ink outline-none placeholder:text-ink-3"
               />
               <button
                 type="button"
-                aria-label="Close chat search"
+                aria-label="Fechar busca de conversas"
                 onClick={() => {
                   setSearchOpen(false);
                   setQuery("");

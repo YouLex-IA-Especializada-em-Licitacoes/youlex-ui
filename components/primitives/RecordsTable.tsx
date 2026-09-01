@@ -25,10 +25,10 @@ const DEFAULT_COLUMN_WIDTHS: Record<ColumnKey, number> = {
 };
 
 const STRENGTH: Record<Strength, { label: string; color: string; rank: number }> = {
-  strong: { label: "Very strong", color: "var(--green)", rank: 3 },
-  weak: { label: "Weak", color: "var(--orange)", rank: 2 },
-  veryweak: { label: "Very weak", color: "var(--red)", rank: 1 },
-  none: { label: "No communication", color: "var(--ink-3)", rank: 0 },
+  strong: { label: "Muito alta", color: "var(--green)", rank: 3 },
+  weak: { label: "Baixa", color: "var(--orange)", rank: 2 },
+  veryweak: { label: "Muito baixa", color: "var(--red)", rank: 1 },
+  none: { label: "Sem histórico", color: "var(--ink-3)", rank: 0 },
 };
 
 // A single mid-lightness base hue per tag. Background, text, and border are
@@ -50,18 +50,18 @@ const TAG_PALETTE: Record<string, TagColor> = {
 };
 
 const TAG_COLORS: Record<string, TagColor> = {
-  B2B: TAG_PALETTE.amber,
-  B2C: TAG_PALETTE.lime,
-  Cafe: TAG_PALETTE.red,
-  Catering: TAG_PALETTE.magenta,
-  "Dairy-free": TAG_PALETTE.cyan,
-  Gelato: TAG_PALETTE.purple,
-  Imports: TAG_PALETTE.orange,
-  Local: TAG_PALETTE.green,
-  Seasonal: TAG_PALETTE.yellow,
-  Sorbet: TAG_PALETTE.pink,
-  Vegan: TAG_PALETTE.lime,
-  Wholesale: TAG_PALETTE.amber,
+  Pregão: TAG_PALETTE.amber,
+  Concorrência: TAG_PALETTE.lime,
+  Dispensa: TAG_PALETTE.red,
+  Concurso: TAG_PALETTE.magenta,
+  TI: TAG_PALETTE.cyan,
+  Obras: TAG_PALETTE.purple,
+  Saúde: TAG_PALETTE.orange,
+  Federal: TAG_PALETTE.green,
+  Estadual: TAG_PALETTE.yellow,
+  Municipal: TAG_PALETTE.pink,
+  Urgente: TAG_PALETTE.lime,
+  Consultoria: TAG_PALETTE.amber,
 };
 
 export type RecordRow = {
@@ -73,80 +73,92 @@ export type RecordRow = {
   website?: string;
 };
 
-const INITIAL_ROWS: RecordRow[] = [
-  { id: "aurora", name: "Aurora Scoops — Reykjavík", tags: ["Gelato", "Seasonal"], last: "9 days ago", strength: "strong", website: "aurora-scoops.example.com" },
-  { id: "kumo", name: "Kumo Creamery — Tokyo", tags: ["B2C", "Cafe", "Vegan"], last: "3 weeks ago", strength: "strong", website: "kumo-creamery.example.com" },
-  { id: "sol-nieve", name: "Sol y Nieve — Buenos Aires", tags: ["Gelato", "Local"], last: "2 months ago", strength: "weak", website: "sol-y-nieve.example.com" },
-  { id: "maple-orbit", name: "Maple Orbit — Montréal", tags: ["B2B", "Wholesale", "Seasonal"], last: "15 days ago", strength: "weak", website: "maple-orbit.example.com" },
-  { id: "blue-fig", name: "Blue Fig Gelato — Florence", tags: ["Gelato", "Cafe"], last: "over 1 year ago", strength: "veryweak", website: "blue-fig.example.com" },
-  { id: "sahara-swirl", name: "Sahara Swirl — Marrakech", tags: ["Sorbet", "Local"], last: "5 months ago", strength: "veryweak" },
-  { id: "cloudberry", name: "Cloudberry Cone — Helsinki", tags: ["Dairy-free", "Seasonal"], last: "No contact", strength: "none", website: "cloudberry-cone.example.com" },
-  { id: "palm-sugar", name: "Palm Sugar Creamery — Bangkok", tags: ["B2C", "Vegan"], last: "3 months ago", strength: "veryweak", website: "palm-sugar.example.com" },
-  { id: "cape-vanilla", name: "Cape Vanilla Co. — Cape Town", tags: ["Wholesale", "Imports"], last: "over 1 year ago", strength: "veryweak", website: "cape-vanilla.example.com" },
-  { id: "andes-snow", name: "Andes Snow Creamery — Quito", tags: ["Gelato", "Catering"], last: "almost 2 years ago", strength: "veryweak" },
-  { id: "tasman-sea", name: "Tasman Sea Gelato — Hobart", tags: ["Gelato", "Local"], last: "2 months ago", strength: "weak", website: "tasman-sea.example.com" },
-  { id: "silk-road", name: "Silk Road Sorbet — Tbilisi", tags: ["Sorbet", "Imports"], last: "about 1 month ago", strength: "weak", website: "silk-road.example.com" },
-  { id: "rosewater", name: "Rosewater Kulfi — Jaipur", tags: ["B2C", "Seasonal"], last: "2 months ago", strength: "veryweak" },
-  { id: "lumen", name: "Lumen Soft Serve — Copenhagen", tags: ["Dairy-free", "Cafe"], last: "8 months ago", strength: "weak", website: "lumen-soft-serve.example.com" },
-  { id: "cacao-norte", name: "Cacao Norte — Oaxaca", tags: ["B2B", "Local", "Wholesale"], last: "about 2 years ago", strength: "none", website: "cacao-norte.example.com" },
-  { id: "pine-pistachio", name: "Pine & Pistachio — Istanbul", tags: ["Gelato", "Catering"], last: "about 1 month ago", strength: "veryweak" },
-  { id: "ember-cone", name: "Ember Cone Company — Seoul", tags: ["B2C", "Vegan"], last: "15 days ago", strength: "weak", website: "ember-cone.example.com" },
-  { id: "coral-coast", name: "Coral Coast Sorbet — Honolulu", tags: ["Sorbet", "Local"], last: "9 days ago", strength: "strong", website: "coral-coast.example.com" },
-  { id: "sunbird", name: "Sunbird Gelateria — Lisbon", tags: ["Gelato", "Cafe"], last: "over 2 years ago", strength: "none", website: "sunbird.example.com" },
-  { id: "mooncake", name: "Mooncake Ice Cream — Singapore", tags: ["B2B", "Wholesale"], last: "about 1 month ago", strength: "veryweak", website: "mooncake-ice-cream.example.com" },
-  { id: "juniper", name: "Juniper & Cream — Vancouver", tags: ["Dairy-free", "Catering"], last: "No contact", strength: "none" },
-  { id: "mango-moon", name: "Mango Moon Gelato — Nairobi", tags: ["Sorbet", "Vegan"], last: "almost 2 years ago", strength: "veryweak", website: "mango-moon.example.com" },
-  { id: "fjord-fizz", name: "Fjord Fizz Ice — Oslo", tags: ["Dairy-free", "Seasonal"], last: "No contact", strength: "none" },
-  { id: "pampa", name: "Pampa Creamery — Córdoba", tags: ["B2C", "Local"], last: "12 months ago", strength: "veryweak", website: "pampa-creamery.example.com" },
-  { id: "lotus-leaf", name: "Lotus Leaf Scoops — Hanoi", tags: ["Vegan", "Cafe"], last: "15 days ago", strength: "weak" },
-  { id: "saffron-sky", name: "Saffron Sky Kulfi — Dubai", tags: ["Imports", "Catering"], last: "almost 2 years ago", strength: "veryweak", website: "saffron-sky.example.com" },
-  { id: "alpine-churn", name: "Alpine Churn — Zürich", tags: ["B2B", "Gelato", "Wholesale"], last: "4 days ago", strength: "strong", website: "alpine-churn.example.com" },
-  { id: "monsoon-mango", name: "Monsoon Mango — Mumbai", tags: ["Sorbet", "Vegan", "Catering"], last: "18 days ago", strength: "weak", website: "monsoon-mango.example.com" },
-  { id: "cedar-spoon", name: "Cedar Spoon — Beirut", tags: ["Cafe", "Local", "Seasonal"], last: "6 days ago", strength: "strong", website: "cedar-spoon.example.com" },
-  { id: "baltic-berry", name: "Baltic Berry — Tallinn", tags: ["Dairy-free", "Seasonal", "B2C"], last: "5 weeks ago", strength: "weak", website: "baltic-berry.example.com" },
-  { id: "delta-dairy", name: "Delta Dairy Works — New Orleans", tags: ["B2B", "Wholesale", "Local"], last: "2 days ago", strength: "strong", website: "delta-dairy.example.com" },
-  { id: "yuzu-yard", name: "Yuzu Yard — Kyoto", tags: ["Sorbet", "Cafe", "Seasonal"], last: "11 days ago", strength: "strong", website: "yuzu-yard.example.com" },
-  { id: "copper-cone", name: "Copper Cone — Melbourne", tags: ["Gelato", "Cafe", "B2C"], last: "about 1 month ago", strength: "weak", website: "copper-cone.example.com" },
-  { id: "mint-medina", name: "Mint Medina — Tunis", tags: ["Dairy-free", "Vegan", "Local"], last: "No contact", strength: "none" },
-  { id: "glacier-grove", name: "Glacier Grove — Anchorage", tags: ["Seasonal", "Local", "Catering"], last: "7 weeks ago", strength: "weak", website: "glacier-grove.example.com" },
-  { id: "orchard-cloud", name: "Orchard Cloud — Lyon", tags: ["Gelato", "Seasonal", "Cafe"], last: "5 days ago", strength: "strong", website: "orchard-cloud.example.com" },
-  { id: "tamarind-tide", name: "Tamarind Tide — Chennai", tags: ["Vegan", "Sorbet", "B2C"], last: "9 months ago", strength: "veryweak", website: "tamarind-tide.example.com" },
-  { id: "amber-scoop", name: "Amber Scoop — Prague", tags: ["Gelato", "B2B"], last: "over 1 year ago", strength: "none" },
-  { id: "boreal-batch", name: "Boreal Batch — Yellowknife", tags: ["Dairy-free", "Local", "Seasonal"], last: "8 days ago", strength: "strong", website: "boreal-batch.example.com" },
-  { id: "coconut-commons", name: "Coconut Commons — Manila", tags: ["Vegan", "B2C", "Cafe"], last: "24 days ago", strength: "weak", website: "coconut-commons.example.com" },
-  { id: "dolomite-dairy", name: "Dolomite Dairy — Bolzano", tags: ["Gelato", "Wholesale"], last: "3 days ago", strength: "strong", website: "dolomite-dairy.example.com" },
-  { id: "equator-cream", name: "Equator Cream — Kampala", tags: ["B2B", "Catering", "Local"], last: "10 months ago", strength: "veryweak", website: "equator-cream.example.com" },
-  { id: "hibiscus-house", name: "Hibiscus House — Accra", tags: ["Sorbet", "Cafe"], last: "6 weeks ago", strength: "weak", website: "hibiscus-house.example.com" },
-  { id: "lagoon-ladle", name: "Lagoon Ladle — Venice", tags: ["Gelato", "Seasonal", "Catering"], last: "7 days ago", strength: "strong", website: "lagoon-ladle.example.com" },
-  { id: "midnight-milk", name: "Midnight Milk — Tromsø", tags: ["Dairy-free", "Vegan", "Wholesale"], last: "No contact", strength: "none" },
-  { id: "nomad-nougat", name: "Nomad Nougat — Ulaanbaatar", tags: ["Imports", "B2B"], last: "almost 2 years ago", strength: "none", website: "nomad-nougat.example.com" },
-  { id: "olive-snow", name: "Olive Snow — Athens", tags: ["Gelato", "Cafe", "Local"], last: "4 days ago", strength: "strong", website: "olive-snow.example.com" },
-  { id: "pacific-pear", name: "Pacific Pear — Valparaíso", tags: ["Sorbet", "Seasonal"], last: "2 months ago", strength: "weak", website: "pacific-pear.example.com" },
-  { id: "quartz-cone", name: "Quartz Cone — Denver", tags: ["B2C", "Wholesale"], last: "10 days ago", strength: "strong", website: "quartz-cone.example.com" },
-  { id: "red-lantern", name: "Red Lantern Creamery — Taipei", tags: ["Cafe", "Vegan"], last: "about 1 month ago", strength: "weak", website: "red-lantern.example.com" },
-  { id: "salt-silk", name: "Salt & Silk — Muscat", tags: ["Imports", "Catering", "Gelato"], last: "8 months ago", strength: "veryweak", website: "salt-and-silk.example.com" },
-  { id: "tropic-churn", name: "Tropic Churn — San Juan", tags: ["Sorbet", "Local", "B2C"], last: "6 days ago", strength: "strong", website: "tropic-churn.example.com" },
-  { id: "umber-cream", name: "Umber Cream — Warsaw", tags: ["B2B", "Wholesale", "Cafe"], last: "5 weeks ago", strength: "weak", website: "umber-cream.example.com" },
-  { id: "vanilla-vale", name: "Vanilla Vale — Antananarivo", tags: ["Imports", "Local"], last: "No contact", strength: "none" },
-  { id: "willow-whip", name: "Willow Whip — Portland", tags: ["Dairy-free", "Vegan", "Cafe"], last: "3 days ago", strength: "strong", website: "willow-whip.example.com" },
-  { id: "zenith-gelato", name: "Zenith Gelato — Auckland", tags: ["Gelato", "Seasonal"], last: "3 weeks ago", strength: "weak", website: "zenith-gelato.example.com" },
-  { id: "apricot-atlas", name: "Apricot Atlas — Algiers", tags: ["Sorbet", "Imports"], last: "11 months ago", strength: "veryweak", website: "apricot-atlas.example.com" },
-  { id: "black-sesame", name: "Black Sesame Social — Bandung", tags: ["Vegan", "Cafe", "B2C"], last: "9 days ago", strength: "strong", website: "black-sesame.example.com" },
-  { id: "crimson-clover", name: "Crimson Clover — Brussels", tags: ["Gelato", "Wholesale", "Catering"], last: "2 months ago", strength: "weak", website: "crimson-clover.example.com" },
-  { id: "dragonfruit-dock", name: "Dragonfruit Dock — Shenzhen", tags: ["Sorbet", "B2B", "Wholesale"], last: "No contact", strength: "none" },
+/* dado do domínio de licitações — gerado para provar a tabela com volume real
+ * (centenas de linhas), não as ~60 originais do upstream. Determinístico
+ * (sem Math.random) para não gerar hydration mismatch entre server e client. */
+const ORGAOS = [
+  "Prefeitura de Osasco", "Prefeitura de Campinas", "Prefeitura de Curitiba",
+  "Governo do Estado de SP", "Governo do Estado do RJ", "Governo do Estado da BA",
+  "Secretaria de Saúde SP", "Secretaria de Educação MG", "Ministério da Infraestrutura",
+  "Ministério da Saúde", "Câmara Municipal de Campinas", "Tribunal de Justiça do RS",
+  "INSS", "DNIT", "Petrobras", "Eletrobras", "Prefeitura de Belo Horizonte",
+  "Prefeitura de Salvador", "Prefeitura de Fortaleza", "Governo do Distrito Federal",
 ];
+const MODALIDADES: [string, string[]][] = [
+  ["Pregão Eletrônico", ["Pregão"]],
+  ["Concorrência", ["Concorrência"]],
+  ["Dispensa de Licitação", ["Dispensa"]],
+  ["Concurso Público", ["Concurso"]],
+];
+const OBJETOS = [
+  "aquisição de equipamentos de TI", "serviços de consultoria jurídica",
+  "obras de pavimentação urbana", "fornecimento de materiais de saúde",
+  "manutenção predial", "serviços de limpeza urbana", "aquisição de veículos",
+  "serviços de engenharia consultiva", "locação de software de gestão",
+  "reforma de unidades escolares",
+];
+const OBJETO_TAGS: Record<string, string> = {
+  "aquisição de equipamentos de TI": "TI",
+  "serviços de consultoria jurídica": "Consultoria",
+  "obras de pavimentação urbana": "Obras",
+  "fornecimento de materiais de saúde": "Saúde",
+  "manutenção predial": "Obras",
+  "serviços de limpeza urbana": "Municipal",
+  "aquisição de veículos": "Federal",
+  "serviços de engenharia consultiva": "Consultoria",
+  "locação de software de gestão": "TI",
+  "reforma de unidades escolares": "Estadual",
+};
+const ESFERAS = ["Federal", "Estadual", "Municipal"];
+const LAST_SEEN = [
+  "2 dias atrás", "4 dias atrás", "9 dias atrás", "15 dias atrás", "3 semanas atrás",
+  "1 mês atrás", "2 meses atrás", "5 meses atrás", "8 meses atrás", "1 ano atrás",
+  "quase 2 anos atrás", "Sem movimentação",
+];
+const STRENGTH_CYCLE: Strength[] = ["strong", "weak", "veryweak", "none"];
 
-/* the AI column resolves to fictional competitor pairs */
-const AI_LABEL = "Competitors";
+function slugify(value: string): string {
+  return value
+    .normalize("NFD")
+    .replace(/[̀-ͯ]/g, "")
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/(^-|-$)/g, "");
+}
+
+const ROW_COUNT = 300;
+
+const INITIAL_ROWS: RecordRow[] = Array.from({ length: ROW_COUNT }, (_, i) => {
+  const orgao = ORGAOS[i % ORGAOS.length];
+  const [modalidade, modalidadeTags] = MODALIDADES[i % MODALIDADES.length];
+  const objeto = OBJETOS[i % OBJETOS.length];
+  const esfera = ESFERAS[i % ESFERAS.length];
+  const numero = `${String((i % 180) + 1).padStart(3, "0")}/${2024 + (i % 3)}`;
+  const strength = STRENGTH_CYCLE[i % STRENGTH_CYCLE.length];
+  const last = LAST_SEEN[i % LAST_SEEN.length];
+  const hasWebsite = i % 5 !== 0;
+  const id = `${slugify(orgao)}-${slugify(modalidade)}-${i}`;
+  return {
+    id,
+    name: `${modalidade} ${numero} — ${orgao}`,
+    tags: [...modalidadeTags, OBJETO_TAGS[objeto], esfera],
+    last,
+    strength,
+    website: hasWebsite ? `${id}.compras.example.gov.br` : undefined,
+  };
+});
+
+/* the AI column resolves to fictional competing bidders */
+const AI_LABEL = "Concorrentes";
 const COMPETITOR_POOL = [
-  "Frost & Ladle",
-  "Polar Pint Co.",
-  "Meltwater Creamery",
-  "Cirrus Scoops",
-  "Golden Churn",
-  "Velvet Freeze",
-  "North Cone Collective",
-  "Sundae Syndicate",
+  "Vieira & Almeida Advogados",
+  "Consórcio Litoral Norte",
+  "Prime Licitações Ltda.",
+  "Grupo Meridiano Serviços",
+  "Construtora Horizonte",
+  "Alfa Engenharia e Obras",
+  "Consórcio Nova Capital",
+  "Sigma Consultoria Jurídica",
 ];
 const competitorsFor = (index: number) => `${COMPETITOR_POOL[index % 8]}, ${COMPETITOR_POOL[(index + 3) % 8]}`;
 
@@ -184,17 +196,17 @@ type ToolKind = "model" | "web" | "user";
 type ColumnMeta = { type: string; tool: string; toolKind: ToolKind; inputs?: string; prompt?: Prompt };
 
 const COLUMN_META: Record<string, ColumnMeta> = {
-  Company: { type: "Text", tool: "User input", toolKind: "user" },
-  Categories: { type: "Multi select", tool: "Sprinkles 5", toolKind: "model", inputs: "Company", prompt: { before: "Tag each ", chip: "Company", after: " with its market categories." } },
-  "Last interaction": { type: "Date", tool: "User input", toolKind: "user" },
-  "Connection strength": { type: "Single select", tool: "Sprinkles 5", toolKind: "model", inputs: "Last interaction", prompt: { before: "Score the relationship from ", chip: "Last interaction", after: "." } },
-  Links: { type: "URL", tool: "Web search", toolKind: "web", inputs: "Company", prompt: { before: "Find the website for ", chip: "Company", after: "." } },
-  [AI_LABEL]: { type: "Text", tool: "Web search", toolKind: "web", inputs: "Company", prompt: { before: "Find competitors for ", chip: "Company" } },
+  Licitação: { type: "Text", tool: "User input", toolKind: "user" },
+  Modalidade: { type: "Multi select", tool: "Sprinkles 5", toolKind: "model", inputs: "Licitação", prompt: { before: "Classifique cada ", chip: "Licitação", after: " nas suas categorias de mercado." } },
+  "Última atualização": { type: "Date", tool: "User input", toolKind: "user" },
+  "Probabilidade de êxito": { type: "Single select", tool: "Sprinkles 5", toolKind: "model", inputs: "Última atualização", prompt: { before: "Avalie o relacionamento a partir de ", chip: "Última atualização", after: "." } },
+  Portal: { type: "URL", tool: "Web search", toolKind: "web", inputs: "Licitação", prompt: { before: "Encontre o portal para ", chip: "Licitação", after: "." } },
+  [AI_LABEL]: { type: "Text", tool: "Web search", toolKind: "web", inputs: "Licitação", prompt: { before: "Encontre concorrentes para ", chip: "Licitação" } },
 };
 
 const NEW_PROPERTY_TYPES = ["Text", "File", "Collection", "Single select", "Multi select", "URL", "Reference", "JSON", "File splitter"];
 const MODEL_OPTIONS = ["Sprinkles 5", "Sprinkles 4.2", "Sprinkles Mini"];
-const INPUT_OPTIONS = ["Company", "Categories", "Last interaction", "Connection strength", "Links"];
+const INPUT_OPTIONS = ["Licitação", "Modalidade", "Última atualização", "Probabilidade de êxito", "Portal"];
 
 function Checkbox({ checked, mixed = false, onChange, label }: { checked: boolean; mixed?: boolean; onChange: () => void; label: string }) {
   return (
@@ -619,7 +631,7 @@ export default function RecordsTable({ rows = INITIAL_ROWS, fill = false }: { ro
       <div
         className="records-scroll"
         tabIndex={0}
-        aria-label="Companies table. Scroll horizontally and vertically to view all columns and records."
+        aria-label="Tabela de licitações. Scroll horizontally and vertically to view all columns and records."
         onScroll={() => {
           if (ignoreScrollRef.current) {
             ignoreScrollRef.current = false;
@@ -645,17 +657,17 @@ export default function RecordsTable({ rows = INITIAL_ROWS, fill = false }: { ro
           </colgroup>
           <thead>
             <tr>
-              <th className={`records-header-cell records-sticky-cell ${prop?.col === "Company" ? "is-colsel" : ""}`}>
-                <div className="records-company-header" style={{ cursor: "pointer" }} onClick={(event) => openProp("Company")(event)}>
+              <th className={`records-header-cell records-sticky-cell ${prop?.col === "Licitação" ? "is-colsel" : ""}`}>
+                <div className="records-company-header" style={{ cursor: "pointer" }} onClick={(event) => openProp("Licitação")(event)}>
                   <Checkbox checked={allSelected} mixed={partiallySelected} onChange={toggleAll} label="Select all companies" />
                   <span>Company</span>
                 </div>
-                <span role="separator" aria-orientation="vertical" aria-label="Resize Company column" className={`records-resize-handle ${resizingColumn === "company" ? "is-resizing" : ""}`} onPointerDown={startColumnResize("company", 180)} />
+                <span role="separator" aria-orientation="vertical" aria-label="Redimensionar coluna Licitação" className={`records-resize-handle ${resizingColumn === "company" ? "is-resizing" : ""}`} onPointerDown={startColumnResize("company", 180)} />
               </th>
-              <HeaderCell label="Categories" selected={prop?.col === "Categories"} onPick={openProp("Categories")} sort={sort} onSort={toggleSort} onResizeStart={startColumnResize("categories")} resizing={resizingColumn === "categories"} icon={<Icon size={15}>{TYPE_GLYPHS["Multi select"]}</Icon>} />
-              <HeaderCell label="Last interaction" selected={prop?.col === "Last interaction"} onPick={openProp("Last interaction")} sortKey="last" sort={sort} onSort={toggleSort} onResizeStart={startColumnResize("last")} resizing={resizingColumn === "last"} icon={<Icon size={15}>{TYPE_GLYPHS.Date}</Icon>} />
-              <HeaderCell label="Connection strength" selected={prop?.col === "Connection strength"} onPick={openProp("Connection strength")} sortKey="strength" sort={sort} onSort={toggleSort} onResizeStart={startColumnResize("strength")} resizing={resizingColumn === "strength"} icon={<Icon size={15}>{TYPE_GLYPHS["Single select"]}</Icon>} />
-              <HeaderCell label="Links" selected={prop?.col === "Links"} onPick={openProp("Links")} sort={sort} onSort={toggleSort} onResizeStart={startColumnResize("links")} resizing={resizingColumn === "links"} icon={<Icon size={15}>{TYPE_GLYPHS.URL}</Icon>} />
+              <HeaderCell label="Modalidade" selected={prop?.col === "Modalidade"} onPick={openProp("Modalidade")} sort={sort} onSort={toggleSort} onResizeStart={startColumnResize("categories")} resizing={resizingColumn === "categories"} icon={<Icon size={15}>{TYPE_GLYPHS["Multi select"]}</Icon>} />
+              <HeaderCell label="Última atualização" selected={prop?.col === "Última atualização"} onPick={openProp("Última atualização")} sortKey="last" sort={sort} onSort={toggleSort} onResizeStart={startColumnResize("last")} resizing={resizingColumn === "last"} icon={<Icon size={15}>{TYPE_GLYPHS.Date}</Icon>} />
+              <HeaderCell label="Probabilidade de êxito" selected={prop?.col === "Probabilidade de êxito"} onPick={openProp("Probabilidade de êxito")} sortKey="strength" sort={sort} onSort={toggleSort} onResizeStart={startColumnResize("strength")} resizing={resizingColumn === "strength"} icon={<Icon size={15}>{TYPE_GLYPHS["Single select"]}</Icon>} />
+              <HeaderCell label="Portal" selected={prop?.col === "Portal"} onPick={openProp("Portal")} sort={sort} onSort={toggleSort} onResizeStart={startColumnResize("links")} resizing={resizingColumn === "links"} icon={<Icon size={15}>{TYPE_GLYPHS.URL}</Icon>} />
               {aiAdded && (
                 <th ref={aiThRef} className={`records-header-cell ${prop?.col === AI_LABEL ? "is-colsel" : ""}`}>
                   <button type="button" className="records-header-button" onClick={openProp(AI_LABEL)}>
@@ -709,11 +721,11 @@ export default function RecordsTable({ rows = INITIAL_ROWS, fill = false }: { ro
               const selectedRow = selected.has(row.id);
               const strength = STRENGTH[row.strength];
               return <tr key={row.id} className={`records-row ${selectedRow ? "is-selected" : ""}`}>
-                <td className={`records-cell records-sticky-cell records-company-cell ${prop?.col === "Company" ? "is-colsel" : ""}`}><span className="records-rownum">{index + 1}</span><Checkbox checked={selectedRow} onChange={() => toggleRow(row.id)} label={`Select ${row.name}`} /><span className="records-company-mark">{row.name.slice(0, 1).toUpperCase()}</span><a href={row.website ? `https://${row.website}` : "#"} onClick={(event) => !row.website && event.preventDefault()} title={row.name} className={`records-company-name ${row.website ? "has-link" : ""}`}>{row.name}</a></td>
-                <td className={`records-cell ${prop?.col === "Categories" ? "is-colsel" : ""}`}>{isCalc("Categories", index) ? <CalcCell /> : <TagList tags={row.tags} />}</td>
-                <td className={`records-cell ${row.last === "No contact" ? "records-muted" : ""} ${prop?.col === "Last interaction" ? "is-colsel" : ""}`}>{isCalc("Last interaction", index) ? <CalcCell /> : row.last}</td>
-                <td className={`records-cell ${prop?.col === "Connection strength" ? "is-colsel" : ""}`}>{isCalc("Connection strength", index) ? <CalcCell /> : <span className="records-strength"><span className="records-strength-dot" style={{ background: strength.color }} />{strength.label}</span>}</td>
-                <td className={`records-cell ${prop?.col === "Links" ? "is-colsel" : ""}`}>{isCalc("Links", index) ? <CalcCell /> : row.website ? <a className="records-link" href={`https://${row.website}`} title={row.website} target="_blank" rel="noreferrer"><span className="records-link-label">{row.website}</span><Icon size={12}><path d="M14 5h5v5M19 5l-8 8" /></Icon></a> : <span className="records-muted">—</span>}</td>
+                <td className={`records-cell records-sticky-cell records-company-cell ${prop?.col === "Licitação" ? "is-colsel" : ""}`}><span className="records-rownum">{index + 1}</span><Checkbox checked={selectedRow} onChange={() => toggleRow(row.id)} label={`Select ${row.name}`} /><span className="records-company-mark">{row.name.slice(0, 1).toUpperCase()}</span><a href={row.website ? `https://${row.website}` : "#"} onClick={(event) => !row.website && event.preventDefault()} title={row.name} className={`records-company-name ${row.website ? "has-link" : ""}`}>{row.name}</a></td>
+                <td className={`records-cell ${prop?.col === "Modalidade" ? "is-colsel" : ""}`}>{isCalc("Modalidade", index) ? <CalcCell /> : <TagList tags={row.tags} />}</td>
+                <td className={`records-cell ${row.last === "Sem movimentação" ? "records-muted" : ""} ${prop?.col === "Última atualização" ? "is-colsel" : ""}`}>{isCalc("Última atualização", index) ? <CalcCell /> : row.last}</td>
+                <td className={`records-cell ${prop?.col === "Probabilidade de êxito" ? "is-colsel" : ""}`}>{isCalc("Probabilidade de êxito", index) ? <CalcCell /> : <span className="records-strength"><span className="records-strength-dot" style={{ background: strength.color }} />{strength.label}</span>}</td>
+                <td className={`records-cell ${prop?.col === "Portal" ? "is-colsel" : ""}`}>{isCalc("Portal", index) ? <CalcCell /> : row.website ? <a className="records-link" href={`https://${row.website}`} title={row.website} target="_blank" rel="noreferrer"><span className="records-link-label">{row.website}</span><Icon size={12}><path d="M14 5h5v5M19 5l-8 8" /></Icon></a> : <span className="records-muted">—</span>}</td>
                 {aiAdded && (
                   <td className={`records-cell ${prop?.col === AI_LABEL ? "is-colsel" : ""}`}>
                     {calc?.col === AI_LABEL ? (index < calc.resolved ? competitorsFor(index) : <CalcCell />) : aiDone ? competitorsFor(index) : <span className="records-muted">—</span>}

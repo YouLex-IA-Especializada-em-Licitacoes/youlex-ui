@@ -136,15 +136,15 @@ const FIELDS: FineTuneField[] = [
   { key: "opacity", label: "Opacity", value: 100, min: 0, max: 100, suffix: "%" },
 ];
 
-const OPTIONS = ["Seasonal", "Classic", "Limited"];
+const OPTIONS = ["Cláusula padrão", "Cláusula específica", "Cláusula excepcional"];
 
 const DEFAULT_LABELS: FineTuneCardLabels = {
-  title: "Flavor card",
+  title: "Cartão da cláusula",
   layout: "Layout",
-  type: "Type",
-  placeholder: "Select type",
-  adjust: "Adjust",
-  edited: "Edited",
+  type: "Tipo",
+  placeholder: "Selecionar tipo",
+  adjust: "Ajustando",
+  edited: "Editado",
 };
 
 function chunk<T>(items: T[], size: number): T[][] {

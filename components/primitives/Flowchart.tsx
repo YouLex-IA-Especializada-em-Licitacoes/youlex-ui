@@ -11,8 +11,8 @@ import { useLayoutEffect } from "react";
  * real dropdowns (same menu as the PromptBar model picker).
  * ───────────────────────────────────────────────────────── */
 
-const PURPLE = "#9a5cff";
-const AMBER = "#f09a2f";
+const PURPLE = "var(--accent)";
+const AMBER = "var(--orange)";
 
 const mix = (hue: string, pct: number, base = "var(--surface)") =>
   `color-mix(in srgb, ${hue} ${pct}%, ${base})`;
@@ -40,10 +40,10 @@ const NODES: StepNode[] = [
     row: 0,
     x: 0.5,
     w: 300,
-    kind: { label: "Trigger", hue: PURPLE },
+    kind: { label: "Gatilho", hue: PURPLE },
     hue: PURPLE,
-    title: "New order created",
-    caption: "Trigger when a new order is created",
+    title: "Nova licitação publicada",
+    caption: "Disparado quando um novo edital é publicado",
   },
   {
     id: "cond",
@@ -60,18 +60,18 @@ const EDGES = [{ from: "trigger", to: "cond" }];
 /* estimated heights for the first paint; measured immediately after */
 const EST_H: Record<string, number> = { trigger: 92, cond: 134 };
 
-const PROPERTIES = ["flavor", "topping", "size", "scoops"];
+const PROPERTIES = ["modalidade", "órgão", "valor estimado", "UF"];
 const FLAVORS = [
-  { name: "Rocky Road", tag: "Classic" },
-  { name: "Mint Chip", tag: "Classic" },
-  { name: "Pistachio", tag: "Seasonal" },
-  { name: "Bubblegum", tag: "Retro" },
+  { name: "Pregão Eletrônico", tag: "Comum" },
+  { name: "Concorrência", tag: "Comum" },
+  { name: "Dispensa", tag: "Exceção" },
+  { name: "Concurso", tag: "Raro" },
 ];
 const TOPPINGS = [
-  { name: "Brown butter bourbon brittle crunch" },
-  { name: "Rainbow sprinkles" },
-  { name: "Hot fudge" },
-  { name: "Candied pecans" },
+  { name: "Serviços de tecnologia da informação" },
+  { name: "Obras e engenharia" },
+  { name: "Aquisição de materiais de saúde" },
+  { name: "Serviços de consultoria jurídica" },
 ];
 
 /* ── icons ── */
@@ -189,7 +189,7 @@ function SourceChip() {
       <span className="text-ink-2">
         <ConeIcon size={12} />
       </span>
-      order
+      edital
     </span>
   );
 }
@@ -244,10 +244,10 @@ function SelectChip({
 
 function ConditionBody() {
   const [values, setValues] = useState<Record<string, string>>({
-    prop1: "flavor",
-    val1: "Rocky Road",
-    prop2: "topping",
-    val2: "Brown butter bourbon brittle crunch",
+    prop1: "modalidade",
+    val1: "Pregão Eletrônico",
+    prop2: "valor estimado",
+    val2: "Aquisição de materiais de saúde",
   });
   const [open, setOpen] = useState<string | null>(null);
 

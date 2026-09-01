@@ -12,7 +12,7 @@ import { useEffect, useMemo, useState } from "react";
 const EASE = "cubic-bezier(0.16, 1, 0.3, 1)";
 
 const formatPercent = (v: number) => `${v > 0 ? "+" : ""}${v.toFixed(2)}%`;
-const formatMoney = (v: number) => `$${Math.round(v).toLocaleString("en-US")}`;
+const formatMoney = (v: number) => `R$ ${Math.round(v).toLocaleString("pt-BR")}`;
 /* anchor the snapshot to *call* time (inside each card's mount-time memo) —
  * a module-load constant goes stale, and once the points age past the chart
  * window the canvas renders empty */
@@ -125,21 +125,21 @@ export type CompareSeries = {
 
 const COMPARE_SERIES: CompareSeries[] = [
   {
-    name: "Mint Chip",
+    name: "Créditos consumidos",
     values: [-2.9, -3.4, -3.05, -3.86, -3.52, -4.1, -3.82, -4.41],
-    sub: "-$2,377.66",
+    sub: "-R$ 2.377,66",
     tone: "red",
     dot: "bg-orange",
-    color: "#f68f3c",
+    color: "var(--orange)",
     tooltipColor: "var(--orange)",
   },
   {
-    name: "Pistachio",
+    name: "Créditos disponíveis",
     values: [0.22, 0.58, 0.42, 0.91, 0.76, 1.08, 0.96, 1.15],
-    sub: "+$617.22",
+    sub: "+R$ 617,22",
     tone: "green",
     dot: "bg-accent",
-    color: "#3d9aff",
+    color: "var(--accent)",
     tooltipColor: "var(--accent)",
   },
 ];
@@ -253,7 +253,7 @@ function AnomalyCard({ data: anomaly = ANOMALY_DATA }: { data?: AnomalyData }) {
 
   const data = metric === "spend" ? spend : usage;
   const value = data.at(-1)?.value ?? (metric === "spend" ? 2112 : 96);
-  const threshold = metric === "spend" ? "$2,112" : "82 kWh";
+  const threshold = metric === "spend" ? "R$ 2.112" : "82 consultas";
   const moneyLabel = formatMoney(spend.at(-1)?.value ?? 2112);
 
   return (
@@ -261,10 +261,10 @@ function AnomalyCard({ data: anomaly = ANOMALY_DATA }: { data?: AnomalyData }) {
       <div className="flex items-center justify-between">
         <span className="flex items-center gap-1.5 text-[12px] font-medium text-ink">
           <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--red)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M12 19V5M5 12l7-7 7 7" /></svg>
-          High freezer spend
+          Alto consumo de créditos
         </span>
         <span className="rounded-full bg-field px-2 py-0.5 text-[10.5px] font-medium text-ink-2">
-          Snapshot
+          Instantâneo
         </span>
       </div>
       <div className="mt-2 overflow-hidden rounded-control bg-inset shadow-hairline">
@@ -273,8 +273,8 @@ function AnomalyCard({ data: anomaly = ANOMALY_DATA }: { data?: AnomalyData }) {
             {hoverIndex !== null
               ? metric === "spend"
                 ? formatMoney(data[hoverIndex].value)
-                : `${Math.round(data[hoverIndex].value)} kWh`
-              : `${threshold} threshold`}
+                : `${Math.round(data[hoverIndex].value)} consultas`
+              : `limite de ${threshold}`}
           </span>
           <span className="flex rounded-full bg-field p-0.5">
             {(["spend", "usage"] as const).map((item) => (
@@ -287,7 +287,7 @@ function AnomalyCard({ data: anomaly = ANOMALY_DATA }: { data?: AnomalyData }) {
                   metric === item ? "bg-surface text-ink shadow-btn" : "text-ink-3 hover:text-ink-2"
                 }`}
               >
-                {item === "spend" ? "Spend" : "Usage"}
+                {item === "spend" ? "Gastos" : "Consultas"}
               </button>
             ))}
           </span>
@@ -304,7 +304,7 @@ function AnomalyCard({ data: anomaly = ANOMALY_DATA }: { data?: AnomalyData }) {
             data={data}
             value={value}
             theme={dark ? "dark" : "light"}
-            color="#ee5c61"
+            color="var(--red)"
             grid
             scrub={false}
             fill={false}
@@ -315,22 +315,22 @@ function AnomalyCard({ data: anomaly = ANOMALY_DATA }: { data?: AnomalyData }) {
             lineWidth={2.25}
             cursor="crosshair"
             padding={{ top: 34, right: 0, bottom: 22, left: 0 }}
-            formatValue={(v) => (metric === "spend" ? formatMoney(v) : `${Math.round(v)} kWh`)}
+            formatValue={(v) => (metric === "spend" ? formatMoney(v) : `${Math.round(v)} consultas`)}
           />
           {hoverIndex !== null && <>
             <span className="insight-chart-cursor" style={{ left: `${(hoverIndex / (data.length - 1)) * 100}%` }} />
             <span className="insight-chart-tooltip-anchor" style={{ left: `${Math.min(Math.max((hoverIndex / (data.length - 1)) * 100, 28), 72)}%` }}>
-              <ChartTooltip rows={[{ label: metric === "spend" ? "Spend" : "Usage", value: metric === "spend" ? formatMoney(data[hoverIndex].value) : `${Math.round(data[hoverIndex].value)} kWh`, color: "var(--red)" }]} />
+              <ChartTooltip rows={[{ label: metric === "spend" ? "Gastos" : "Consultas", value: metric === "spend" ? formatMoney(data[hoverIndex].value) : `${Math.round(data[hoverIndex].value)} consultas`, color: "var(--red)" }]} />
             </span>
           </>}
         </div>
       </div>
       <div className="mt-1.5 flex items-baseline gap-2">
         <span className="text-[17px] font-semibold tracking-[-0.01em] text-ink tabular-nums">
-          {moneyLabel} spent
+          {moneyLabel} consumidos
         </span>
-        <Mono tone="red">+$1,834.66</Mono>
-        <span className="text-[11px] text-ink-3">vs 3 months</span>
+        <Mono tone="red">+R$ 1.834,66</Mono>
+        <span className="text-[11px] text-ink-3">vs 3 meses</span>
       </div>
     </div>
   );
@@ -347,9 +347,9 @@ export type AllocationSegment = {
 };
 
 const ALLOCATION_SEGMENTS: AllocationSegment[] = [
-  { name: "VAN", label: "Vanilla", pct: 72.5, amount: "$51,785", cls: "bg-orange", tone: "text-orange" },
-  { name: "CHOC", label: "Chocolate", pct: 22.8, amount: "$16,278", cls: "bg-line-strong", tone: "text-ink-2" },
-  { name: "MINT", label: "Mint", pct: 4.7, amount: "$3,357", cls: "bg-line", tone: "text-ink-3" },
+  { name: "PESQ", label: "Pesquisa jurídica", pct: 72.5, amount: "R$ 51.785", cls: "bg-orange", tone: "text-orange" },
+  { name: "PECA", label: "Geração de peças", pct: 22.8, amount: "R$ 16.278", cls: "bg-line-strong", tone: "text-ink-2" },
+  { name: "EDIT", label: "Análise de edital", pct: 4.7, amount: "R$ 3.357", cls: "bg-line", tone: "text-ink-3" },
 ];
 
 /* 3 — allocation: hero number + segmented bar + legend */
@@ -361,9 +361,9 @@ function AllocationCard({ segments = ALLOCATION_SEGMENTS }: { segments?: Allocat
     <div className="min-h-[278px] rounded-card bg-surface p-3 shadow-hairline">
       <span className="flex items-center gap-1.5 text-[12px] font-medium text-ink">
         <span className="flex size-3.5 items-center justify-center rounded-full bg-orange text-[8px] font-bold text-white">
-          V
+          P
         </span>
-        Vanilla allocation
+        Consumo por categoria
       </span>
       <span className="mt-1 block text-[20px] font-semibold tracking-[-0.01em] text-ink tabular-nums">
         {active.amount}
@@ -418,7 +418,7 @@ function AllocationCard({ segments = ALLOCATION_SEGMENTS }: { segments?: Allocat
       <div className="mt-3 min-h-16 rounded-control bg-inset px-2.5 py-2 shadow-hairline">
         <span className={`block text-[11.5px] font-medium ${active.tone}`}>{active.label}</span>
         <span className="mt-1 block text-[11px] leading-relaxed text-ink-3">
-          Contribution snapshot across current inventory value. Segment selection changes the inspected group without moving the card.
+          Instantâneo de consumo de créditos por categoria de uso. A seleção de segmento troca o grupo inspecionado sem mover o cartão.
         </span>
       </div>
     </div>
@@ -438,34 +438,34 @@ const PAGES: InsightPage[] = [
     key: "compare",
     prose: (
       <>
-        The worst performer in your <Entity name="Creamery" tone="bg-orange" /> is
-        Rocky Road — down <Mono tone="red">-6%</Mono> or <Mono tone="red">-$2,453.44</Mono>.
+        A pior categoria da sua <Entity name="conta" tone="bg-orange" /> é
+        Créditos consumidos — queda de <Mono tone="red">-6%</Mono> ou <Mono tone="red">-R$ 2.453,44</Mono>.
       </>
     ),
     Card: CompareCard,
-    pill: "Should I rebalance flavors?",
+    pill: "Devo revisar o uso de créditos?",
   },
   {
     key: "anomaly",
     prose: (
       <>
-        Unusually high freezer bill on <span className="font-medium text-ink">Dec 13</span> —{" "}
-        <Mono tone="red">+$1,834.66</Mono> above your average.
+        Consumo de créditos incomum em <span className="font-medium text-ink">13 dez</span> —{" "}
+        <Mono tone="red">+R$ 1.834,66</Mono> acima da sua média.
       </>
     ),
     Card: AnomalyCard,
-    pill: "Get tips on cutting freezer costs",
+    pill: "Ver dicas para reduzir o consumo",
   },
   {
     key: "allocation",
     prose: (
       <>
-        You’re heavily invested in <Entity name="Vanilla" tone="bg-orange" /> — it’s{" "}
-        <span className="font-medium text-ink">72.5%</span> of your case.
+        Você está concentrado em <Entity name="Pesquisa jurídica" tone="bg-orange" /> — é{" "}
+        <span className="font-medium text-ink">72,5%</span> do seu consumo.
       </>
     ),
     Card: AllocationCard,
-    pill: "If we look at seasonals, what changes?",
+    pill: "E se eu redistribuir entre categorias?",
   },
 ];
 
