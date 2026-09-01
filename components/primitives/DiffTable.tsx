@@ -31,15 +31,15 @@ export type DiffRow = {
 };
 
 const ROWS: DiffRow[] = [
-  { key: "rocky", id: "Rocky Road", dept: "Classic", email: "aurora-scoops", removed: true },
-  { key: "bubblegum", id: "Bubblegum", dept: "Retro", email: "kumo-creamery", removed: true },
-  { key: "mint", id: "Mint Chip", dept: "Classic", email: "maple-orbit", removed: false },
+  { key: "clausula-multa", id: "Cláusula 8ª — Multa", dept: "Penalidades", email: "v3-recurso", removed: true },
+  { key: "clausula-prazo", id: "Cláusula 4ª — Prazo de entrega", dept: "Execução", email: "v2-minuta", removed: true },
+  { key: "clausula-garantia", id: "Cláusula 6ª — Garantia contratual", dept: "Execução", email: "v3-recurso", removed: false },
 ];
 
 const DOT: Record<string, string> = {
-  Classic: "bg-accent",
-  Retro: "bg-ink-3",
-  Seasonal: "bg-orange",
+  Execução: "bg-accent",
+  Penalidades: "bg-ink-3",
+  Reajuste: "bg-orange",
 };
 
 function IncludedMark({ included, tone }: { included: boolean; tone: "red" | "green" }) {
@@ -71,10 +71,10 @@ export default function DiffTable({
   const tinted = stage >= 1;
   const settled = stage >= 2;
   const [accepted, setAccepted] = useState(false);
-  const [edits, setEdits] = useState<Record<string, boolean>>({ rocky: true, bubblegum: true, pistachio: true });
+  const [edits, setEdits] = useState<Record<string, boolean>>({ "clausula-multa": true, "clausula-prazo": true, reequilibrio: true });
 
-  const removals = ["rocky", "bubblegum"].filter((key) => edits[key]).length;
-  const additions = edits.pistachio ? 1 : 0;
+  const removals = ["clausula-multa", "clausula-prazo"].filter((key) => edits[key]).length;
+  const additions = edits.reequilibrio ? 1 : 0;
   const showAdded = settled;
 
   const toggleEdit = (key: string) => setEdits((current) => ({ ...current, [key]: !current[key] }));
@@ -83,8 +83,8 @@ export default function DiffTable({
     <div className="w-full max-w-95">
       <div className="relative overflow-hidden rounded-card bg-surface shadow-card">
         <div className="primitive-card-bar flex items-center justify-between border-b border-line">
-          <span className="text-[12.5px] font-medium text-ink">Proposed menu cleanup</span>
-          {settled && !accepted && <span className="text-[11px] text-ink-3">Click changed rows to toggle</span>}
+          <span className="text-[12.5px] font-medium text-ink">Revisão proposta da minuta contratual</span>
+          {settled && !accepted && <span className="text-[11px] text-ink-3">Clique nas linhas alteradas para alternar</span>}
         </div>
 
         <table className="w-full table-fixed border-collapse text-left">
@@ -95,7 +95,7 @@ export default function DiffTable({
           </colgroup>
           <thead>
             <tr className="border-b border-line">
-              {["Flavor", "Category", "Supplier"].map((h) => (
+              {["Cláusula", "Tipo", "Versão"].map((h) => (
                 <th key={h} className="primitive-table-cell text-[12px] font-medium text-ink-3">
                   {h}
                 </th>
@@ -170,32 +170,32 @@ export default function DiffTable({
                       role="checkbox"
                       tabIndex={accepted ? -1 : 0}
                       aria-checked={edits.pistachio}
-                      aria-label="Include adding Pistachio"
-                      onClick={accepted ? undefined : () => toggleEdit("pistachio")}
+                      aria-label="Incluir cláusula de reequilíbrio econômico-financeiro"
+                      onClick={accepted ? undefined : () => toggleEdit("reequilibrio")}
                       onKeyDown={accepted ? undefined : (event) => {
                         if (event.key === "Enter" || event.key === " ") {
                           event.preventDefault();
-                          toggleEdit("pistachio");
+                          toggleEdit("reequilibrio");
                         }
                       }}
                       className={`grid grid-cols-[34%_30%_36%] items-center border-t border-line transition-[background-color,filter,opacity] duration-150 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-inset focus-visible:ring-accent ${
                         accepted ? "" : "cursor-pointer hover:brightness-[0.985]"
                       }`}
-                      style={{ background: edits.pistachio ? "var(--green-tint)" : undefined }}
+                      style={{ background: edits.reequilibrio ? "var(--green-tint)" : undefined }}
                     >
-                      <span className="primitive-table-cell text-[13px] font-medium tabular-nums transition-colors duration-200" style={{ color: edits.pistachio ? "var(--green)" : "var(--ink-3)" }}>
-                        Pistachio
+                      <span className="primitive-table-cell text-[13px] font-medium tabular-nums transition-colors duration-200" style={{ color: edits.reequilibrio ? "var(--green)" : "var(--ink-3)" }}>
+                        Cláusula 9ª — Reequilíbrio econômico
                       </span>
                       <span className="primitive-table-cell">
                         <span className="inline-flex h-5.5 items-center gap-1.5 rounded-full bg-surface px-2 text-[11.5px] font-medium shadow-hairline">
                           <span className="size-1.5 rounded-full bg-green" />
-                          <span className="text-ink-2">Seasonal</span>
+                          <span className="text-ink-2">Reajuste</span>
                         </span>
                       </span>
-                      <span className="primitive-table-cell text-[13px] transition-colors duration-200" style={{ color: edits.pistachio ? "var(--green)" : "var(--ink-3)" }}>
+                      <span className="primitive-table-cell text-[13px] transition-colors duration-200" style={{ color: edits.reequilibrio ? "var(--green)" : "var(--ink-3)" }}>
                         <span className="flex items-center justify-between gap-2">
-                          <span className="min-w-0 truncate">maple-orbit</span>
-                          <IncludedMark included={edits.pistachio} tone="green" />
+                          <span className="min-w-0 truncate">v3-recurso</span>
+                          <IncludedMark included={edits.reequilibrio} tone="green" />
                         </span>
                       </span>
                     </div>
@@ -220,12 +220,12 @@ export default function DiffTable({
                 <span className="flex size-4.5 items-center justify-center rounded-full bg-green text-white">
                   <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M20 6L9 17l-5-5" /></svg>
                 </span>
-                {removals + additions} {removals + additions === 1 ? "edit" : "edits"} applied
+                {removals + additions} {removals + additions === 1 ? "alteração aplicada" : "alterações aplicadas"}
               </span>
             ) : (
               <>
                 <span className="text-[11.5px] tabular-nums text-ink-3">
-                  {removals} {removals === 1 ? "removal" : "removals"} · {additions} {additions === 1 ? "addition" : "additions"}
+                  {removals} {removals === 1 ? "remoção" : "remoções"} · {additions} {additions === 1 ? "adição" : "adições"}
                 </span>
                 <span className="flex items-center gap-1.5">
                   <Button
@@ -237,7 +237,7 @@ export default function DiffTable({
                     }}
                     className="text-[12px]"
                   >
-                    Apply {removals + additions} {removals + additions === 1 ? "change" : "changes"}
+                    Aplicar {removals + additions} {removals + additions === 1 ? "alteração" : "alterações"}
                   </Button>
                 </span>
               </>

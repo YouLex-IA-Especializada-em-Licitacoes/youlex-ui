@@ -32,11 +32,11 @@ import { StreamText } from "@/components/atoms/StreamText";
  * tokens.
  * ───────────────────────────────────────────────────────── */
 
-const LEAD = "Pistachio holds the top slot all weekend. ";
+const LEAD = "A contratada deverá cumprir o prazo estabelecido no edital. ";
 const PICKED =
-  "Churn it first thing Saturday so the batch has time to firm up before the afternoon rush.";
+  "Entregar o objeto em até 30 dias corridos, contados da assinatura do contrato, sob pena de multa.";
 const REWRITE =
-  "Churn pistachio first thing Saturday so the batch has time to fully firm before the afternoon rush.";
+  "Entregar o objeto em até 30 dias corridos, contados da assinatura do contrato, sob pena de multa diária de 0,5% sobre o valor total.";
 
 /* The passage: lead-in text, the selected `original`, and the streamed `rewrite`. */
 export type SelectionText = {
@@ -74,9 +74,9 @@ const DEFAULT_TEXT: SelectionText = {
 };
 
 const DEFAULT_LABELS: SelectionActionsLabels = {
-  keep: "Keep",
-  discard: "Discard",
-  placeholder: "Describe edits",
+  keep: "Manter",
+  discard: "Descartar",
+  placeholder: "Descreva a edição",
 };
 
 type Mode = "idle" | "thinking" | "streaming" | "result";
@@ -116,13 +116,13 @@ const primary =
 
 const DEFAULT_ACTIONS: SelectionActionSet = {
   primary: [
-    { id: "Explain", icon: icons.explain },
-    { id: "Improve", icon: icons.improve, action: "Improve", busyLabel: "Improving" },
+    { id: "Explicar", icon: icons.explain },
+    { id: "Reforçar", icon: icons.improve, action: "Reforçar", busyLabel: "Reforçando" },
   ],
   more: [
-    { id: "Shorten", icon: icons.shorten, action: "Shorten", busyLabel: "Shortening" },
-    { id: "Tone", icon: icons.tone, action: "Change tone", busyLabel: "Changing tone" },
-    { id: "Grammar", icon: icons.grammar, action: "Fix grammar" },
+    { id: "Resumir", icon: icons.shorten, action: "Resumir", busyLabel: "Resumindo" },
+    { id: "Tom", icon: icons.tone, action: "Ajustar tom", busyLabel: "Ajustando tom" },
+    { id: "Revisar", icon: icons.grammar, action: "Corrigir texto" },
   ],
 };
 
@@ -149,7 +149,7 @@ export default function SelectionActions({
   const copy = { ...DEFAULT_LABELS, ...labels };
   const [shown, setShown] = useState(false);
   const [mode, setMode] = useState<Mode>("idle");
-  const [action, setAction] = useState("Improve");
+  const [action, setAction] = useState("Reforçar");
   const [prompt, setPrompt] = useState("");
   const [typingWidth, setTypingWidth] = useState<number | null>(null);
   const [expanded, setExpanded] = useState(false);
@@ -287,7 +287,7 @@ export default function SelectionActions({
     setExpanded(false);
     setPrompt("");
     setTypingWidth(null);
-    setAction("Improve");
+    setAction("Reforçar");
     setMode("idle");
   };
 
@@ -298,7 +298,7 @@ export default function SelectionActions({
   for (const item of [...actions.primary, ...actions.more]) {
     if (item.action && item.busyLabel) busyLabelMap[item.action] = item.busyLabel;
   }
-  const busyLabel = busyLabelMap[action] ?? "Editing";
+  const busyLabel = busyLabelMap[action] ?? "Editando";
 
   return (
     <div className="w-full max-w-[460px]">
@@ -395,7 +395,7 @@ export default function SelectionActions({
                 <span className="mx-0.5 h-4 w-px shrink-0 bg-line" />
                 <button
                   type="button"
-                  aria-label="Try again"
+                  aria-label="Tentar novamente"
                   onClick={() => run(action)}
                   className="flex size-7 shrink-0 items-center justify-center rounded-full text-ink-3 transition-[background-color,color,transform] duration-150 hover:bg-hover-2 hover:text-ink-2 active:scale-[0.96]"
                 >
@@ -428,7 +428,7 @@ export default function SelectionActions({
                     }}
                     onSubmit={(event) => {
                       event.preventDefault();
-                      run(prompt.trim() || "Improve");
+                      run(prompt.trim() || "Reforçar");
                     }}
                   >
                     <input
@@ -507,7 +507,7 @@ export default function SelectionActions({
                   <span className="mx-0.5 h-4 w-px shrink-0 bg-line" />
                   <button
                     type="button"
-                    aria-label={expanded ? "Show fewer actions" : "Show more actions"}
+                    aria-label={expanded ? "Mostrar menos ações" : "Mostrar mais ações"}
                     aria-expanded={expanded}
                     onClick={() => setExpanded((value) => !value)}
                     className="flex size-7 shrink-0 items-center justify-center rounded-full text-ink transition-[background-color,transform] duration-200 hover:bg-hover active:scale-[0.96]"
@@ -535,7 +535,7 @@ export default function SelectionActions({
                 >
                   <button
                     type="button"
-                    aria-label="Send edit instruction"
+                    aria-label="Enviar instrução de edição"
                     onClick={() => run(prompt.trim())}
                     className="flex size-7 shrink-0 items-center justify-center rounded-full bg-ink text-surface transition-[opacity,transform] duration-200 active:scale-[0.94]"
                   >

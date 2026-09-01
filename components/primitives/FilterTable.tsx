@@ -16,22 +16,22 @@ export type FilterTableLabels = {
 };
 
 const FILTERS: { key: "all" | Status; label: string; dot?: string; count: number }[] = [
-  { key: "all", label: "All", count: 5 },
-  { key: "todo", label: "To do", dot: "#f09a2f", count: 2 },
-  { key: "progress", label: "In Progress", dot: "#16a6c7", count: 2 },
-  { key: "done", label: "Completed", dot: "#25a878", count: 1 },
+  { key: "all", label: "Todas", count: 5 },
+  { key: "todo", label: "A analisar", dot: "var(--orange)", count: 2 },
+  { key: "progress", label: "Em andamento", dot: "var(--accent)", count: 2 },
+  { key: "done", label: "Concluída", dot: "var(--green)", count: 1 },
 ];
 
 const ROWS: TableRow[] = [
-  { task: "Restock mango sorbet", date: "Dec 03", status: "todo", owner: "Mango Moon Gelato" },
-  { task: "Churn black sesame", date: "Sep 22", status: "progress", owner: "Kumo Creamery" },
-  { task: "Print summer menu", date: "Jan 02", status: "todo", owner: "Coral Coast Sorbet" },
-  { task: "Taste-test batch 42", date: "Nov 08", status: "progress", owner: "Maple Orbit" },
-  { task: "Order waffle cones", date: "Apr 14", status: "done", owner: "Aurora Scoops" },
+  { task: "Conferir edital nº 042/2026 — Pregão Eletrônico", date: "03 dez", status: "todo", owner: "Prefeitura de Osasco" },
+  { task: "Elaborar impugnação de edital", date: "22 set", status: "progress", owner: "Secretaria de Saúde SP" },
+  { task: "Cadastrar proposta no ComprasNet", date: "02 jan", status: "todo", owner: "Governo do Estado do RJ" },
+  { task: "Revisar minuta de contrato administrativo", date: "08 nov", status: "progress", owner: "Câmara Municipal de Campinas" },
+  { task: "Protocolar recurso administrativo", date: "14 abr", status: "done", owner: "Ministério da Infraestrutura" },
 ];
 
 const LABELS: FilterTableLabels = {
-  columns: { task: "Task name", date: "Date", status: "Status", owner: "Advisor" },
+  columns: { task: "Licitação", date: "Prazo", status: "Status", owner: "Órgão" },
 };
 
 const PILLS: Record<Status, { label: string; cls: string }> = {

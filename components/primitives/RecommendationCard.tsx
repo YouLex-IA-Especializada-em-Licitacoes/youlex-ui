@@ -31,10 +31,10 @@ export type RecommendationLabels = {
 };
 
 const DEFAULT_LABELS: RecommendationLabels = {
-  title: "Want me to place this restock order?",
-  alternatives: "Alternatives",
-  otherOptions: "Other options",
-  accepted: "Accepted",
+  title: "Quer que eu recomende participar desta licitação?",
+  alternatives: "Alternativas",
+  otherOptions: "Outras opções",
+  accepted: "Aceito",
 };
 
 const OPTIONS: RecommendationOption[] = [
@@ -42,44 +42,44 @@ const OPTIONS: RecommendationOption[] = [
     key: "high",
     body: (
       <>
-        Reorder waffle cones from{" "}
-        <EntityChip name="Cone King" />{" "}
-        with lead time <ValuePill tone="green">7 days</ValuePill>
+        Participar do Pregão Eletrônico{" "}
+        <EntityChip name="042/2026 — Prefeitura de Osasco" />{" "}
+        com prazo de habilitação <ValuePill tone="green">7 dias</ValuePill>
       </>
     ),
-    short: "Reorder from Cone King · 7-day lead",
+    short: "Pregão 042/2026 · prazo de 7 dias",
     signal: 3,
     tone: "var(--green)",
-    label: "High confidence",
-    cta: "Accept",
+    label: "Alta confiança",
+    cta: "Aceitar",
     ctaVariant: "accent",
   },
   {
     key: "review",
     body: (
       <>
-        Switch vanilla to <ValuePill>Vanilla Madagascar</ValuePill> for peak season.
+        Revisar a proposta técnica para atender ao critério <ValuePill>Melhor técnica e preço</ValuePill> antes de submeter.
       </>
     ),
-    short: "Switch to Vanilla Madagascar",
+    short: "Revisar proposta técnica",
     signal: 2,
     tone: "var(--orange)",
-    label: "Needs review",
-    cta: "Configure",
+    label: "Precisa de revisão",
+    cta: "Configurar",
     ctaVariant: "primary",
   },
   {
     key: "none",
     body: (
       <>
-        Fall back to a <span className="font-medium text-ink">full restock</span> across every SKU.
+        Acompanhar <span className="font-medium text-ink">sem submeter proposta</span> por enquanto.
       </>
     ),
-    short: "Full restock across every SKU",
+    short: "Acompanhar sem submeter proposta",
     signal: 0,
     tone: "var(--ink-3)",
-    label: "No signal",
-    cta: "Accept full restock",
+    label: "Sem sinal suficiente",
+    cta: "Acompanhar mesmo assim",
     ctaVariant: "primary",
   },
 ];

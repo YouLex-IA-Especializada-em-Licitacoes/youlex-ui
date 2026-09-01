@@ -18,20 +18,20 @@ export type SearchListLabels = {
 };
 
 const ITEMS: SearchItem[] = [
-  "Forecast summer demand",
-  "Find waffle cone suppliers",
-  "Compare seasonal flavors",
-  "Draft flavor launch plan",
-  "Check cold-chain status",
-  "Audit sugar costs",
-  "Retire low sellers",
+  "Jurisprudência sobre reequilíbrio econômico-financeiro",
+  "Buscar editais de pregão eletrônico em aberto",
+  "Comparar minutas de contrato administrativo",
+  "Rascunhar recurso administrativo",
+  "Verificar status de habilitação",
+  "Auditar prazos de impugnação",
+  "Arquivar licitações encerradas",
 ];
 
 const LABELS: SearchListLabels = {
-  placeholder: "Search flavors…",
-  ariaLabel: "Search flavors",
-  emptyTitle: "No results found",
-  emptyHint: "Adjust your search to try again",
+  placeholder: "Buscar jurisprudência e editais…",
+  ariaLabel: "Buscar jurisprudência e editais",
+  emptyTitle: "Nenhum resultado encontrado",
+  emptyHint: "Ajuste sua busca e tente novamente",
 };
 
 export default function SearchList({
@@ -66,7 +66,7 @@ export default function SearchList({
           />
           {query && (
             <button
-              aria-label="Clear search"
+              aria-label="Limpar busca"
               type="button"
               onClick={() => setQuery("")}
               className="flex size-6 items-center justify-center rounded-full text-ink-3
