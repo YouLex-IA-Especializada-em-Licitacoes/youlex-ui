@@ -43,13 +43,13 @@ const PRIMITIVES = [
   ["diff-table", "Diff Table", "DiffTable.tsx", ["button"], []],
   ["records-table", "Records Table", "RecordsTable.tsx", ["glide-menu"], [], recordsCss],
   ["filter-table", "Filter Table", "FilterTable.tsx", [], []],
-  ["sidebar-nav", "Sidebar Nav", "SidebarNav.tsx", ["glide-menu"], ["@central-icons-react/round-outlined-radius-2-stroke-2"], sidebarCss],
+  ["sidebar-nav", "Sidebar Nav", "SidebarNav.tsx", ["glide-menu"], ["lucide-react"], sidebarCss],
   ["search", "Search", "SearchList.tsx", ["glide-menu"], []],
   ["flowchart", "Flowchart", "Flowchart.tsx", [], []],
   ["insight-cards", "Insight Cards", "InsightCards.tsx", [], ["liveline"]],
   ["code-block", "Code Block", "CodeBlock.tsx", [], []],
   ["fine-tune-card", "Fine-tune Card", "FineTuneCard.tsx", ["glide-menu"], []],
-  ["selection-actions", "Selection Actions", "SelectionActions.tsx", ["button", "shimmer", "stream-text"], ["iconoir-react"]],
+  ["selection-actions", "Selection Actions", "SelectionActions.tsx", ["button", "shimmer", "stream-text"], ["lucide-react"]],
 ];
 
 const CAPTION = Object.fromEntries(

@@ -21,16 +21,9 @@ npm run dev
 ```
 
 Open http://localhost:3000. Analytics and email capture are optional (see
-[Environment](#environment)) — but note the icon set below is not.
+[Environment](#environment)); everything else runs with no configuration.
 
-> **Heads up — commercial icon set.** `SidebarNav` uses
-> [`@central-icons-react`](https://centralicons.com), a paid icon library with
-> a license check that runs on `npm install`. Set `CENTRAL_LICENSE_KEY` in your
-> environment before installing, **or** swap those imports in
-> `components/primitives/SidebarNav.tsx` for your own icons. Everything else
-> runs with no configuration.
-
-Stack: Next.js (App Router) · React · Tailwind CSS v4 · TypeScript.
+Stack: Next.js (App Router) · React · Tailwind CSS v4 · TypeScript · lucide-react.
 
 ## What's in here
 
@@ -49,7 +42,7 @@ lib/
 
 The primitives are the product. Most files under `components/primitives/` paste
 in on their own; some also import a shared building block (`Button`, `GlideMenu`,
-`EntityChip`, …) or an npm package (`liveline`, `glimm`, `iconoir-react`, …). Every
+`EntityChip`, …) or an npm package (`liveline`, `glimm`, `lucide-react`, …). Every
 component's exact dependencies are listed on its gallery card, and the
 [component registry](#install-a-component) resolves them for you automatically.
 

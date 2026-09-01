@@ -130,7 +130,7 @@ export const META: Meta[] = [
     caption: "Collapsible workspace and chat navigation with gliding hover states.",
     file: "SidebarNav.tsx",
     deps: ["glide-menu"],
-    npm: ["@central-icons-react/round-outlined-radius-2-stroke-2"],
+    npm: ["lucide-react"],
   },
   {
     id: "search",
@@ -174,6 +174,6 @@ export const META: Meta[] = [
     caption: "Highlight a passage and hand it to the agent to rewrite.",
     file: "SelectionActions.tsx",
     deps: ["button", "shimmer", "stream-text"],
-    npm: ["iconoir-react"],
+    npm: ["lucide-react"],
   },
 ];
