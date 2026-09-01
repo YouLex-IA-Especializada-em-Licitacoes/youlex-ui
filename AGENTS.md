@@ -57,6 +57,21 @@ utilitária (`bg-[var(--surface)]`, etc.) ou pelas classes semânticas que o `@t
 paleta para a identidade da YouLex (YLX-192+) é editar os valores em `:root`/`.dark`, não o
 markup dos componentes.
 
+## Ícones
+
+Todo ícone do repositório vem de `lucide-react` (YLX-195; substituiu `iconoir-react` e
+`@central-icons-react/*`, removidos do `package.json`). Convenção de `strokeWidth`:
+
+- `SidebarNav.tsx` usa o `strokeWidth` padrão do lucide (`2`) — igual ao peso do
+  `@central-icons-react/round-outlined-radius-2-stroke-2` que ele substituiu.
+- `SelectionActions.tsx` fixa `strokeWidth={1.8}` nos ícones regulares e `strokeWidth={2.4}`
+  no ícone de enviar (`send`), preservando o traço mais fino do `iconoir-react` original —
+  com o `2` padrão do lucide os ícones dessa barra ficavam visualmente mais pesados que o
+  resto do harness.
+
+Um componente novo com ícones deve conferir o peso visual ao lado dos primitives vizinhos no
+harness antes de aceitar o `strokeWidth` padrão do lucide.
+
 ## Lint e build
 
 - `bun run lint` — `eslint .` (flat config em `eslint.config.mjs`, eslint 9 + typescript-eslint +
