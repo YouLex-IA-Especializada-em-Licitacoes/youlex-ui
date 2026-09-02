@@ -105,7 +105,7 @@ write("foundation", {
   $schema: SCHEMA_ITEM,
   name: "foundation",
   type: "registry:style",
-  title: "Beautiful UI foundation",
+  title: "YouLex foundation",
   description:
     "Design tokens (:root/.dark), the @theme mapping, base rules, the primitive-* spacing utilities, and shared keyframes every component needs." +
     IMPORT_NOTE("beautifui/foundation.css"),
@@ -169,7 +169,7 @@ write("registry", {
   name: "youlex",
   homepage: HOMEPAGE,
   items: [
-    { name: "foundation", type: "registry:style", title: "Beautiful UI foundation" },
+    { name: "foundation", type: "registry:style", title: "YouLex foundation" },
     ...Object.entries(INTERNAL).map(([name, m]) => ({ name, type: m.type, title: m.title })),
     ...indexItems.map(({ name, type, title }) => ({ name, type, title })),
   ],
