@@ -53,7 +53,33 @@ const PRIMITIVES = [
   ["code-block", "Code Block", "CodeBlock.tsx", [], []],
   ["fine-tune-card", "Fine-tune Card", "FineTuneCard.tsx", ["glide-menu"], []],
   ["selection-actions", "Selection Actions", "SelectionActions.tsx", ["button", "shimmer", "stream-text"], ["lucide-react"]],
+  ["citation-card", "Citation Card", "CitationCard.tsx", ["button"], []],
 ];
+
+/* ── guard: every .tsx in components/primitives/ must have a registry entry, ──
+   ── and every registry entry must point at a .tsx that exists — both        ──
+   ── directions, because a fixed list only ever fails silently in one.       ── */
+const PRIMITIVES_DIR = path.join(ROOT, "components", "primitives");
+const filesOnDisk = new Set(fs.readdirSync(PRIMITIVES_DIR).filter((f) => f.endsWith(".tsx")));
+const filesRegistered = new Set([
+  ...Object.values(INTERNAL)
+    .map((m) => m.path)
+    .filter((p) => p.startsWith("components/primitives/"))
+    .map((p) => p.slice("components/primitives/".length)),
+  ...PRIMITIVES.map(([, , file]) => file),
+]);
+
+const unregistered = [...filesOnDisk].filter((f) => !filesRegistered.has(f));
+const missing = [...filesRegistered].filter((f) => !filesOnDisk.has(f));
+if (unregistered.length || missing.length) {
+  const lines = [];
+  if (unregistered.length)
+    lines.push(`components/primitives/ sem entrada no registry: ${unregistered.join(", ")}`);
+  if (missing.length)
+    lines.push(`entradas do registry sem componente em components/primitives/: ${missing.join(", ")}`);
+  console.error(`Discordância entre PRIMITIVES/INTERNAL e components/primitives/:\n${lines.join("\n")}`);
+  process.exit(1);
+}
 
 const CAPTION = Object.fromEntries(
   read("lib/meta.ts")
@@ -79,7 +105,7 @@ write("foundation", {
   $schema: SCHEMA_ITEM,
   name: "foundation",
   type: "registry:style",
-  title: "Beautiful UI foundation",
+  title: "YouLex foundation",
   description:
     "Design tokens (:root/.dark), the @theme mapping, base rules, the primitive-* spacing utilities, and shared keyframes every component needs." +
     IMPORT_NOTE("beautifui/foundation.css"),
@@ -143,7 +169,7 @@ write("registry", {
   name: "youlex",
   homepage: HOMEPAGE,
   items: [
-    { name: "foundation", type: "registry:style", title: "Beautiful UI foundation" },
+    { name: "foundation", type: "registry:style", title: "YouLex foundation" },
     ...Object.entries(INTERNAL).map(([name, m]) => ({ name, type: m.type, title: m.title })),
     ...indexItems.map(({ name, type, title }) => ({ name, type, title })),
   ],
