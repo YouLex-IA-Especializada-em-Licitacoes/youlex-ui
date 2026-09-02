@@ -25,6 +25,14 @@ Open http://localhost:3000. Analytics and email capture are optional (see
 
 Stack: Next.js (App Router) · React · Tailwind CSS v4 · TypeScript · lucide-react.
 
+### `dev` vs `preview`
+
+- `bun run dev` — hot-reloading development server. Use it while building a component.
+- `bun run preview` — regenerates the registry and runs an actual production build
+  (`next build && next start`) before serving. Use it to look at what will actually be
+  published — dark/light theme and the empty/loading/error states only show their real
+  behavior in a production bundle, not in `dev`. Open http://localhost:3000.
+
 ## What's in here
 
 ```
