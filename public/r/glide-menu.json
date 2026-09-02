@@ -5,7 +5,7 @@
   "title": "GlideMenu",
   "description": "Shared building block used by other Beautiful UI components.",
   "registryDependencies": [
-    "https://www.beautifului.dev/r/foundation.json"
+    "https://youlex-ia-especializada-em-licitacoes.github.io/youlex-ui/foundation.json"
   ],
   "files": [
     {

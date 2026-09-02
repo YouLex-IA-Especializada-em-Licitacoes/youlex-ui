@@ -1,11 +1,14 @@
 // Generates a self-hosted shadcn registry into public/r/*.json.
-// Consume with:  npx shadcn add https://www.beautifului.dev/r/<name>.json
+// Consume with:  npx shadcn add https://youlex-ia-especializada-em-licitacoes.github.io/youlex-ui/<name>.json
+// GitHub Pages is published straight from public/r/ (see .github/workflows/publish-registry.yml),
+// so public/r/ IS the site root — no /r/ segment in the served URL.
 import fs from "node:fs";
 import path from "node:path";
 
 const ROOT = process.cwd();
 const OUT = path.join(ROOT, "public", "r");
-const BASE = "https://www.beautifului.dev/r";
+const HOMEPAGE = "https://youlex-ia-especializada-em-licitacoes.github.io/youlex-ui";
+const BASE = HOMEPAGE;
 const read = (p) => fs.readFileSync(path.join(ROOT, p), "utf8");
 
 /* ── split globals.css: generic foundation vs. the two big per-component blocks ── */
@@ -137,8 +140,8 @@ for (const [name, title, file, deps, npm, extraCss] of PRIMITIVES) {
 /* the registry index */
 write("registry", {
   $schema: "https://ui.shadcn.com/schema/registry.json",
-  name: "beautifui",
-  homepage: "https://www.beautifului.dev",
+  name: "youlex",
+  homepage: HOMEPAGE,
   items: [
     { name: "foundation", type: "registry:style", title: "Beautiful UI foundation" },
     ...Object.entries(INTERNAL).map(([name, m]) => ({ name, type: m.type, title: m.title })),

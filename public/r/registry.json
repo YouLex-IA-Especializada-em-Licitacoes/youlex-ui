@@ -1,7 +1,7 @@
 {
   "$schema": "https://ui.shadcn.com/schema/registry.json",
-  "name": "beautifui",
-  "homepage": "https://www.beautifului.dev",
+  "name": "youlex",
+  "homepage": "https://youlex-ia-especializada-em-licitacoes.github.io/youlex-ui",
   "items": [
     {
       "name": "foundation",
