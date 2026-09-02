@@ -176,4 +176,14 @@ export const META: Meta[] = [
     deps: ["button", "shimmer", "stream-text"],
     npm: ["lucide-react"],
   },
+  {
+    id: "citation-card",
+    title: "Citation Card",
+    caption: "Lei, jurisprudência ou cláusula de edital que fundamenta a resposta — com o ciclo de carregar, vazio e erro.",
+    file: "CitationCard.tsx",
+    variants: ["Padrão", "Carregando", "Vazio", "Erro"],
+    deps: ["button"],
+    dataShape:
+      "Citation ({reference, source, excerpt, kind: 'lei'|'jurisprudencia'|'edital'}) resolvido de forma assíncrona pelo backend a partir da citação que o agente aponta na resposta; sem contrato de stream event ainda — candidato ao mesmo esforço de contrato descrito para ContextCards/StreamingText em docs/direcionamento/55_CONTRATO_BACKEND_CHAT_01-09-2026.md.",
+  },
 ];
