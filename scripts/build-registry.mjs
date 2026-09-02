@@ -56,6 +56,31 @@ const PRIMITIVES = [
   ["citation-card", "Citation Card", "CitationCard.tsx", ["button"], []],
 ];
 
+/* ── guard: every .tsx in components/primitives/ must have a registry entry, ──
+   ── and every registry entry must point at a .tsx that exists — both        ──
+   ── directions, because a fixed list only ever fails silently in one.       ── */
+const PRIMITIVES_DIR = path.join(ROOT, "components", "primitives");
+const filesOnDisk = new Set(fs.readdirSync(PRIMITIVES_DIR).filter((f) => f.endsWith(".tsx")));
+const filesRegistered = new Set([
+  ...Object.values(INTERNAL)
+    .map((m) => m.path)
+    .filter((p) => p.startsWith("components/primitives/"))
+    .map((p) => p.slice("components/primitives/".length)),
+  ...PRIMITIVES.map(([, , file]) => file),
+]);
+
+const unregistered = [...filesOnDisk].filter((f) => !filesRegistered.has(f));
+const missing = [...filesRegistered].filter((f) => !filesOnDisk.has(f));
+if (unregistered.length || missing.length) {
+  const lines = [];
+  if (unregistered.length)
+    lines.push(`components/primitives/ sem entrada no registry: ${unregistered.join(", ")}`);
+  if (missing.length)
+    lines.push(`entradas do registry sem componente em components/primitives/: ${missing.join(", ")}`);
+  console.error(`Discordância entre PRIMITIVES/INTERNAL e components/primitives/:\n${lines.join("\n")}`);
+  process.exit(1);
+}
+
 const CAPTION = Object.fromEntries(
   read("lib/meta.ts")
     .split("{")
