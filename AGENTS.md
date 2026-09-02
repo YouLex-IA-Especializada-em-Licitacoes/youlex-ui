@@ -82,6 +82,9 @@ harness antes de aceitar o `strokeWidth` padrão do lucide.
   portar um componente novo, só para não travar o CI num repo recém-nascido.
 - `bun run build` — regenera o registry e roda `next build`.
 - `bun run registry` — só a regeneração do registry, sem build do Next.
+- `bun run preview` — regenera o registry, roda `next build` e sobe `next start`. Use para olhar
+  o build de produção real (tema claro/escuro, estados vazio/carregando/erro) antes de publicar;
+  `bun run dev` só mostra o app em desenvolvimento.
 
 ## CI
 
