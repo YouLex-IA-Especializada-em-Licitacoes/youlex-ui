@@ -72,6 +72,22 @@ Todo ícone do repositório vem de `lucide-react` (YLX-195; substituiu `iconoir-
 Um componente novo com ícones deve conferir o peso visual ao lado dos primitives vizinhos no
 harness antes de aceitar o `strokeWidth` padrão do lucide.
 
+## Componente nasce sem dado (YLX-287)
+
+Componente nasce sem dado. A prop de dado não tem valor default de exemplo; sem dado, o componente
+renderiza o vazio declarado. O dado de demonstração mora na página de vitrine, não no módulo do
+componente. Nenhum componente exibe número, percentual, valor em reais, prazo ou tese jurídica que
+não tenha chegado por prop. Lista renderiza por iteração, nunca por índice literal. `setTimeout`
+governa animação, nunca qual dado aparece.
+
+Na prática, neste repo: o dado de vitrine mora em `components/site/demo-data.tsx` (não em
+`components/primitives/`), como uma constante mais um componente `<XDemo>` que passa essa
+constante por prop para o primitive real; `lib/registry.tsx` aponta a galeria para o `<XDemo>`,
+não para o primitive cru. Um primitive cujo default só faz sentido dentro do próprio módulo
+(porque compõe um helper não exportado, como `Entity`/`Mono` em `InsightCards.tsx`) pode exportar
+essa constante com `export const DEMO_*` no lugar do valor default da prop — mas o export continua
+fora do caminho default, e `demo-data.tsx` a importa de lá.
+
 ## Lint e build
 
 - `bun run lint` — `eslint .` (flat config em `eslint.config.mjs`, eslint 9 + typescript-eslint +
