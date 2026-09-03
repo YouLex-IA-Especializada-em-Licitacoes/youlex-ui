@@ -104,7 +104,8 @@ fora do caminho default, e `demo-data.tsx` a importa de lá.
 
 ## CI
 
-`.github/workflows/ci.yml` roda lint + build em toda PR/push para `develop`/`main`. **A conta da
-org está com o GitHub Actions bloqueado por faturamento** (YLX-181) — o workflow vai reprovar em
-1–3s sem executar nada até isso ser resolvido. Prove localmente (`bun run lint && bun run build`)
-e cole a saída no PR/relatório enquanto isso não muda.
+`.github/workflows/ci.yml` roda lint + build em toda PR/push para `develop`/`main`. O bloqueio de
+faturamento que travava o GitHub Actions da org (YLX-181) foi resolvido — o CI executa de verdade
+(`verificar` com steps reais, `deploy (b2b)` com sucesso, snyk passando). Ainda assim, rode
+localmente (`bun run lint && bun run build`) e cole a saída no PR/relatório — é complemento ao CI,
+não substituto.
