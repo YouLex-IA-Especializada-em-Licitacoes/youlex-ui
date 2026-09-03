@@ -17,7 +17,7 @@ import SearchList from "@/components/primitives/SearchList";
 import SidebarNav from "@/components/primitives/SidebarNav";
 import StreamingText from "@/components/primitives/StreamingText";
 import TaskRows from "@/components/primitives/TaskRows";
-import ThinkingState from "@/components/primitives/ThinkingState";
+import { ThinkingStateDemo as ThinkingState } from "@/components/site/demo-data";
 import ToolChips from "@/components/primitives/ToolChips";
 
 function Spark({ className = "" }: { className?: string }) {

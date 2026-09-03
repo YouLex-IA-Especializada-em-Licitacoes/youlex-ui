@@ -11,7 +11,6 @@ import { useLayoutEffect } from "react";
  * real dropdowns (same menu as the PromptBar model picker).
  * ───────────────────────────────────────────────────────── */
 
-const PURPLE = "var(--accent)";
 const AMBER = "var(--orange)";
 
 const mix = (hue: string, pct: number, base = "var(--surface)") =>
@@ -33,27 +32,6 @@ export type StepNode = {
   caption?: string;
   condition?: boolean; // renders the if/else chip rows instead
 };
-
-const NODES: StepNode[] = [
-  {
-    id: "trigger",
-    row: 0,
-    x: 0.5,
-    w: 300,
-    kind: { label: "Gatilho", hue: PURPLE },
-    hue: PURPLE,
-    title: "Nova licitação publicada",
-    caption: "Disparado quando um novo edital é publicado",
-  },
-  {
-    id: "cond",
-    row: 1,
-    x: 0.5,
-    w: 356,
-    kind: { label: "If / Else", hue: AMBER },
-    condition: true,
-  },
-];
 
 const EDGES = [{ from: "trigger", to: "cond" }];
 
@@ -326,7 +304,7 @@ function StepBody({ node }: { node: StepNode }) {
 }
 
 /* ── the canvas ── */
-export default function Flowchart({ steps = NODES }: { steps?: StepNode[]; variant?: string } = {}) {
+export default function Flowchart({ steps = [] }: { steps?: StepNode[]; variant?: string } = {}) {
   const canvasRef = useRef<HTMLDivElement>(null);
   const nodeRefs = useRef(new Map<string, HTMLElement>());
   const [width, setWidth] = useState(0);
@@ -467,7 +445,7 @@ export default function Flowchart({ steps = NODES }: { steps?: StepNode[]; varia
     >
       {/* connectors */}
       <svg width={cw} height={canvasH} className="pointer-events-none absolute inset-0">
-        {EDGES.map((edge) => (
+        {EDGES.filter((edge) => steps.some((n) => n.id === edge.from) && steps.some((n) => n.id === edge.to)).map((edge) => (
           <path
             key={`${edge.from}-${edge.to}`}
             d={bezier(edge)}
@@ -478,6 +456,14 @@ export default function Flowchart({ steps = NODES }: { steps?: StepNode[]; varia
           />
         ))}
       </svg>
+
+      {/* empty state */}
+      {steps.length === 0 && (
+        <div className="absolute inset-0 flex flex-col items-center justify-center gap-1 text-center">
+          <span className="text-[13px] font-medium text-ink">Nenhum passo no fluxo</span>
+          <span className="max-w-64 text-[12px] leading-relaxed text-ink-3">O gatilho e as condições aparecem aqui quando o fluxo é definido.</span>
+        </div>
+      )}
 
       {/* nodes */}
       {steps.map((node) => {

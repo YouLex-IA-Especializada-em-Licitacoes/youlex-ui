@@ -433,7 +433,10 @@ export type InsightPage = {
   pill: string;
 };
 
-const PAGES: InsightPage[] = [
+/* Kept here (not in components/site/demo-data.tsx) because it composes the
+ * unexported Entity/Mono prose helpers above — exported so the gallery can
+ * still pass it in explicitly as `pages`, per YLX-287 §4.1. */
+export const DEMO_PAGES: InsightPage[] = [
   {
     key: "compare",
     prose: (
@@ -479,7 +482,7 @@ const DEFAULT_INSIGHT_LABELS: InsightCardsLabels = {
 };
 
 export default function InsightCards({
-  pages = PAGES,
+  pages = [],
   labels,
 }: {
   variant?: string;
@@ -493,7 +496,16 @@ export default function InsightCards({
     setPage((current) => (current + direction + pages.length) % pages.length);
   };
 
-  const { prose, Card, pill } = pages[page];
+  if (pages.length === 0) {
+    return (
+      <div className="flex min-h-[408px] w-full max-w-86 flex-col items-center justify-center gap-1.5 rounded-card bg-surface text-center shadow-hairline">
+        <span className="text-[13px] font-medium text-ink">Nenhum insight ainda</span>
+        <span className="max-w-64 text-[12px] leading-relaxed text-ink-3">Os insights aparecem aqui conforme o agente analisa o consumo.</span>
+      </div>
+    );
+  }
+
+  const { prose, Card, pill } = pages[page % pages.length];
 
   return (
     <div className="min-h-[408px] w-full max-w-86">

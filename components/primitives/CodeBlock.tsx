@@ -11,18 +11,6 @@ import { useCallback, useState, type ReactNode } from "react";
  * Both share syntax coloring, insets, and wrapping behavior.
  * ───────────────────────────────────────────────────────── */
 
-const FILE = "calcula-prazo-recursal.ts";
-
-const CODE_LINES = [
-  "export async function calcularPrazoRecursal() {",
-  '  const edital = await getEdital("pregao-014-2026");',
-  "  const intimacao = await ata.fetch({ edital });",
-  '  await prazo.registrar(intimacao, { dias: "3-uteis" });',
-  "  if (!intimacao.publicada) return null;",
-  "  return intimacao.dataLimite;",
-  "}",
-];
-
 /* A single run of code within a diff row; `change` tints it as an add/del. */
 export type CodePiece = { text: string; change?: "add" | "del" };
 /* One row of a unified diff: old/new line numbers, its kind, and its pieces. */
@@ -35,20 +23,8 @@ export type DiffRow = {
 /* Prominent copy strings on the code block. */
 export type CodeBlockLabels = { copy: string; copied: string };
 
-// Back-compat internal aliases for the local component signatures.
+// Back-compat internal alias for the local component signatures.
 type Piece = CodePiece;
-type Row = DiffRow;
-
-const DIFF: Row[] = [
-  { old: 1, cur: 1, type: "ctx", pieces: [{ text: "export async function calcularPrazoRecursal() {" }] },
-  { old: 2, cur: 2, type: "ctx", pieces: [{ text: '  const edital = await getEdital("pregao-014-2026");' }] },
-  { old: 3, cur: 3, type: "ctx", pieces: [{ text: "  const intimacao = await ata.fetch({ edital });" }] },
-  { old: 4, cur: null, type: "del", pieces: [{ text: "  await prazo.registrar(intimacao, { dias: " }, { text: '"5-uteis"', change: "del" }, { text: " });" }] },
-  { old: null, cur: 4, type: "add", pieces: [{ text: "  await prazo.registrar(intimacao, { dias: " }, { text: '"3-uteis"', change: "add" }, { text: " });" }] },
-  { old: null, cur: 5, type: "add", pieces: [{ text: "  if (!intimacao.publicada) return null;" }] },
-  { old: 5, cur: 6, type: "ctx", pieces: [{ text: "  return intimacao.dataLimite;" }] },
-  { old: 6, cur: 7, type: "ctx", pieces: [{ text: "}" }] },
-];
 
 const HATCH = "repeating-linear-gradient(45deg, var(--red) 0, var(--red) 1.5px, transparent 1.5px, transparent 3px)";
 
@@ -133,10 +109,10 @@ export type CodeBlockProps = {
 
 export default function CodeBlock({
   variant = "Code",
-  lines = CODE_LINES,
+  lines = [],
   code,
-  diff = DIFF,
-  filename = FILE,
+  diff = [],
+  filename = "",
   labels,
   onCopy,
 }: CodeBlockProps) {
@@ -194,6 +170,7 @@ export default function CodeBlock({
         {isDiff ? (
           <div className="relative">
             <span className="pointer-events-none absolute inset-y-0 left-5 w-px bg-line" />
+            {diff.length === 0 && <div className="px-4 py-2 text-[12px] text-ink-3">Nenhuma alteração</div>}
             {diff.map((r, i) => {
               const add = r.type === "add";
               const del = r.type === "del";
@@ -219,6 +196,7 @@ export default function CodeBlock({
         ) : (
           <div className="relative">
             <span className="pointer-events-none absolute inset-y-0 left-5 w-px bg-line" />
+            {lines.length === 0 && <div className="px-4 py-2 text-[12px] text-ink-3">Nenhum código ainda</div>}
             {lines.map((line, i) => (
               <div key={i} className="grid grid-cols-[20px_minmax(0,1fr)] items-start">
                 <span className="select-none text-center text-[11px] text-ink-3">{i + 1}</span>

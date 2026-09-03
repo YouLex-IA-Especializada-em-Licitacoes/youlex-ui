@@ -98,44 +98,9 @@ const DEFAULT_LABELS: TaskRowsLabels = {
   failed: "Falhou",
 };
 
-const TASK_ROWS: TaskRow[] = [
-  {
-    key: "verify",
-    label: "Verificação de documentos de habilitação",
-    amount: "12 documentos",
-    status: "done",
-    details: [
-      { label: "Certidões negativas conferidas", meta: "12/12" },
-      { label: "Documentos vencidos sinalizados", meta: "0" },
-    ],
-  },
-  {
-    key: "index",
-    label: "Montar minuta de recurso administrativo",
-    amount: "7 cláusulas",
-    status: "running",
-    step: 2,
-    details: [
-      { label: "Lendo edital de Pregão Eletrônico nº 014-2026", meta: "3 arquivos" },
-      { label: "Avaliando risco de inabilitação", meta: "68%" },
-    ],
-  },
-  {
-    key: "draft",
-    label: "Redigir petições",
-    amount: "2 minutas",
-    status: "sequence",
-    step: 3,
-    details: [
-      { label: "Impugnação ao edital", meta: "rascunho" },
-      { label: "Pedido de esclarecimento", meta: "rascunho" },
-    ],
-  },
-];
-
 export default function TaskRows({
   variant = "Capsules",
-  rows = TASK_ROWS,
+  rows = [],
   labels,
   className,
   onToggleRow,
@@ -189,6 +154,9 @@ export default function TaskRows({
         list ? "gap-0 self-start overflow-hidden rounded-card bg-surface shadow-card" : "min-h-[196px] gap-2"
       }${className ? ` ${className}` : ""}`}
     >
+      {rows.length === 0 && (
+        <div className="px-3 py-6 text-center text-[12.5px] text-ink-3">Nenhuma tarefa em andamento</div>
+      )}
       {rows.map((row, i) => {
         const open = manualOpen[row.key] ?? (row.key === "index" && tick === 2);
         return (

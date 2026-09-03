@@ -32,12 +32,6 @@ import { StreamText } from "@/components/atoms/StreamText";
  * tokens.
  * ───────────────────────────────────────────────────────── */
 
-const LEAD = "A contratada deverá cumprir o prazo estabelecido no edital. ";
-const PICKED =
-  "Entregar o objeto em até 30 dias corridos, contados da assinatura do contrato, sob pena de multa.";
-const REWRITE =
-  "Entregar o objeto em até 30 dias corridos, contados da assinatura do contrato, sob pena de multa diária de 0,5% sobre o valor total.";
-
 /* The passage: lead-in text, the selected `original`, and the streamed `rewrite`. */
 export type SelectionText = {
   lead: string;
@@ -67,11 +61,7 @@ export type SelectionActionsLabels = {
   placeholder: string;
 };
 
-const DEFAULT_TEXT: SelectionText = {
-  lead: LEAD,
-  original: PICKED,
-  rewrite: REWRITE,
-};
+const EMPTY_TEXT: SelectionText = { lead: "", original: "", rewrite: "" };
 
 const DEFAULT_LABELS: SelectionActionsLabels = {
   keep: "Manter",
@@ -145,7 +135,7 @@ export default function SelectionActions({
   labels,
   onAction,
 }: SelectionActionsProps = {}) {
-  const passage = { ...DEFAULT_TEXT, ...textProp };
+  const passage = { ...EMPTY_TEXT, ...textProp };
   const copy = { ...DEFAULT_LABELS, ...labels };
   const [shown, setShown] = useState(false);
   const [mode, setMode] = useState<Mode>("idle");

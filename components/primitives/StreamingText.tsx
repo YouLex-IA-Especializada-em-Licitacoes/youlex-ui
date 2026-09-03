@@ -11,41 +11,12 @@ import { useEffect, useState } from "react";
 const WORD_MS = 55;
 const HOLD_MS = 3400;
 
-/* one streamed word, or a `cite` placeholder that renders an inline source chip */
+/* one streamed word, or a `cite` placeholder that renders an inline source chip
+ * for the next unused entry in `sources`, in order */
 export type StreamingToken = { text: string; cite?: boolean };
-
-const TOKENS: StreamingToken[] = [
-  ..."O julgamento por lotes neste edital só se sustenta se a divisão do objeto em itens for tecnicamente inviável — do contrário, restringe indevidamente a competitividade."
-    .split(" ")
-    .map((text) => ({ text })),
-  { text: "", cite: true },
-  ..."O TCU já pacificou esse entendimento em precedentes recentes."
-    .split(" ")
-    .map((text) => ({ text })),
-];
-
-const FOLLOW_UPS = [
-  "Quais os prazos recursais aplicáveis a este edital",
-  "Comparar este julgado com o Acórdão 2.622/2015",
-];
-
-const SOURCE_IMAGES = {
-  scoop:
-    "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%231f7a5f'/%3E%3Cpath d='M20 36c0 7 5.4 12 12 12s12-5 12-12H20Z' fill='%23fff'/%3E%3Ccircle cx='32' cy='25' r='11' fill='%23bff3dd'/%3E%3Cpath d='M24 24c4-7 13-7 17 0' fill='none' stroke='%231f7a5f' stroke-width='4' stroke-linecap='round'/%3E%3C/svg%3E",
-  trends:
-    "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%232f6fec'/%3E%3Cpath d='M15 43 27 31l8 7 14-18' fill='none' stroke='%23fff' stroke-width='7' stroke-linecap='round' stroke-linejoin='round'/%3E%3Ccircle cx='49' cy='20' r='5' fill='%23bfe0ff'/%3E%3C/svg%3E",
-  market:
-    "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%23e56d24'/%3E%3Cpath d='M17 45V25h8v20h-8Zm11 0V16h8v29h-8Zm11 0V30h8v15h-8Z' fill='%23fff'/%3E%3Cpath d='M16 49h32' stroke='%23ffd6b8' stroke-width='4' stroke-linecap='round'/%3E%3C/svg%3E",
-};
 
 /* one cited source rendered as an inline chip and in the sources list */
 export type StreamingSource = { name: string; domain: string; href: string; image: string };
-
-const SOURCES: StreamingSource[] = [
-  { name: "Jurisprudência TCU", domain: "tcu.gov.br", href: "https://portal.tcu.gov.br/jurisprudencia/", image: SOURCE_IMAGES.scoop },
-  { name: "Lei 14.133/2021", domain: "planalto.gov.br", href: "https://www.planalto.gov.br/ccivil_03/_ato2019-2022/2021/lei/l14133.htm", image: SOURCE_IMAGES.trends },
-  { name: "ComprasNet", domain: "comprasnet.gov.br", href: "https://www.gov.br/compras/pt-br", image: SOURCE_IMAGES.market },
-];
 
 function sourceImage(source: StreamingSource) {
   return source.image;
@@ -88,10 +59,32 @@ const DEFAULT_LABELS: StreamingLabels = {
   followUps: "Perguntas relacionadas",
 };
 
+/** Pure render of the revealed tokens — `cite` tokens consume `sources` in
+ * order (iteration, not a fixed `sources[0]`), so it's testable in isolation. */
+export function StreamTokens({ tokens, sources }: { tokens: StreamingToken[]; sources: StreamingSource[] }) {
+  /* the Nth cite token maps to the Nth source — computed without mutating
+   * a counter inside the render map (react-hooks/immutability) */
+  let seen = 0;
+  const citeIndexes = tokens.map((token) => (token.cite ? seen++ : -1));
+  return (
+    <>
+      {tokens.map((token, i) =>
+        token.cite ? (
+          <SourceChip key={i} source={sources[citeIndexes[i]]} />
+        ) : (
+          <span key={i} className="inline">
+            {token.text}{" "}
+          </span>
+        ),
+      )}
+    </>
+  );
+}
+
 export default function StreamingText({
-  content = TOKENS,
-  sources = SOURCES,
-  followUps = FOLLOW_UPS,
+  content = [],
+  sources = [],
+  followUps = [],
   labels,
   loop = true,
   fill = false,
@@ -136,15 +129,7 @@ export default function StreamingText({
   return (
     <div className={fill ? "w-full" : "min-h-[15.5rem] w-full max-w-95"}>
       <p className="text-[13px] leading-relaxed text-ink">
-        {content.slice(0, count).map((token, i) =>
-          token.cite ? (
-            <SourceChip key={i} source={sources[0]} />
-          ) : (
-            <span key={i} className="inline">
-              {token.text}{" "}
-            </span>
-          ),
-        )}
+        <StreamTokens tokens={content.slice(0, count)} sources={sources} />
         {!done && (
           <span
             className="ml-0.5 inline-block h-3 w-0.5 translate-y-0.5 rounded-full bg-ink"

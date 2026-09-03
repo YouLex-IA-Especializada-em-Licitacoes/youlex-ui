@@ -37,17 +37,6 @@ export type SidebarRecent = {
   prompt?: string;
 };
 
-const DEFAULT_RECENTS: SidebarRecent[] = [
-  { id: "editais", label: "Editais em análise" },
-  { id: "urgentes", label: "Pendências urgentes de hoje" },
-  { id: "ticket", label: "Chamado sobre edital nº 042/2026" },
-  { id: "resumo", label: "Resumo da carga de trabalho" },
-  { id: "encerrar", label: "Encerrar acompanhamento de licitação" },
-  { id: "protocolo", label: "Protocolar recursos em lote" },
-  { id: "recurso", label: "Propor minuta de recurso" },
-  { id: "prazos", label: "Prazos da semana" },
-];
-
 type SidebarNavProps = {
   activeTitle?: string | null;
   className?: string;
@@ -211,7 +200,7 @@ export default function SidebarNav({
   footerLabel = "Fazer upgrade",
   footerIcon,
   onFooterClick,
-  recents = DEFAULT_RECENTS,
+  recents = [],
 }: SidebarNavProps) {
   const [collapsed, setCollapsed] = useState(false);
   const [internalNav, setInternalNav] = useState("chats");
@@ -430,6 +419,9 @@ export default function SidebarNav({
             })}
             {query && visibleRecents.length === 0 && (
               <div className="sidebar-copy mx-2 px-2 py-2 text-[12.5px] text-ink-3">No chats found</div>
+            )}
+            {!query && recents.length === 0 && (
+              <div className="sidebar-copy mx-2 px-2 py-2 text-[12.5px] text-ink-3">Nenhuma conversa recente</div>
             )}
           </GlideGroup>
         </div>

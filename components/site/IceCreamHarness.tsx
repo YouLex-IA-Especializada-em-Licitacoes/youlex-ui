@@ -3,20 +3,22 @@
 import { useEffect, useRef, useState, type CSSProperties, type ReactNode } from "react";
 import { useDialKit, type DialConfig } from "dialkit";
 import posthog from "posthog-js";
-import ApprovalCard from "@/components/primitives/ApprovalCard";
-import ContextCards from "@/components/primitives/ContextCards";
-import DiffTable from "@/components/primitives/DiffTable";
-import InsightCards from "@/components/primitives/InsightCards";
 import LoadingState from "@/components/primitives/LoadingState";
 import PromptBar from "@/components/primitives/PromptBar";
-import RecommendationCard from "@/components/primitives/RecommendationCard";
-import RecordsTable from "@/components/primitives/RecordsTable";
-import SelectionActions from "@/components/primitives/SelectionActions";
 import SidebarNav from "@/components/primitives/SidebarNav";
-import StreamingText from "@/components/primitives/StreamingText";
-import TaskRows from "@/components/primitives/TaskRows";
-import ThinkingState from "@/components/primitives/ThinkingState";
-import ToolChips from "@/components/primitives/ToolChips";
+import { ThinkingStateDemo as ThinkingState } from "@/components/site/demo-data";
+import {
+  ApprovalCardDemo as ApprovalCard,
+  ContextCardsDemo as ContextCards,
+  DiffTableDemo as DiffTable,
+  InsightCardsDemo as InsightCards,
+  RecommendationCardDemo as RecommendationCard,
+  RecordsTableDemo as RecordsTable,
+  SelectionActionsDemo as SelectionActions,
+  StreamingTextDemo as StreamingText,
+  TaskRowsDemo as TaskRows,
+  ToolChipsDemo as ToolChips,
+} from "@/components/site/demo-data";
 import { UseThisModal } from "@/components/site/UseThisHarness";
 
 /* ─────────────────────────────────────────────────────────

@@ -2,8 +2,6 @@
 
 import { useState } from "react";
 import { Button, type ButtonVariant } from "@/components/atoms/Button";
-import { EntityChip } from "@/components/atoms/EntityChip";
-import { ValuePill } from "@/components/atoms/ValuePill";
 
 /* ─────────────────────────────────────────────────────────
  * RECOMMENDATION CARD
@@ -37,53 +35,6 @@ const DEFAULT_LABELS: RecommendationLabels = {
   accepted: "Aceito",
 };
 
-const OPTIONS: RecommendationOption[] = [
-  {
-    key: "high",
-    body: (
-      <>
-        Participar do Pregão Eletrônico{" "}
-        <EntityChip name="042/2026 — Prefeitura de Osasco" />{" "}
-        com prazo de habilitação <ValuePill tone="green">7 dias</ValuePill>
-      </>
-    ),
-    short: "Pregão 042/2026 · prazo de 7 dias",
-    signal: 3,
-    tone: "var(--green)",
-    label: "Alta confiança",
-    cta: "Aceitar",
-    ctaVariant: "accent",
-  },
-  {
-    key: "review",
-    body: (
-      <>
-        Revisar a proposta técnica para atender ao critério <ValuePill>Melhor técnica e preço</ValuePill> antes de submeter.
-      </>
-    ),
-    short: "Revisar proposta técnica",
-    signal: 2,
-    tone: "var(--orange)",
-    label: "Precisa de revisão",
-    cta: "Configurar",
-    ctaVariant: "primary",
-  },
-  {
-    key: "none",
-    body: (
-      <>
-        Acompanhar <span className="font-medium text-ink">sem submeter proposta</span> por enquanto.
-      </>
-    ),
-    short: "Acompanhar sem submeter proposta",
-    signal: 0,
-    tone: "var(--ink-3)",
-    label: "Sem sinal suficiente",
-    cta: "Acompanhar mesmo assim",
-    ctaVariant: "primary",
-  },
-];
-
 function Meter({ signal, tone }: { signal: number; tone: string }) {
   return (
     <span className="flex items-end gap-0.5">
@@ -99,7 +50,7 @@ function Meter({ signal, tone }: { signal: number; tone: string }) {
 }
 
 export default function RecommendationCard({
-  options = OPTIONS,
+  options = [],
   labels,
 }: {
   options?: RecommendationOption[];
@@ -113,6 +64,15 @@ export default function RecommendationCard({
 
   const active = options[selected];
   const others = options.map((o, i) => ({ o, i })).filter(({ i }) => i !== selected);
+
+  if (!active) {
+    return (
+      <div className="flex w-full max-w-95 flex-col items-center gap-1.5 rounded-card bg-surface px-3.5 py-6 text-center shadow-card">
+        <span className="text-[13px] font-medium text-ink">Nenhuma recomendação ainda</span>
+        <span className="max-w-64 text-[12px] leading-relaxed text-ink-3">A recomendação aparece aqui quando o agente avalia opções.</span>
+      </div>
+    );
+  }
 
   return (
     <div className="w-full max-w-95 overflow-hidden rounded-card bg-surface shadow-card">

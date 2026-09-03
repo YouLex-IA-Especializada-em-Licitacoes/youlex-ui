@@ -19,24 +19,6 @@ export type ApprovalQuestion = {
   options: string[];
 };
 
-const QUESTIONS: ApprovalQuestion[] = [
-  {
-    q: "Deseja que eu prossiga com a impugnação ao edital?",
-    type: "radio",
-    options: ["Sim, protocolar impugnação", "Não, apenas registrar ressalva em ata", "Aguardar orientação do cliente"],
-  },
-  {
-    q: "Quais anexos devo incluir na petição de recurso?",
-    type: "check",
-    options: ["Ata da sessão de julgamento", "Parecer técnico da área de engenharia", "Jurisprudência do TCU citada"],
-  },
-  {
-    q: "Em qual processo devo aplicar esta minuta de contrato?",
-    type: "radio",
-    options: ["Pregão Eletrônico nº 014-2026", "Concorrência nº 002-2026", "Dispensa de Licitação nº 031-2026"],
-  },
-];
-
 export type ApprovalLabels = {
   skip: string;
   continue: string;
@@ -140,7 +122,7 @@ function Ico({ path, size = 14, sw = 2 }: { path: React.ReactNode; size?: number
 }
 
 export default function ApprovalCard({
-  questions = QUESTIONS,
+  questions = [],
   labels,
   onSubmitted,
   onAnswerChange,
@@ -246,6 +228,15 @@ export default function ApprovalCard({
     setOpen(true);
     measured.current = false;
   };
+
+  if (questions.length === 0) {
+    return (
+      <div className="flex w-full max-w-80 flex-col items-center gap-1.5 rounded-card bg-surface px-3.5 py-6 text-center shadow-card">
+        <span className="text-[13px] font-medium text-ink">Nenhuma pergunta pendente</span>
+        <span className="max-w-64 text-[12px] leading-relaxed text-ink-3">As perguntas de aprovação aparecem aqui quando o agente precisa de uma decisão sua.</span>
+      </div>
+    );
+  }
 
   if (!open) {
     return (

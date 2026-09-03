@@ -15,6 +15,9 @@ type Strength = "strong" | "weak" | "veryweak" | "none";
 type SortKey = "name" | "last" | "strength";
 type ColumnKey = "company" | "categories" | "last" | "strength" | "links" | "ai";
 
+/* thead order for the columns measured from the DOM — must match the <th> markup order */
+const MEASURED_COLUMN_ORDER: ColumnKey[] = ["company", "categories", "last", "strength", "links"];
+
 const DEFAULT_COLUMN_WIDTHS: Record<ColumnKey, number> = {
   company: 270,
   categories: 275,
@@ -128,7 +131,10 @@ function slugify(value: string): string {
 
 const ROW_COUNT = 300;
 
-const INITIAL_ROWS: RecordRow[] = Array.from({ length: ROW_COUNT }, (_, i) => {
+/* Exported (not a prop default) for the same reason as InsightCards' DEMO_PAGES:
+ * it composes the unexported slugify()/pools above — the gallery passes it in
+ * explicitly as `rows`, per YLX-287 §4.1. */
+export const DEMO_ROWS: RecordRow[] = Array.from({ length: ROW_COUNT }, (_, i) => {
   const orgao = ORGAOS[i % ORGAOS.length];
   const [modalidade, modalidadeTags] = MODALIDADES[i % MODALIDADES.length];
   const objeto = OBJETOS[i % OBJETOS.length];
@@ -443,7 +449,7 @@ function InputPicker({
   );
 }
 
-export default function RecordsTable({ rows = INITIAL_ROWS, fill = false }: { rows?: RecordRow[]; fill?: boolean; variant?: string }) {
+export default function RecordsTable({ rows = [], fill = false }: { rows?: RecordRow[]; fill?: boolean; variant?: string }) {
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [sort, setSort] = useState<{ key: SortKey; dir: 1 | -1 }>({ key: "name", dir: 1 });
   const [columnWidths, setColumnWidths] = useState(DEFAULT_COLUMN_WIDTHS);
@@ -484,14 +490,12 @@ export default function RecordsTable({ rows = INITIAL_ROWS, fill = false }: { ro
     const headers = Array.from(tableRef.current.querySelectorAll<HTMLTableCellElement>("thead th"));
     if (headers.length < 6) return;
 
-    const measured: Record<ColumnKey, number> = {
-      company: headers[0].getBoundingClientRect().width,
-      categories: headers[1].getBoundingClientRect().width,
-      last: headers[2].getBoundingClientRect().width,
-      strength: headers[3].getBoundingClientRect().width,
-      links: headers[4].getBoundingClientRect().width,
+    const measured = {
+      ...Object.fromEntries(
+        MEASURED_COLUMN_ORDER.map((key, i) => [key, headers[i].getBoundingClientRect().width]),
+      ),
       ai: DEFAULT_COLUMN_WIDTHS.ai,
-    };
+    } as Record<ColumnKey, number>;
     initialColumnWidthsRef.current = measured;
     setColumnWidths(measured);
     setActionColumnWidth(headers[headers.length - 1].getBoundingClientRect().width);
@@ -717,6 +721,9 @@ export default function RecordsTable({ rows = INITIAL_ROWS, fill = false }: { ro
           </thead>
           {/* data cells stay silent — the papery link/flick sound is too much when scanning rows */}
           <tbody data-sound-silent>
+            {visibleRows.length === 0 && (
+              <tr><td colSpan={6} className="records-cell records-muted">Nenhum registro ainda</td></tr>
+            )}
             {visibleRows.map((row, index) => {
               const selectedRow = selected.has(row.id);
               const strength = STRENGTH[row.strength];
@@ -745,7 +752,7 @@ export default function RecordsTable({ rows = INITIAL_ROWS, fill = false }: { ro
               </td>
               <td className="records-cell records-muted"><span className="records-footer-value">—</span></td>
               <td className="records-cell">
-                <span className="records-footer-value records-average"><span className="records-strength-dot" style={{ background: "var(--orange)" }} />{Math.round(rows.reduce((sum, row) => sum + STRENGTH[row.strength].rank, 0) / rows.length / 3 * 100)}% average</span>
+                <span className="records-footer-value records-average"><span className="records-strength-dot" style={{ background: "var(--orange)" }} />{rows.length === 0 ? 0 : Math.round(rows.reduce((sum, row) => sum + STRENGTH[row.strength].rank, 0) / rows.length / 3 * 100)}% average</span>
               </td>
               <td className="records-cell"><span className="records-footer-value records-muted">{rows.filter((row) => row.website).length} links</span></td>
               {aiAdded && <td className="records-cell records-muted"><span className="records-footer-value">{aiDone ? `${rows.length} filled` : "—"}</span></td>}

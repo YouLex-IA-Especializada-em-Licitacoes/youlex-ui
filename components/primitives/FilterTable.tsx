@@ -22,14 +22,6 @@ const FILTERS: { key: "all" | Status; label: string; dot?: string; count: number
   { key: "done", label: "Concluída", dot: "var(--green)", count: 1 },
 ];
 
-const ROWS: TableRow[] = [
-  { task: "Conferir edital nº 042/2026 — Pregão Eletrônico", date: "03 dez", status: "todo", owner: "Prefeitura de Osasco" },
-  { task: "Elaborar impugnação de edital", date: "22 set", status: "progress", owner: "Secretaria de Saúde SP" },
-  { task: "Cadastrar proposta no ComprasNet", date: "02 jan", status: "todo", owner: "Governo do Estado do RJ" },
-  { task: "Revisar minuta de contrato administrativo", date: "08 nov", status: "progress", owner: "Câmara Municipal de Campinas" },
-  { task: "Protocolar recurso administrativo", date: "14 abr", status: "done", owner: "Ministério da Infraestrutura" },
-];
-
 const LABELS: FilterTableLabels = {
   columns: { task: "Licitação", date: "Prazo", status: "Status", owner: "Órgão" },
 };
@@ -41,7 +33,7 @@ const PILLS: Record<Status, { label: string; cls: string }> = {
 };
 
 export default function FilterTable({
-  rows = ROWS,
+  rows = [],
   labels = LABELS,
 }: {
   rows?: TableRow[];
@@ -97,6 +89,9 @@ export default function FilterTable({
             <span className="border-r border-[var(--grid-line)] px-3 py-2">{labels.columns.status}</span>
             <span className="px-3 py-2">{labels.columns.owner}</span>
           </div>
+          {rows.length === 0 && (
+            <div className="px-3 py-6 text-center text-[12.5px] text-ink-3">Nenhuma tarefa ainda</div>
+          )}
           {rows.map((row) => {
             const shown = filter === "all" || row.status === filter;
             const pill = PILLS[row.status];

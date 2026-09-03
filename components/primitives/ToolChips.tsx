@@ -45,69 +45,11 @@ const DEFAULT_LABELS: ToolChipsLabels = {
   more: "+2 mais",
 };
 
-const ROWS: ToolStep[] = [
-  {
-    icon: "think", label: "Pensando", chip: "Planejando a estratégia recursal…", mono: false, detailMono: false,
-    detail: [
-      { text: "O prazo recursal de 3 dias úteis conta a partir da intimação em ata." },
-      { text: "Há dois fundamentos: preço inexequível e restrição indevida de competitividade." },
-    ],
-  },
-  {
-    icon: "write", label: "Escrever 204 linhas", chip: "minuta_recurso.docx", mono: true, detailMono: true,
-    detail: [
-      { text: "+ Fundamento: art. 59, Lei 14.133/2021 — julgamento por lotes", tone: "add" },
-      { text: "+ Pedido: reabertura do prazo para nova diligência", tone: "add" },
-    ],
-  },
-  {
-    icon: "run", label: "Revisar e protocolar", chip: "protocolar_peticao.sh", mono: true, detailMono: true,
-    detail: [
-      { text: "✓ formatação da petição validada" },
-      { text: "✓ 34 verificações concluídas" },
-    ],
-  },
-  {
-    icon: "read", label: "Ler imagem", chip: "grafico-prazos.png", mono: true, detailMono: false,
-    detail: [
-      { text: "1280 × 720 · gráfico de linha, três exercícios." },
-      { text: "Prazo médio de julgamento sobe 12% até julho." },
-    ],
-  },
-];
-
-const DIFFS: ToolDiff[] = [
-  { file: "clausulas.css", add: 13, del: 0 },
-  { file: "minuta_recurso.docx", add: 74, del: 41 },
-  { file: "sumario.ts", add: 8, del: 2 },
-];
-
-/* hovering a file chip opens its diff — green added, red removed */
-const DIFF_LINES: Record<string, ToolDiffLine[]> = {
-  "clausulas.css": [
-    { text: ".clausula-card {", tone: "ctx" },
-    { text: "  gap: 14px;", tone: "del" },
-    { text: "  gap: 12px;", tone: "add" },
-    { text: "  container-type: inline-size;", tone: "add" },
-    { text: "}", tone: "ctx" },
-  ],
-  "minuta_recurso.docx": [
-    { text: "const fundamentos = art59(edital);", tone: "ctx" },
-    { text: "const pedido = fundamentos;", tone: "del" },
-    { text: "const pedido = fundamentos.filter(", tone: "add" },
-    { text: "  (f) => f.prazo <= 3,", tone: "add" },
-    { text: ");", tone: "add" },
-  ],
-  "sumario.ts": [
-    { text: "export const tese = \"preco-inexequivel\";", tone: "del" },
-    { text: "export const tese = \"restricao-competitividade\";", tone: "add" },
-  ],
-};
 
 export default function ToolChips({
-  steps = ROWS,
-  diffs = DIFFS,
-  diffLines = DIFF_LINES,
+  steps = [],
+  diffs = [],
+  diffLines = {},
   labels,
   className,
   onOpenChange,
@@ -191,6 +133,9 @@ export default function ToolChips({
             row hover pills room inside this overflow-hidden clip box */}
         <div className="-mx-1 overflow-hidden px-1.5 pb-1">
         <div className="mt-1.5 flex flex-col gap-1">
+          {steps.length === 0 && (
+            <div className="py-4 text-[12px] text-ink-3">Nenhuma chamada de ferramenta ainda</div>
+          )}
           {steps.slice(0, step).map((row) => {
             const rowOpen = openRows.has(row.label);
             return (

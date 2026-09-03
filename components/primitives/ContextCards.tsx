@@ -26,27 +26,8 @@ const DEFAULT_LABELS: ContextCardsLabels = {
   count: "32",
 };
 
-const CHUNKS: ContextChunk[] = [
-  {
-    title: "Habilitação jurídica — cláusula 7.2",
-    chars: "290 caracteres",
-    body: "A comprovação de regularidade fiscal e trabalhista deve ser verificada antes da assinatura do contrato administrativo com o licitante vencedor.",
-    source: "Edital de Pregão Eletrônico nº 014-2026.pdf",
-    badge: "PDF",
-    tone: "bg-red",
-  },
-  {
-    title: "Jurisprudência — julgamento por lotes",
-    chars: "1.250 caracteres",
-    body: "TCU, Acórdão 2.622/2015: o julgamento por lotes só se justifica quando a divisão do objeto em itens for tecnicamente inviável, sob pena de restrição à competitividade.",
-    source: "Acordao_TCU_2622-2015.csv",
-    badge: "CSV",
-    tone: "bg-green",
-  },
-];
-
 export default function ContextCards({
-  chunks = CHUNKS,
+  chunks = [],
   labels,
   className,
 }: {
@@ -76,6 +57,15 @@ export default function ContextCards({
         </span>
       </div>
 
+      {chunks.length === 0 && (
+        <div className="flex flex-col items-center gap-1.5 rounded-card bg-surface px-3.5 py-6 text-center shadow-card">
+          <span className="flex size-7 items-center justify-center rounded-full bg-inset text-ink-3">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 12h-6l-2 3h-4l-2-3H2" /><path d="M5.45 5.11 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11Z" /></svg>
+          </span>
+          <span className="text-[13px] font-medium text-ink">Nenhum trecho recuperado</span>
+          <span className="max-w-64 text-[12px] leading-relaxed text-ink-3">Os trechos aparecem aqui quando o agente recupera contexto da base.</span>
+        </div>
+      )}
       {chunks.map((chunk, i) => (
         <div
           key={chunk.title}
