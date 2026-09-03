@@ -123,7 +123,7 @@ export type CompareSeries = {
   tooltipColor: string;
 };
 
-const COMPARE_SERIES: CompareSeries[] = [
+export const DEMO_COMPARE_SERIES: CompareSeries[] = [
   {
     name: "Créditos consumidos",
     values: [-2.9, -3.4, -3.05, -3.86, -3.52, -4.1, -3.82, -4.41],
@@ -145,7 +145,7 @@ const COMPARE_SERIES: CompareSeries[] = [
 ];
 
 /* 1 — return comparison: 2 series, legend + big deltas + line chart */
-function CompareCard({ series = COMPARE_SERIES }: { series?: CompareSeries[] }) {
+export function CompareCard({ series = [] }: { series?: CompareSeries[] }) {
   const dark = useDarkMode();
   const [hoverIndex, setHoverIndex] = useState<number | null>(null);
   const points = useMemo(
@@ -230,15 +230,20 @@ function CompareCard({ series = COMPARE_SERIES }: { series?: CompareSeries[] }) 
 export type AnomalyData = {
   spend: number[];
   usage: number[];
+  /** formatted delta vs. the comparison window, e.g. "+R$ 1.834,66" — omit to hide the line */
+  deltaLabel?: string;
 };
 
-const ANOMALY_DATA: AnomalyData = {
+const EMPTY_ANOMALY: AnomalyData = { spend: [], usage: [] };
+
+export const DEMO_ANOMALY_DATA: AnomalyData = {
   spend: [274, 289, 264, 307, 331, 1210, 1718, 2112],
   usage: [18, 19, 17, 21, 22, 58, 81, 96],
+  deltaLabel: "+R$ 1.834,66",
 };
 
 /* 2 — anomaly: bars with threshold + big spent value */
-function AnomalyCard({ data: anomaly = ANOMALY_DATA }: { data?: AnomalyData }) {
+export function AnomalyCard({ data: anomaly = EMPTY_ANOMALY }: { data?: AnomalyData }) {
   const dark = useDarkMode();
   const [metric, setMetric] = useState<"spend" | "usage">("spend");
   const [hoverIndex, setHoverIndex] = useState<number | null>(null);
@@ -251,10 +256,14 @@ function AnomalyCard({ data: anomaly = ANOMALY_DATA }: { data?: AnomalyData }) {
     [anomaly],
   );
 
+  if (anomaly.spend.length === 0 && anomaly.usage.length === 0) {
+    return <div className="min-h-[278px] rounded-card bg-surface p-3 shadow-hairline" />;
+  }
+
   const data = metric === "spend" ? spend : usage;
-  const value = data.at(-1)?.value ?? (metric === "spend" ? 2112 : 96);
-  const threshold = metric === "spend" ? "R$ 2.112" : "82 consultas";
-  const moneyLabel = formatMoney(spend.at(-1)?.value ?? 2112);
+  const value = data.at(-1)?.value ?? 0;
+  const threshold = metric === "spend" ? formatMoney(value) : `${Math.round(value)} consultas`;
+  const moneyLabel = formatMoney(spend.at(-1)?.value ?? 0);
 
   return (
     <div className="min-h-[278px] rounded-card bg-surface p-3 shadow-hairline">
@@ -329,7 +338,7 @@ function AnomalyCard({ data: anomaly = ANOMALY_DATA }: { data?: AnomalyData }) {
         <span className="text-[17px] font-semibold tracking-[-0.01em] text-ink tabular-nums">
           {moneyLabel} consumidos
         </span>
-        <Mono tone="red">+R$ 1.834,66</Mono>
+        {anomaly.deltaLabel && <Mono tone="red">{anomaly.deltaLabel}</Mono>}
         <span className="text-[11px] text-ink-3">vs 3 meses</span>
       </div>
     </div>
@@ -346,16 +355,20 @@ export type AllocationSegment = {
   tone: string;
 };
 
-const ALLOCATION_SEGMENTS: AllocationSegment[] = [
+export const DEMO_ALLOCATION_SEGMENTS: AllocationSegment[] = [
   { name: "PESQ", label: "Pesquisa jurídica", pct: 72.5, amount: "R$ 51.785", cls: "bg-orange", tone: "text-orange" },
   { name: "PECA", label: "Geração de peças", pct: 22.8, amount: "R$ 16.278", cls: "bg-line-strong", tone: "text-ink-2" },
   { name: "EDIT", label: "Análise de edital", pct: 4.7, amount: "R$ 3.357", cls: "bg-line", tone: "text-ink-3" },
 ];
 
 /* 3 — allocation: hero number + segmented bar + legend */
-function AllocationCard({ segments = ALLOCATION_SEGMENTS }: { segments?: AllocationSegment[] }) {
-  const [selected, setSelected] = useState(segments[0].name);
+export function AllocationCard({ segments = [] }: { segments?: AllocationSegment[] }) {
+  const [selected, setSelected] = useState<string | null>(null);
   const active = segments.find((segment) => segment.name === selected) ?? segments[0];
+
+  if (!active) {
+    return <div className="min-h-[278px] rounded-card bg-surface p-3 shadow-hairline" />;
+  }
 
   return (
     <div className="min-h-[278px] rounded-card bg-surface p-3 shadow-hairline">
@@ -377,22 +390,22 @@ function AllocationCard({ segments = ALLOCATION_SEGMENTS }: { segments?: Allocat
           <button
             key={s.name}
             type="button"
-            aria-pressed={selected === s.name}
+            aria-pressed={active.name === s.name}
             aria-label={`${s.label}: ${s.pct}%`}
             onClick={() => setSelected(s.name)}
             className={`relative h-full overflow-hidden rounded-full ${s.cls} transition-[opacity,transform,box-shadow] duration-300 active:scale-[0.98]`}
             style={{
               width: `${s.pct}%`,
-              opacity: selected === s.name ? 1 : 0.58,
-              boxShadow: selected === s.name ? "inset 0 0 0 1px rgba(255,255,255,0.22)" : undefined,
+              opacity: active.name === s.name ? 1 : 0.58,
+              boxShadow: active.name === s.name ? "inset 0 0 0 1px rgba(255,255,255,0.22)" : undefined,
               transitionTimingFunction: EASE,
             }}
           >
             <span
               className="absolute inset-y-1 left-1 rounded-full bg-white/20 transition-[width,opacity] duration-500"
               style={{
-                width: selected === s.name ? "calc(100% - 8px)" : "0%",
-                opacity: selected === s.name ? 1 : 0,
+                width: active.name === s.name ? "calc(100% - 8px)" : "0%",
+                opacity: active.name === s.name ? 1 : 0,
                 transitionTimingFunction: EASE,
               }}
             />
@@ -404,10 +417,10 @@ function AllocationCard({ segments = ALLOCATION_SEGMENTS }: { segments?: Allocat
           <button
             key={s.name}
             type="button"
-            aria-pressed={selected === s.name}
+            aria-pressed={active.name === s.name}
             onClick={() => setSelected(s.name)}
             className={`flex items-center gap-1 rounded-full px-1.5 py-0.5 text-[11px] transition-[background-color,color,transform] duration-150 active:scale-[0.96] ${
-              selected === s.name ? "bg-field text-ink" : "text-ink-2 hover:bg-hover hover:text-ink"
+              active.name === s.name ? "bg-field text-ink" : "text-ink-2 hover:bg-hover hover:text-ink"
             }`}
           >
             <span className={`size-1.5 rounded-full ${s.cls}`} />
@@ -445,7 +458,7 @@ export const DEMO_PAGES: InsightPage[] = [
         Créditos consumidos — queda de <Mono tone="red">-6%</Mono> ou <Mono tone="red">-R$ 2.453,44</Mono>.
       </>
     ),
-    Card: CompareCard,
+    Card: () => <CompareCard series={DEMO_COMPARE_SERIES} />,
     pill: "Devo revisar o uso de créditos?",
   },
   {
@@ -453,10 +466,10 @@ export const DEMO_PAGES: InsightPage[] = [
     prose: (
       <>
         Consumo de créditos incomum em <span className="font-medium text-ink">13 dez</span> —{" "}
-        <Mono tone="red">+R$ 1.834,66</Mono> acima da sua média.
+        <Mono tone="red">{DEMO_ANOMALY_DATA.deltaLabel}</Mono> acima da sua média.
       </>
     ),
-    Card: AnomalyCard,
+    Card: () => <AnomalyCard data={DEMO_ANOMALY_DATA} />,
     pill: "Ver dicas para reduzir o consumo",
   },
   {
@@ -467,7 +480,7 @@ export const DEMO_PAGES: InsightPage[] = [
         <span className="font-medium text-ink">72,5%</span> do seu consumo.
       </>
     ),
-    Card: AllocationCard,
+    Card: () => <AllocationCard segments={DEMO_ALLOCATION_SEGMENTS} />,
     pill: "E se eu redistribuir entre categorias?",
   },
 ];
