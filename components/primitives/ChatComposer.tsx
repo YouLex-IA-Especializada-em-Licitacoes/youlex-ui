@@ -1,13 +1,11 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 
 /* ─────────────────────────────────────────────────────────
  * CHAT — interactive panel with tabs, replies, and composer.
  * The reply sequence begins only after the user sends.
  * ───────────────────────────────────────────────────────── */
-
-type Phase = "idle" | "sent" | "reply1" | "reply2" | "done";
 
 /* one scripted agent reply in the thread */
 export type ChatMessage = {
@@ -16,23 +14,6 @@ export type ChatMessage = {
   time: string;
   body: string;
 };
-
-const MESSAGES: ChatMessage[] = [
-  {
-    label: "Histórico Processual",
-    sub: "Dados do Edital",
-    time: "4s",
-    body: "Recuperei os 3 últimos julgamentos do TCU sobre julgamento por lotes para comparação.",
-  },
-  {
-    label: "Comparação",
-    sub: "Detecção de Tese",
-    time: "2s",
-    body: "A tese de restrição à competitividade tem 12% mais chance de acolhimento com picos em recursos recentes.",
-  },
-];
-
-const SUGGESTIONS = ["Editais", "Jurisprudência"];
 
 export type ChatComposerLabels = {
   /** the pre-filled prompt shown in the first user bubble */
@@ -51,24 +32,20 @@ function Section({
   sub,
   time,
   body,
-  resolving,
+  delayMs = 0,
 }: {
   label: string;
   sub: string;
   time: string;
   body: string;
-  resolving?: boolean;
+  /** purely visual stagger between replies — never gates whether a reply renders */
+  delayMs?: number;
 }) {
   return (
     <div
-      className="flex w-full flex-col gap-1.5 transition-[opacity,filter,transform] duration-400"
+      className="flex w-full flex-col gap-1.5"
       style={{
-        opacity: resolving ? 0.55 : 1,
-        filter: resolving ? "blur(0.5px)" : "blur(0)",
-        transform: resolving ? "scale(0.985)" : "scale(1)",
-        transformOrigin: "top left",
-        transitionTimingFunction: "cubic-bezier(0.23, 1, 0.32, 1)",
-        animation: "fade-up 400ms cubic-bezier(0.23,1,0.32,1) both",
+        animation: `fade-up 400ms cubic-bezier(0.23,1,0.32,1) ${delayMs}ms both`,
       }}
     >
       <div className="flex items-center gap-1 text-[12px] leading-[1.3]">
@@ -81,14 +58,33 @@ function Section({
   );
 }
 
+/** Pure iteration over `messages` — extracted so the 0/1/2/5-entry
+ * behaviour is testable without simulating the send interaction. */
+export function ChatMessageList({ messages }: { messages: ChatMessage[] }) {
+  return (
+    <>
+      {messages.map((message, i) => (
+        <Section
+          key={i}
+          label={message.label}
+          sub={message.sub}
+          time={message.time}
+          body={message.body}
+          delayMs={i * 150}
+        />
+      ))}
+    </>
+  );
+}
+
 export default function ChatComposer({
-  messages = MESSAGES,
-  suggestions = SUGGESTIONS,
+  messages = [],
+  suggestions = [],
   labels,
   onSend,
 }: {
   variant?: string;
-  /** scripted agent replies revealed in sequence after the user sends */
+  /** scripted agent replies revealed after the user sends */
   messages?: ChatMessage[];
   /** header chips (tabs) for switching context */
   suggestions?: string[];
@@ -98,22 +94,12 @@ export default function ChatComposer({
   onSend?: (text: string) => void;
 } = {}) {
   const l = { ...DEFAULT_LABELS, ...labels };
-  const [phase, setPhase] = useState<Phase>("done");
+  const [sent, setSent] = useState(false);
   const [draft, setDraft] = useState("");
   const [submitted, setSubmitted] = useState(l.initialPrompt);
   const [tab, setTab] = useState(suggestions[0] ?? "");
   const inputRef = useRef<HTMLInputElement>(null);
 
-  useEffect(() => {
-    let t: ReturnType<typeof setTimeout>;
-    if (phase === "sent") t = setTimeout(() => setPhase("reply1"), 500);
-    else if (phase === "reply1") t = setTimeout(() => setPhase("reply2"), 1400);
-    else if (phase === "reply2") t = setTimeout(() => setPhase("done"), 1200);
-    else return;
-    return () => clearTimeout(t);
-  }, [phase]);
-
-  const sent = phase !== "idle";
   const canSend = draft.trim().length > 0;
 
   const send = () => {
@@ -122,7 +108,7 @@ export default function ChatComposer({
     setSubmitted(text);
     onSend?.(text);
     setDraft("");
-    setPhase("sent");
+    setSent(true);
   };
 
   return (
@@ -180,23 +166,7 @@ export default function ChatComposer({
           </div>
         </div>
 
-        {messages[0] && (phase === "reply1" || phase === "reply2" || phase === "done") ? (
-          <Section
-            label={messages[0].label}
-            sub={messages[0].sub}
-            time={messages[0].time}
-            body={messages[0].body}
-          />
-        ) : null}
-        {messages[1] && (phase === "reply2" || phase === "done") ? (
-          <Section
-            label={messages[1].label}
-            sub={messages[1].sub}
-            time={messages[1].time}
-            body={messages[1].body}
-            resolving={phase === "reply2"}
-          />
-        ) : null}
+        {sent && <ChatMessageList messages={messages} />}
       </div>
 
       {/* composer */}

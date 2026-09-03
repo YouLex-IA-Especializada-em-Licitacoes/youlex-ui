@@ -25,7 +25,7 @@ function useSequence(steps: number[]) {
   return stage;
 }
 
-type Row = {
+export type ThinkingRow = {
   primary: string;
   secondary?: string;
   mono?: boolean;
@@ -34,48 +34,7 @@ type Row = {
   href?: string;
 };
 
-const VARIANTS: Record<
-  string,
-  { active: string; done: string; rows: Row[]; query?: string }
-> = {
-  Steps: {
-    active: "Pensando",
-    done: "Pensou por 4 segundos",
-    rows: [
-      { primary: "Lendo o edital" },
-      { primary: "Verificando prazos recursais" },
-      { primary: "Comparando com jurisprudência do TCU", secondary: "6 acórdãos" },
-      { primary: "Redigindo a minuta de recurso" },
-    ],
-  },
-  Reasoning: {
-    active: "Pensando",
-    done: "Pensou por 4 segundos",
-    rows: [
-      { primary: "O edital exige atestado de capacidade técnica em quantidade superior à jurisprudência do TCU admite como razoável." },
-      { primary: "Devo verificar o prazo decadencial antes de recomendar a impugnação." },
-    ],
-  },
-  Search: {
-    active: "Pesquisando na web",
-    done: "Pesquisou na web",
-    query: "acórdão TCU julgamento por lotes licitação",
-    rows: [
-      { primary: "TCU — Portal de Jurisprudência", secondary: "tcu.gov.br", href: "https://portal.tcu.gov.br/jurisprudencia/" },
-      { primary: "Planalto — Lei 14.133/2021", secondary: "planalto.gov.br", href: "https://www.planalto.gov.br/ccivil_03/_ato2019-2022/2021/lei/l14133.htm" },
-      { primary: "ComprasNet — Editais", secondary: "comprasnet.gov.br", href: "https://www.gov.br/compras/pt-br" },
-    ],
-  },
-  Coding: {
-    active: "Executando ferramentas",
-    done: "Executou 3 ferramentas",
-    rows: [
-      { primary: "Ler", secondary: "edital_pregao_014-2026.pdf", mono: true },
-      { primary: "Editar", secondary: "minuta_recurso.docx", mono: true, add: 74, del: 41 },
-      { primary: "Executar", secondary: "protocolar_peticao.sh", mono: true },
-    ],
-  },
-};
+export type ThinkingData = { active: string; done: string; rows: ThinkingRow[]; query?: string };
 
 function Dot({ tone }: { tone: string }) {
   return (
@@ -90,11 +49,22 @@ function Dot({ tone }: { tone: string }) {
 
 const TONES = ["bg-accent", "bg-orange", "bg-green"];
 
-export default function ThinkingState({ variant = "Steps", onSettled }: { variant?: string; onSettled?: () => void }) {
+const EMPTY_DATA: ThinkingData = { active: "Pensando", done: "Pensou", rows: [] };
+
+export default function ThinkingState({
+  variant = "Steps",
+  data,
+  onSettled,
+}: {
+  variant?: string;
+  /** the trace content — no default; without it the trace has nothing to show */
+  data?: ThinkingData;
+  onSettled?: () => void;
+}) {
   const stage = useSequence(STAGES);
   const [manualExpanded, setManualExpanded] = useState<boolean | null>(null);
   const [selectedTool, setSelectedTool] = useState<string | null>(null);
-  const v = VARIANTS[variant] ?? VARIANTS.Steps;
+  const v = data ?? EMPTY_DATA;
   const autoExpanded = stage >= 1 && stage < 4;
   const expanded = manualExpanded ?? autoExpanded;
   const working = stage < 3;

@@ -6,7 +6,7 @@
     {
       "name": "foundation",
       "type": "registry:style",
-      "title": "Beautiful UI foundation"
+      "title": "YouLex foundation"
     },
     {
       "name": "button",
@@ -137,6 +137,11 @@
       "name": "selection-actions",
       "type": "registry:component",
       "title": "Selection Actions"
+    },
+    {
+      "name": "citation-card",
+      "type": "registry:component",
+      "title": "Citation Card"
     }
   ]
 }

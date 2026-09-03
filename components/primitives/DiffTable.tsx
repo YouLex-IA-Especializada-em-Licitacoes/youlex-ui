@@ -30,12 +30,6 @@ export type DiffRow = {
   removed: boolean;
 };
 
-const ROWS: DiffRow[] = [
-  { key: "clausula-multa", id: "Cláusula 8ª — Multa", dept: "Penalidades", email: "v3-recurso", removed: true },
-  { key: "clausula-prazo", id: "Cláusula 4ª — Prazo de entrega", dept: "Execução", email: "v2-minuta", removed: true },
-  { key: "clausula-garantia", id: "Cláusula 6ª — Garantia contratual", dept: "Execução", email: "v3-recurso", removed: false },
-];
-
 const DOT: Record<string, string> = {
   Execução: "bg-accent",
   Penalidades: "bg-ink-3",
@@ -61,7 +55,7 @@ function IncludedMark({ included, tone }: { included: boolean; tone: "red" | "gr
 }
 
 export default function DiffTable({
-  rows = ROWS,
+  rows = [],
 }: {
   rows?: DiffRow[];
   variant?: string;
@@ -103,6 +97,11 @@ export default function DiffTable({
             </tr>
           </thead>
           <tbody>
+            {rows.length === 0 && (
+              <tr>
+                <td colSpan={3} className="px-3 py-6 text-center text-[12.5px] text-ink-3">Nenhuma alteração proposta</td>
+              </tr>
+            )}
             {rows.map((row) => {
               const out = row.removed && tinted && edits[row.key];
               const interactive = row.removed && settled && !accepted;

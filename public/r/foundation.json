@@ -2,7 +2,7 @@
   "$schema": "https://ui.shadcn.com/schema/registry-item.json",
   "name": "foundation",
   "type": "registry:style",
-  "title": "Beautiful UI foundation",
+  "title": "YouLex foundation",
   "description": "Design tokens (:root/.dark), the @theme mapping, base rules, the primitive-* spacing utilities, and shared keyframes every component needs. Then add `@import \"./beautifui/foundation.css\";` to your app's globals.css.",
   "files": [
     {

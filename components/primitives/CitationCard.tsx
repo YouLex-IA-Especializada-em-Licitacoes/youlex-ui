@@ -39,14 +39,6 @@ const DEFAULT_LABELS: CitationCardLabels = {
   openSource: "Abrir fonte",
 };
 
-const DEFAULT_CITATION: Citation = {
-  reference: "Lei nº 14.133/2021, art. 75, II",
-  source: "Planalto — legislação federal",
-  excerpt:
-    "É dispensável a licitação para contratação que envolva valores inferiores a R$ 59.906,02, no caso de obras e serviços de engenharia ou de serviços de manutenção de veículos automotores.",
-  kind: "lei",
-};
-
 const KIND_LABEL: Record<Citation["kind"], string> = {
   lei: "Lei",
   jurisprudencia: "Jurisprudência",
@@ -133,8 +125,8 @@ function ErrorBody({
 }
 
 export default function CitationCard({
-  variant = "Padrão",
-  citation = DEFAULT_CITATION,
+  variant = "Vazio",
+  citation,
   labels,
   className,
 }: {
@@ -145,7 +137,7 @@ export default function CitationCard({
 } = {}) {
   const copy = { ...DEFAULT_LABELS, ...labels };
   const [retried, setRetried] = useState(false);
-  const state = retried ? "Padrão" : variant;
+  const state = retried ? "Vazio" : citation ? variant : "Vazio";
 
   return (
     <div className={className}>
@@ -155,7 +147,7 @@ export default function CitationCard({
             <ScaleIcon />
           </span>
           <span className="text-[12.5px] font-medium text-ink-2">
-            {state === "Padrão" ? KIND_LABEL[citation.kind] : "Citação"}
+            {state === "Padrão" && citation ? KIND_LABEL[citation.kind] : "Citação"}
           </span>
         </div>
 
@@ -164,7 +156,7 @@ export default function CitationCard({
         {state === "Erro" && (
           <ErrorBody label={copy.error} retryLabel={copy.retry} onRetry={() => setRetried(true)} />
         )}
-        {state === "Padrão" && (
+        {state === "Padrão" && citation && (
           <div className="flex flex-col gap-2 px-3.5 py-3">
             <span className="text-[13px] font-semibold text-ink">{citation.reference}</span>
             <p className="text-[12.5px] leading-relaxed text-ink-2">“{citation.excerpt}”</p>

@@ -17,16 +17,6 @@ export type SearchListLabels = {
   emptyHint: string;
 };
 
-const ITEMS: SearchItem[] = [
-  "Jurisprudência sobre reequilíbrio econômico-financeiro",
-  "Buscar editais de pregão eletrônico em aberto",
-  "Comparar minutas de contrato administrativo",
-  "Rascunhar recurso administrativo",
-  "Verificar status de habilitação",
-  "Auditar prazos de impugnação",
-  "Arquivar licitações encerradas",
-];
-
 const LABELS: SearchListLabels = {
   placeholder: "Buscar jurisprudência e editais…",
   ariaLabel: "Buscar jurisprudência e editais",
@@ -35,7 +25,7 @@ const LABELS: SearchListLabels = {
 };
 
 export default function SearchList({
-  items = ITEMS,
+  items = [],
   labels = LABELS,
 }: {
   items?: SearchItem[];
@@ -46,7 +36,7 @@ export default function SearchList({
   const results = query
     ? items.filter((i) => i.toLowerCase().includes(query.toLowerCase()))
     : items.slice(0, 5);
-  const empty = query.length > 2 && results.length === 0;
+  const empty = items.length === 0 || (query.length > 2 && results.length === 0);
 
   return (
     <div className="flex min-h-[248px] w-full max-w-72 flex-col items-stretch">
